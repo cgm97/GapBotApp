@@ -1,24 +1,12 @@
 # GapBotWeb  
 
 1.1 폴더 구조  
-GapBotWeb/  
-├── public/  
-│   ├── css/  
-│   │   └── styles.css  
-│   └── images/  
-│       └── .png  
-├── views/  
-│   ├── index.html  
-│   ├── patchnote.html  
-│   └── .html  
-├── server.js  
-└── package.json  
-
-2.1 설치  
-mkdir GapBotWeb  
-cd GapBotWeb  
-npm init -y  
-npm install express  
-
-3.1 서버 Start  
-node server.js  
+GapBotApp/
+├── client/                # React 프로젝트 (프론트엔드)  
+│   ├── build/             # React 빌드 결과물  
+│   ├── src/               # React 소스 코드  
+│   └── package.json  
+├── server/                # Node.js 프로젝트 (백엔드)  
+│   ├── server.js          # Node.js 서버 코드  
+│   └── package.json  
+└── README.md              # 프로젝트 설명  
