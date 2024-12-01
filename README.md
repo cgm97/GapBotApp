@@ -1,7 +1,7 @@
 # GapBotWeb  
 
 1.1 폴더 구조  
-GapBotApp/
+GapBotApp/  
 ├── client/                # React 프로젝트 (프론트엔드)  
 │   ├── build/             # React 빌드 결과물  
 │   ├── src/               # React 소스 코드  
