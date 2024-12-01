@@ -1,38 +1,300 @@
-.App {
+/* 기본 스타일 */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+/* 광고 영역 (왼쪽과 오른쪽) */
+.advertise {
+  width: 200px;  /* 광고 영역 너비 */
+  background-color: #f0f0f0;  /* 광고 영역 배경색 */
+  padding: 20px;
   text-align: center;
+  box-sizing: border-box;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.left {
+  /* 왼쪽 광고 영역 스타일 */
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
+.right {
+  /* 오른쪽 광고 영역 스타일 */
+}
+
+/* wrapper는 콘텐츠 영역을 가운데 정렬 */
+.wrapper {
+  display: flex;  /* Flexbox 활성화 */
+  justify-content: center;  /* 콘텐츠 영역을 가운데로 정렬 */
+  padding: 10px;
+}
+
+/* 콘텐츠 영역 */
+.content {
+  flex: 1;  /* 콘텐츠 영역이 남은 공간을 모두 차지하도록 설정 */
+  background-color: #ffffff;  /* 콘텐츠 배경색 */
+  padding-left: 10px;
+  padding-right: 10px;
+  max-width: 1200px;  /* 콘텐츠의 최대 너비 설정 */
+  box-sizing: border-box;  /* 여백을 포함하여 크기 계산 */
+}
+
+/* 상단 영역 */
+.top {
+  background-image: url('./img/image.png'); /* 배경 이미지 경로 */
+  background-size: cover; /* 이미지를 요소 크기에 맞게 채움 */
+  background-position: center; /* 이미지의 중심을 기준으로 배치 */
+  background-repeat: no-repeat; /* 배경 이미지 반복 제거 */
+  color: white; /* 텍스트 색상 */
+  text-align: right;
+  display: flex; /* Flexbox 활성화 */
+  justify-content: space-between; /* 양쪽 끝으로 정렬 */
+  align-items: center; /* 세로 중앙 정렬 */
+  padding: 5px 20px;
+}
+
+/* 헤더 */
+.header {
+  background-image: url('./img/image.png'); /* 배경 이미지 경로 */
+  background-size: cover; /* 이미지를 요소 크기에 맞게 채움 */
+  background-position: center; /* 이미지의 중심을 기준으로 배치 */
+  background-repeat: no-repeat; /* 배경 이미지 반복 제거 */
+  height: 50px; /* 헤더 높이 설정 */
+  color: white; /* 텍스트 색상 */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0px 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.logo-image {
+  width: 80px; /* 로고의 너비 */
+  height: auto; /* 비율 유지 */
+  margin-right: 10px; /* 텍스트와 간격 */
+  vertical-align: middle;
+}
+
+.nav ul {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav li {
+  margin-left: 20px;
+}
+
+a {
+  text-decoration: none;
+  color: white;
+  font-weight: bold;
+  transition: color 0.3s;
+}
+
+a:hover {
+  color: #FFD700;
+}
+
+/* 검색 박스 컨테이너 */
+.search-container {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%); /* 중앙 정렬 */
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+  border-radius: 50px; /* 전체 요소에 둥근 테두리 추가 */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 전체 박스에 그림자 추가 */
+  overflow: hidden; /* 테두리 바깥 부분 숨김 */
+}
+
+/* 검색 박스 */
+.search-box {
+  padding: 8px 15px;
+  font-size: 16px;
+  border: none;
+  outline: none;
+  border-radius: 50px; /* 검색 박스 둥글게 */
+  flex: 1; /* 버튼과 검색 박스가 균등하게 공간 차지 */
+}
+
+/* 돋보기 버튼 */
+.search-icon {
+  background-color: #007bff;
+  border: none;
+  padding: 10px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.search-icon i {
+  color: white;
+  font-size: 18px;
+}
+
+/* 돋보기 버튼 호버 시 스타일 */
+.search-icon:hover {
+  background-color: #0056b3;
+}
+
+/* 메인 콘텐츠 */
+/* 기본 레이아웃 설정 */
+main {
+  padding: 20px;
+}
+
+/* 그리드 레이아웃 설정 */
+.calendar {
+  display: grid;
+  grid-template-rows: auto;
+  grid-gap: 20px; /* 항목 간의 간격 */
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-family: "Arial", sans-serif;
+}
+
+/* 캘린더 영역 (요일) */
+.calendar-days {
+  display: flex;
+  justify-content: space-between; /* 균등한 간격 */
+  padding: 10px; /* 상하좌우 패딩을 줄여 간격을 좁힘 */
+  background: #ffffff; /* 화이트 배경 */
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* 요일 개별 항목 */
+.day {
+  cursor: pointer;
+  padding: 10px 20px;
+  border: 2px solid transparent;
+  border-radius: 50px; /* pill 형태 */
+  background: #f1f3f5; /* 라이트 그레이 배경 */
+  color: #495057; /* 텍스트 색상 */
+  font-weight: bold;
+  font-size: 16px;
+  text-align: center;
+  transition: all 0.3s ease-in-out;
+}
+
+/* Hover 효과 */
+.day:hover {
+  background: #007bff; /* 호버 시 블루 배경 */
+  color: #ffffff; /* 흰 텍스트 */
+  transform: translateY(-3px); /* 위로 약간 이동 */
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2); /* 블루빛 그림자 */
+}
+
+/* 선택된 요일 */
+.day.active {
+  background: #007bff; /* 블루 배경 */
+  color: #ffffff; /* 흰 텍스트 */
+  border: 2px solid #0056b3; /* 진한 블루 테두리 */
+  box-shadow: 0 6px 12px rgba(0, 123, 255, 0.3); /* 선택된 항목에 그림자 강조 */
+  transform: translateY(0); /* 선택 시 초기 상태로 */
+}
+
+/* Content 영역 */
+.content {
+  padding: 20px;
+  border: 1px solid #dee2e6; /* 라이트 그레이 테두리 */
+  border-radius: 8px;
+  background-color: #ffffff; /* 화이트 배경 */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-size: 16px;
+  line-height: 1.6;
+  color: #495057;
+  animation: fadeIn 0.5s ease-in-out; /* 부드러운 나타남 효과 */
+}
+
+/* ad Content 영역 */
+.ad-content {
+  margin-top: 20px;
+  display: flex;
+  border: 1px solid #dee2e6; /* 라이트 그레이 테두리 */
+  border-radius: 8px;
+  background-color: #ffffff; /* 화이트 배경 */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-size: 16px;
+  line-height: 1.6;
+  animation: fadeIn 0.5s ease-in-out; /* 부드러운 나타남 효과 */
+}
+
+/* .notice가 세로로 나열되도록 */
+.notice {
+  margin-top: 20px;
+  display: flex; /* Flexbox 사용 */
+  flex-wrap: wrap; /* 세로로 감싸는 속성 */
+  gap: 10px; /* 항목 간 간격 */
+  justify-content: space-between; /* 가로 간격을 균등하게 */
+}
+
+/* 각 .content 요소 */
+.notice .content {
+  width: calc(33.33% - 10px); /* 각 .content 너비를 3등분 */
+  display: flex;
+  flex-direction: column; /* 세로로 정렬 */
+  justify-content: flex-start; /* 내용이 위에서부터 쌓이게 */
+  align-items: flex-start; /* 텍스트 좌측 정렬 */
+  border: 1px solid #ccc;
+  background-color: #f9f9f9;
+  text-align: left;
+  padding: 10px;
+}
+
+/* 제목 h4 스타일 */
+.notice .content h4 {
+  margin-bottom: 10px; /* 제목과 목록 간의 간격 */
+  font-size: 18px; /* 제목 크기 */
+  font-weight: bold; /* 제목 굵게 */
+  color: #333; /* 제목 색상 */
+  margin-top: 1px
+}
+
+/* ul 목록 스타일 */
+.notice .content ul {
+  list-style-type: none; /* 기본 목록 스타일 제거 */
+  padding-left: 0; /* 왼쪽 여백 제거 */
+  margin: 0; /* 기본 여백 제거 */
+}
+
+/* ul 항목 스타일 */
+.notice .content ul li {
+  margin-bottom: 5px; /* 항목 간 간격 */
+  font-size: 14px; /* 항목 텍스트 크기 */
+  color: #555; /* 항목 색상 */
+}
+
+/* 모바일 화면에서 100% 너비로 변경 (세로 1열로) */
+@media (max-width: 768px) {
+  .notice .content {
+    width: 100%; /* 모바일에서는 한 줄로 전체 너비 차지 */
   }
 }
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
+/* 애니메이션 효과 */
+@keyframes fadeIn {
   from {
-    transform: rotate(0deg);
+    opacity: 0;
+    transform: translateY(10px);
   }
   to {
-    transform: rotate(360deg);
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 모바일 화면 크기에서 그리드 간격 및 너비 조정 */
+@media (max-width: 768px) {
+  .calendar {
+    grid-template-columns: 1fr;  /* 모바일에서는 두 열을 하나로 배치 */
   }
 }
