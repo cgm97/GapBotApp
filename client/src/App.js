@@ -2,9 +2,10 @@ import React from "react";
 import axios from 'axios';
 import './App.css';
 import Header from './components/Header';
+import Top from './components/Top';
 import MainPages from './dom/MainPages';
 import Command from './dom/Command';
-import Top from './components/Top';
+import CalendarUI from './dom/CalendarUI';
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 
 function App() {
@@ -23,7 +24,7 @@ return (
         <Route path="/cmd" element={<Command />} />
         <Route path="/character" element={<div>전투정보실</div>} />
         <Route path="/homework" element={<div>숙제</div>} />
-        <Route path="/calendar" element={<div>일정</div>} />
+        <Route path="/calendar" element={<CalendarUI />} />
       </Routes>
     </div>
 
