@@ -7,10 +7,10 @@ GapBotApp/
 │   ├── src/               # React 소스 코드  
 │   └── public/  
 ├── server/                # Node.js 프로젝트 (백엔드)  
-│   ├── db/
-│   │   └── connection.js  # db connection
+│   ├── db/  
+│   │   └── connection.js  # db connection  
 │   ├─── server.js         # Node.js 서버 코드  
-│   └─── .env              # properties db정보
+│   └─── .env              # properties db정보  
 ├── README.md              # 프로젝트 설명  
 └── package.json           # 루트 package.json
 
