@@ -7,7 +7,10 @@ GapBotApp/
 │   ├── src/               # React 소스 코드  
 │   └── public/  
 ├── server/                # Node.js 프로젝트 (백엔드)  
-│   └─── server.js          # Node.js 서버 코드  
+│   ├── db/
+│   │   └── connection.js  # db connection
+│   ├─── server.js         # Node.js 서버 코드  
+│   └─── .env              # properties db정보
 ├── README.md              # 프로젝트 설명  
 └── package.json           # 루트 package.json
 
@@ -19,6 +22,8 @@ cd server
 npm init -y
 npm install express cors body-parser
 npm install --save-dev nodemon
+npm install mysql2
+npm install dotenv
 ```
 1-2. Nodemon 설정 (옵션)  
 package.json의 scripts 수정
