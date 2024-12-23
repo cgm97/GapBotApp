@@ -44,7 +44,8 @@ http://localhost:5000 실행
 cd client
 npx create-react-app .
 npm install react react-dom
-npm install --save @toast-ui/calendar
+npm install --save @toast-ui/calendar  
+npm install react-router-dom  
 ```
 1-2.React 실행
 ```
