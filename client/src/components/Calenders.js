@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import '../App.css'; // CSS 파일 (위에서 작성한 스타일을 참조)
+import axios from 'axios';
+import '../App.css';
 
 const Calender = () => {
   const [activeDay, setActiveDay] = useState(null);
@@ -26,14 +27,36 @@ const Calender = () => {
 
   useEffect(() => {
     const today = new Date();
-    const currentDay = today.getDay(); // 요일 인덱스
-    const currentDate = daysWithDate[currentDay]?.date; // 안전하게 접근
+    const currentDay = today.getDay();
+    const currentDate = daysWithDate[currentDay]?.date;
     if (currentDate) {
       setActiveDay(currentDate);
     } else {
       console.error("Invalid currentDate:", currentDate);
     }
   }, []);
+
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    // 세션 스토리지에서 데이터 확인
+    const storedData = sessionStorage.getItem('gameContents');
+    if (storedData) {
+      // 세션 스토리지에 데이터가 있으면 바로 사용
+      setData(JSON.parse(storedData));
+    } else {
+      // 세션 스토리지에 데이터가 없으면 API 호출
+      axios.get(process.env.REACT_APP_SERVER_URL+'/api/gameContents')
+        .then((response) => {
+          setData(response.data);  // API 응답 데이터를 상태에 저장
+          sessionStorage.setItem('gameContents', JSON.stringify(response.data)); // 로컬 스토리지에 저장
+        })
+        .catch((error) => {
+          console.error("API 호출 오류:", error);
+          setData(null);  // 에러 발생 시 null로 설정
+        });
+    }
+  }, []);  // 컴포넌트가 마운트될 때 한 번만 실행
 
   return (
     <div className="calendar">
@@ -54,6 +77,13 @@ const Calender = () => {
         <div className="content">
           <h3>{activeDay}의 내용</h3>
           <p>{content[activeDay]}</p>
+        </div>
+      )}
+
+      {data && (
+        <div className="api-data">
+          <h3>API 응답 데이터</h3>
+          <pre>{JSON.stringify(data, null, 2)}</pre>
         </div>
       )}
     </div>
