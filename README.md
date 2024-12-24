@@ -23,7 +23,8 @@ npm init -y
 npm install express cors body-parser
 npm install --save-dev nodemon
 npm install mysql2
-npm install dotenv
+npm install dotenv  
+npm install winston  
 ```
 1-2. Nodemon 설정 (옵션)  
 package.json의 scripts 수정
