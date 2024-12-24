@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const pool = require('./db/connection');
+const logger = require('./logger');  // logger.js 임포트
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -17,10 +18,11 @@ app.use(express.static(path.join(__dirname, '../client/build')));
 // API Routes
 app.get('/api/data', async (req, res) => {
   try {
+    logger.info("/api/data 요청");
     const [rows] = await pool.query('SELECT * FROM ISLAND_SCHEDULE');
     res.json(rows);
   } catch (err) {
-    console.error('오류 발생:', err);
+    logger.error('오류 발생:', err);  // 오류 로그 한 번만 찍음
     res.status(500).json({ error: 'Database query error' });
   }
 });
@@ -46,3 +48,4 @@ app.get('*', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
+
