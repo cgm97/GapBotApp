@@ -25,6 +25,7 @@ npm install --save-dev nodemon
 npm install mysql2
 npm install dotenv  
 npm install winston  
+npm install axios  
 ```
 1-2. Nodemon 설정 (옵션)  
 package.json의 scripts 수정
