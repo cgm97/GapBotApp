@@ -90,7 +90,7 @@ cron.schedule('* * * * *', async () => { // 1분마다 실행
         logger.info({
             method: '매주 WED 10:01',
             url: 'CRON',  // 요청 URL
-            message: `모험섬 데이터 불러오기 성공 ${arr}`,
+            message: `${JSON.stringify(arr, null, 2)}`,
         });
     } catch (error) {
         // 에러 로깅
