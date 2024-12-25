@@ -26,6 +26,7 @@ npm install mysql2
 npm install dotenv  
 npm install winston  
 npm install axios  
+npm install node-cron  
 ```
 1-2. Nodemon 설정 (옵션)  
 package.json의 scripts 수정
