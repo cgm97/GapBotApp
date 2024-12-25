@@ -35,44 +35,67 @@ cron.schedule('* * * * *', async () => { // 1분마다 실행
 
         var arr = [];
         data.forEach(calender => {
-            
-    //  NO INT [pk, increment, note: '일련번호']
-    // BASE_DATE VARCHAR(8) [pk, note: '기준일자']
-    // TIME_TYPE CHAR(1) [pk, note: '시간 타입 (AM:0, PM:1)']
-    // START_TIME JSON [note: '시작시간']
-    // NAME VARCHAR(100) [note: '모험섬 이름']
-    // REWARD_ITEMS JSON [note: '보상 아이템']
-    // BONUS_REWARD_TYPE VARCHAR(100) [note: '주요 아이템']
-    // IMG_URL VARCHAR(100) [note: '이미지 URL']
-    // FST_DTTI TIMESTAMP [default: `CURRENT_TIMESTAMP`, note: '최초 등록 일자']
-    // DL_YN CHAR(1) [default: 'N', note: '삭제 여부']
-            if(calender.CategoryName == '모험 섬'){
+
+            //  NO INT [pk, increment, note: '일련번호']
+            // BASE_DATE VARCHAR(8) [pk, note: '기준일자']
+            // TIME_TYPE CHAR(1) [pk, note: '시간 타입 (AM:0, PM:1)']
+            // NAME VARCHAR(100) [note: '모험섬 이름']
+            // START_TIME JSON [note: '시작시간']
+            // REWARD_ITEMS JSON [note: '보상 아이템']
+            // BONUS_REWARD_TYPE VARCHAR(100) [note: '주요 아이템']
+            // IMG_URL VARCHAR(100) [note: '이미지 URL']
+            // FST_DTTI TIMESTAMP [default: `CURRENT_TIMESTAMP`, note: '최초 등록 일자']
+            // DL_YN CHAR(1) [default: 'N', note: '삭제 여부']
+            if (calender.CategoryName == '모험 섬') {
 
                 const groupedByDate = calender.StartTimes.reduce((acc, dateTime) => {
                     const date = dateTime.split('T')[0].replace(/-/g, ''); // 날짜만 추출 (2024-12-25 -> 20241225)
                     const time = dateTime.split('T')[1]; // 시간만 추출 (예: 19:00:00)
-                
+
                     if (!acc[date]) {
                         acc[date] = { times: [] }; // 날짜 키가 없으면 초기화
                     }
-                
+
                     acc[date].times.push(time);
-                
+
                     return acc;
                 }, {});
-                
+
                 arr.push(Object.entries(groupedByDate).map(([date, { times }]) => {
                     // 첫 번째 시간
                     const firstTime = times[0];
-                
+
                     // 첫 번째 시간이 해당 날짜의 첫 시간이라면, 그 날짜의 모든 시간을 1로 설정
                     const allFirstTime = firstTime === '19:00:00'; // 19시가 첫 번째 시간인지 확인
-                
+
+                    // REWARD_ITEMS에 대표 아이템을 설정
+                    const items = calender.RewardItems.Items.map((item) => {
+                        // StartTimes가 날짜에 맞는지 확인
+                        const isItemOnTargetDate = item.StartTimes && item.StartTimes.some(time => time.includes(date));
+
+                        let category = null;
+                        if (isItemOnTargetDate) {
+                            if (item.Name.includes("골드")) {
+                                category = "골드";
+                            } else if (item.Name.includes("카드")) {
+                                category = "카드";
+                            } else if (item.Name.includes("주화")) {
+                                category = "주화";
+                            } else if (item.Name.includes("실링")) {
+                                category = "실링";
+                            }
+                        }
+
+                        return category;
+                    }).filter(Boolean); // null 값을 제거
+
                     return {
                         BASE_DATE: date, // 날짜 (모든 '-'를 제거한 값)
                         TIME_TYPE: allFirstTime ? 1 : 0, // 첫 번째 시간이 19시라면 전체 status를 1로 설정
-                        START_TIME: times, // `time` 값만 포함된 배열
                         NAME: calender.ContentsName,
+                        START_TIME: times, // `time` 값만 포함된 배열
+                        REWARD_ITEMS: calender.RewardItems.Items,
+                        BONUS_REWARD_TYPE: items,
                         IMG_URL: calender.ContentsIcon
                     };
                 }));
@@ -82,7 +105,7 @@ cron.schedule('* * * * *', async () => { // 1분마다 실행
         logger.info({
             method: '매주 WED 10:01',
             url: 'CRON',  // 요청 URL
-            message: `${JSON.stringify(arr, null, 2)}`,
+            message: `${JSON.stringify(arr, null, 2)} 모험섬 데이터 가공 종료`,
         });
     } catch (error) {
         // 에러 로깅
