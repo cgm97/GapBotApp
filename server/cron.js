@@ -63,23 +63,15 @@ cron.schedule('* * * * *', async () => { // 1분마다 실행
                 
                 arr.push(Object.entries(groupedByDate).map(([date, { times }]) => {
                     // 첫 번째 시간
-                    const firstTime = times[0]; 
+                    const firstTime = times[0];
                 
                     // 첫 번째 시간이 해당 날짜의 첫 시간이라면, 그 날짜의 모든 시간을 1로 설정
-                    const allFirstTime = firstTime === '19:00:00'; // 19시가 첫 번째 시간인지 확인 (주말 오후파트인지 체크)
-                
-                    // 시간 배열을 돌면서 첫 번째 시간은 1, 나머지 시간은 0
-                    const timesWithStatus = times.map((time) => {
-                        return {
-                            time,
-                            status: (allFirstTime || time === firstTime) ? 1 : 0 // 첫 번째 시간은 1, 나머지는 0
-                        };
-                    });
+                    const allFirstTime = firstTime === '19:00:00'; // 19시가 첫 번째 시간인지 확인
                 
                     return {
                         BASE_DATE: date, // 날짜 (모든 '-'를 제거한 값)
                         TIME_TYPE: allFirstTime ? 1 : 0, // 첫 번째 시간이 19시라면 전체 status를 1로 설정
-                        START_TIME: timesWithStatus.map(({ time }) => ({ time })), // 시간 배열만 남기고 `status` 제외
+                        START_TIME: times, // `time` 값만 포함된 배열
                         NAME: calender.ContentsName,
                         IMG_URL: calender.ContentsIcon
                     };
