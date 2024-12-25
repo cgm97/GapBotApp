@@ -68,8 +68,12 @@ cron.schedule('* * * * *', async () => { // 1분마다 실행
                     // 첫 번째 시간이 해당 날짜의 첫 시간이라면, 그 날짜의 모든 시간을 1로 설정
                     const allFirstTime = firstTime === '19:00:00'; // 19시가 첫 번째 시간인지 확인
 
+                    // calender.RewardItems.Items가 존재하는지 확인하고, 없으면 빈 배열로 처리
+                    const rewardItems = calender.RewardItems && calender.RewardItems.Items ? calender.RewardItems.Items : [];
+
+
                     // REWARD_ITEMS에 대표 아이템을 설정
-                    const items = calender.RewardItems.Items.map((item) => {
+                    const items = rewardItems.map((item) => {
                         // StartTimes가 날짜에 맞는지 확인
                         const isItemOnTargetDate = item.StartTimes && item.StartTimes.some(time => time.includes(date));
 
@@ -94,7 +98,7 @@ cron.schedule('* * * * *', async () => { // 1분마다 실행
                         TIME_TYPE: allFirstTime ? 1 : 0, // 첫 번째 시간이 19시라면 전체 status를 1로 설정
                         NAME: calender.ContentsName,
                         START_TIME: times, // `time` 값만 포함된 배열
-                        REWARD_ITEMS: calender.RewardItems.Items,
+                        REWARD_ITEMS: rewardItems,
                         BONUS_REWARD_TYPE: items,
                         IMG_URL: calender.ContentsIcon
                     };
