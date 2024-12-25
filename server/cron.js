@@ -34,7 +34,7 @@ cron.schedule('* * * * *', async () => { // 1분마다 실행
         });
 
         var arr = [];
-        data.array.forEach(calender => {
+        data.forEach(calender => {
             
             if(calender.CategoryName == '모험 섬'){
                 arr.push(calender.ContentsName);
