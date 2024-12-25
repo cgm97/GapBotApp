@@ -36,8 +36,54 @@ cron.schedule('* * * * *', async () => { // 1분마다 실행
         var arr = [];
         data.forEach(calender => {
             
+    //  NO INT [pk, increment, note: '일련번호']
+    // BASE_DATE VARCHAR(8) [pk, note: '기준일자']
+    // TIME_TYPE CHAR(1) [pk, note: '시간 타입 (AM:0, PM:1)']
+    // START_TIME JSON [note: '시작시간']
+    // NAME VARCHAR(100) [note: '모험섬 이름']
+    // REWARD_ITEMS JSON [note: '보상 아이템']
+    // BONUS_REWARD_TYPE VARCHAR(100) [note: '주요 아이템']
+    // IMG_URL VARCHAR(100) [note: '이미지 URL']
+    // FST_DTTI TIMESTAMP [default: `CURRENT_TIMESTAMP`, note: '최초 등록 일자']
+    // DL_YN CHAR(1) [default: 'N', note: '삭제 여부']
             if(calender.CategoryName == '모험 섬'){
-                arr.push(calender.ContentsName);
+
+                const groupedByDate = calender.StartTimes.reduce((acc, dateTime) => {
+                    const date = dateTime.split('T')[0].replace(/-/g, ''); // 날짜만 추출 (2024-12-25 -> 20241225)
+                    const time = dateTime.split('T')[1]; // 시간만 추출 (예: 19:00:00)
+                
+                    if (!acc[date]) {
+                        acc[date] = { times: [] }; // 날짜 키가 없으면 초기화
+                    }
+                
+                    acc[date].times.push(time);
+                
+                    return acc;
+                }, {});
+                
+                arr.push(Object.entries(groupedByDate).map(([date, { times }]) => {
+                    // 첫 번째 시간
+                    const firstTime = times[0]; 
+                
+                    // 첫 번째 시간이 해당 날짜의 첫 시간이라면, 그 날짜의 모든 시간을 1로 설정
+                    const allFirstTime = firstTime === '19:00:00'; // 19시가 첫 번째 시간인지 확인 (주말 오후파트인지 체크)
+                
+                    // 시간 배열을 돌면서 첫 번째 시간은 1, 나머지 시간은 0
+                    const timesWithStatus = times.map((time) => {
+                        return {
+                            time,
+                            status: (allFirstTime || time === firstTime) ? 1 : 0 // 첫 번째 시간은 1, 나머지는 0
+                        };
+                    });
+                
+                    return {
+                        BASE_DATE: date, // 날짜 (모든 '-'를 제거한 값)
+                        TIME_TYPE: allFirstTime ? 1 : 0, // 첫 번째 시간이 19시라면 전체 status를 1로 설정
+                        START_TIME: timesWithStatus.map(({ time }) => ({ time })), // 시간 배열만 남기고 `status` 제외
+                        NAME: calender.ContentsName,
+                        IMG_URL: calender.ContentsIcon
+                    };
+                }));
             }
         });
 
