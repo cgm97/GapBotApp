@@ -3,6 +3,7 @@ const cors = require('cors');
 const path = require('path');
 const logger = require('./logger');  // logger.js 임포트
 const lostarkAPI = require('./routes/api'); // 라우트 등록
+const cron = require('./cron'); // cron.js를 불러옵니다
 require('dotenv').config();
 
 const app = express();
@@ -24,16 +25,15 @@ app.use((req, res, next) => {
   next();  // 다음 미들웨어로 전달
 });
 
-// React 정적 파일 제공
-app.use(express.static(path.join(__dirname, '../client/build')));
-
 // 로스트아크 API 사용
 app.use('/api', lostarkAPI);
 
+// React 정적 파일 제공
+// app.use(express.static(path.join(__dirname, '../client/build')));
 // React의 index.html로 fallback
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
-});
+// app.get('*', (req, res) => {
+//   res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
+// });
 
 // 후처리 미들웨어 (에러 처리 및 로깅)
 app.use((err, req, res, next) => {
