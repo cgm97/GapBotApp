@@ -73,25 +73,53 @@ cron.schedule('* * * * *', async () => { // 1분마다 실행
 
 
                     // REWARD_ITEMS에 대표 아이템을 설정
-                    const items = rewardItems.map((item) => {
-                        // StartTimes가 날짜에 맞는지 확인
-                        const isItemOnTargetDate = item.StartTimes && item.StartTimes.some(time => time.includes(date));
+                    // const items = rewardItems.map((item) => {
+                    //     // StartTimes가 날짜에 맞는지 확인
+                    //     const isItemOnTargetDate = item.StartTimes && item.StartTimes.some(time => time.includes(date));
 
-                        let category = null;
-                        if (isItemOnTargetDate) {
-                            if (item.Name.includes("골드")) {
-                                category = "골드";
-                            } else if (item.Name.includes("카드")) {
-                                category = "카드";
-                            } else if (item.Name.includes("주화")) {
-                                category = "주화";
-                            } else if (item.Name.includes("실링")) {
-                                category = "실링";
-                            }
+                    //     let category = null;
+                    //     if (isItemOnTargetDate) {
+                    //         if (item.Name.includes("골드")) {
+                    //             category = "골드";
+                    //         } else if (item.Name.includes("카드")) {
+                    //             category = "카드";
+                    //         } else if (item.Name.includes("주화")) {
+                    //             category = "주화";
+                    //         } else if (item.Name.includes("실링")) {
+                    //             category = "실링";
+                    //         }
+                    //     }
+
+                    //     return category;
+                    // }).filter(Boolean); // null 값을 제거
+
+                    // RewardItems 배열 순회
+                    let rewardItemsString = '';
+
+                    calender.RewardItems.forEach(reward => {
+                        // Items 배열이 존재하는지 확인
+                        if (reward.Items && Array.isArray(reward.Items)) {
+                            // Items 배열에서 "실링" 또는 "카드" 포함된 아이템 찾기
+                            reward.Items.forEach(item => {
+                                const startDate = startTime.split('T')[0].replace(/-/g, ''); // startTime에서 날짜 부분만 추출
+                                const isItemOnTargetDate = startDate === date; // 날짜 비교
+                                
+                                if (isItemOnTargetDate) {
+                                    if (isItemOnTargetDate) {
+                                        if (item.Name.includes("골드")) {
+                                            category = "골드";
+                                        } else if (item.Name.includes("카드")) {
+                                            category = "카드";
+                                        } else if (item.Name.includes("주화")) {
+                                            category = "주화";
+                                        } else if (item.Name.includes("실링")) {
+                                            category = "실링";
+                                        }
+                                    }
+                                }
+                            });
                         }
-
-                        return category;
-                    }).filter(Boolean); // null 값을 제거
+                    });
 
                     return {
                         BASE_DATE: date, // 날짜 (모든 '-'를 제거한 값)
