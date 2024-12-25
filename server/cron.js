@@ -24,14 +24,17 @@ cron.schedule('* * * * *', async () => { // 1분마다 실행
             },
         });
 
+        // response.data를 사용
+        const data = response.data;
+
         logger.info({
             method: '매주 WED 10:01',
             url: 'CRON',  // 요청 URL
-            message: `모험섬 데이터 불러오기 성공 ${response.length} 건`,
+            message: `모험섬 데이터 불러오기 성공 ${data.length} 건`,
         });
 
         var arr = [];
-        response.array.forEach(calender => {
+        data.array.forEach(calender => {
             
             if(calender.CategoryName == '모험 섬'){
                 arr.push(calender.ContentsName);
