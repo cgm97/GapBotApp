@@ -24,13 +24,25 @@ cron.schedule('* * * * *', async () => { // 1분마다 실행
             },
         });
 
-        // 성공적인 응답 처리
         logger.info({
             method: '매주 WED 10:01',
             url: 'CRON',  // 요청 URL
-            message: '모험섬 저장 완료',
+            message: `모험섬 데이터 불러오기 성공 ${response.length} 건`,
         });
 
+        var arr = [];
+        response.array.forEach(calender => {
+            
+            if(calender.CategoryName == '모험 섬'){
+                arr.push(calender.ContentsName);
+            }
+        });
+
+        logger.info({
+            method: '매주 WED 10:01',
+            url: 'CRON',  // 요청 URL
+            message: `모험섬 데이터 불러오기 성공 ${arr}`,
+        });
     } catch (error) {
         // 에러 로깅
         logger.error({
