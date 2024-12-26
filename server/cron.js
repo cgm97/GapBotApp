@@ -153,6 +153,7 @@ cron.schedule('* * * * *', async () => { // 1분마다 실행
                 throw new Error("유효하지 않은 데이터가 포함되어 있습니다.1"); // 유효성 검사
             }
             if (!island.BASE_DATE) {
+                console.log(JSON.stringify(island));
                 throw new Error("유효하지 않은 데이터가 포함되어 있습니다.2"); // 유효성 검사
             }
             if (!island.TIME_TYPE) {
