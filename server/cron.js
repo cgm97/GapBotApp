@@ -23,7 +23,7 @@ cron.schedule('* * * * *', async () => { // 1분마다 실행
                         BASE_DATE,
                         TIME_TYPE,
                         NAME,
-                        START,
+                        START_TIME,
                         REWARD_ITEMS,
                         BONUS_REWARD_TYPE,
                         IMG_URL
