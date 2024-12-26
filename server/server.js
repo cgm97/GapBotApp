@@ -10,11 +10,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors({
-  origin: 'https://loagap.com',  // 프론트엔드 도메인에서 오는 요청을 허용
-  methods: ['GET', 'POST'],
-  credentials: true,  // 쿠키를 요청에 포함시킬 경우 설정
-}));
+app.use(cors());
 app.use(express.json());
 
 // 미들웨어: 모든 요청에 대해 자동으로 로그 기록
