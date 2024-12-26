@@ -138,32 +138,17 @@ cron.schedule('* * * * *', async () => { // 1분마다 실행
                 }));
             }
         });
-
-        // logger.info({
-        //     method: '데이터확인',
-        //     url: '[CRON]',  // 요청 URL
-        //     //message: `${JSON.stringify(arr, null, 2)} 모험섬 데이터 가공 종료`,
-        //     message: `${arr}`
-        // });
-
         // 쿼리 실행 (다중 insert Promise.all - 병렬처리)
         const promises = arr.flat().map(island => {
-            // 각 항목이 올바르게 설정되었는지 확인
 
-            logger.info({
-            method: '데이터확인',
-            url: '[CRON]',  // 요청 URL
-            //message: `${JSON.stringify(arr, null, 2)} 모험섬 데이터 가공 종료`,
-            message: `${JSON.stringify(island)}`
-        });
-            return connection.execute(insertSql, [
+             connection.execute(insertSql, [
                 island.BASE_DATE,
                 island.TIME_TYPE,
                 island.NAME,
                 JSON.stringify(island.START_TIME) || '[]',  // START_TIME이 없으면 빈 배열로 처리
                 JSON.stringify(island.REWARD_ITEMS) || '{}', // REWARD_ITEMS가 없으면 빈 객체로 처리
                 island.BONUS_REWARD_TYPE || '',  // BONUS_REWARD_TYPE이 없으면 빈 문자열로 처리
-                island.IMG_URL || '',  // IMG_URL이 없으면 빈 문자열로 처리
+                island.IMG_URL || ''  // IMG_URL이 없으면 빈 문자열로 처리
             ]);
         });
         const retInsert = await Promise.all(promises);
