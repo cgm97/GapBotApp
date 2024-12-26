@@ -5,8 +5,8 @@ const pool = require('./db/connection');
 require('dotenv').config(); // .env 파일에서 환경 변수 로드
 
 // 매주 수요일 10시 1분에 실행 - 모험섬 정보
-// cron.schedule('1 10 * * 3', async () => { // async로 변경
-cron.schedule('* * * * *', async () => { // 1분마다 실행
+// cron.schedule('* * * * *', async () => { // 1분마다 실행
+cron.schedule('1 10 * * 3', async () => { // async로 변경
 
     logger.info({
         method: '매주 WED 10:01',
@@ -18,24 +18,11 @@ cron.schedule('* * * * *', async () => { // 1분마다 실행
     const connection = await pool.getConnection();
     const API_URL = "https://developer-lostark.game.onstove.com/gamecontents/calendar";
 
-    // 쿼리
-    const insertSql = `INSERT INTO ISLAND_SCHEDULE (
-                        BASE_DATE,
-                        TIME_TYPE,
-                        NAME,
-                        START_TIME,
-                        REWARD_ITEMS,
-                        BONUS_REWARD_TYPE,
-                        IMG_URL
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?)`;
-    const updateSql = `
-                        UPDATE ISLAND_SCHEDULE
-                            SET DL_YN = ?`;
     try {
-        
+
         // 트랜잭션 시작
         await connection.beginTransaction();
-        
+
         // await 사용
         const response = await axios.get(API_URL, {
             headers: {
@@ -54,6 +41,8 @@ cron.schedule('* * * * *', async () => { // 1분마다 실행
         });
 
         // 쿼리 실행 - 이전 데이터 DL_YN = Y 처리
+        const updateSql = `UPDATE ISLAND_SCHEDULE
+                            SET DL_YN = ?`;
         const [retDelete] = await connection.execute(updateSql, ["Y"]);
         logger.info({
             method: '매주 WED 10:01 모험섬 데이터',
@@ -130,33 +119,27 @@ cron.schedule('* * * * *', async () => { // 1분마다 실행
                         BASE_DATE: date,                 // 날짜 (모든 '-'를 제거한 값)
                         TIME_TYPE: allFirstTime ? 1 : 0, // 첫 번째 시간이 19시라면 전체 status를 1로 설정
                         NAME: calender.ContentsName,
-                        START_TIME: times|| [],  // `time` 값만 포함된 배열
-                        REWARD_ITEMS: calender.RewardItems||{},
+                        START_TIME: times || [],  // `time` 값만 포함된 배열
+                        REWARD_ITEMS: calender.RewardItems || {},
                         BONUS_REWARD_TYPE: category,
-                        IMG_URL: calender.ContentsIcon||''
+                        IMG_URL: calender.ContentsIcon || ''
                     };
                 }));
             }
         });
 
-        // logger.info({
-        //     method: '데이터확인',
-        //     url: '[CRON]',  // 요청 URL
-        //     //message: `${JSON.stringify(arr, null, 2)} 모험섬 데이터 가공 종료`,
-        //     message: `${arr}`
-        // });
-
+        // 쿼리
+        const insertSql = `INSERT INTO ISLAND_SCHEDULE (
+            BASE_DATE,
+            TIME_TYPE,
+            NAME,
+            START_TIME,
+            REWARD_ITEMS,
+            BONUS_REWARD_TYPE,
+            IMG_URL
+        ) VALUES (?, ?, ?, ?, ?, ?, ?)`;
         // 쿼리 실행 (다중 insert Promise.all - 병렬처리)
         const promises = arr.flat().map(island => {
-            // 각 항목이 올바르게 설정되었는지 확인
-
-            logger.info({
-            method: '데이터확인',
-            url: '[CRON]',  // 요청 URL
-            //message: `${JSON.stringify(arr, null, 2)} 모험섬 데이터 가공 종료`,
-            message: `CHECK`
-        });
-
             return connection.execute(insertSql, [
                 island.BASE_DATE,
                 island.TIME_TYPE,
@@ -167,13 +150,13 @@ cron.schedule('* * * * *', async () => { // 1분마다 실행
                 island.IMG_URL || ''  // IMG_URL이 없으면 빈 문자열로 처리
             ]);
         });
-        logger.info({
-            method: '데이터확인',
-            url: '[CRON]',  // 요청 URL
-            //message: `${JSON.stringify(arr, null, 2)} 모험섬 데이터 가공 종료`,
-            message: `CHECK1`
-        });
         const retInsert = await Promise.all(promises);
+
+        // 각 삽입 작업의 결과에서 affectedRows 출력
+        let totalAffectedRows = 0;
+        retInsert.forEach(result => {
+            totalAffectedRows += result[0].affectedRows;  // 결과는 배열로 반환되므로 result[0]에 접근
+        });
 
         // 트랜잭션 커밋
         await connection.commit();
@@ -181,7 +164,7 @@ cron.schedule('* * * * *', async () => { // 1분마다 실행
             method: '매주 WED 10:01 모험섬 데이터',
             url: '[CRON]',  // 요청 URL
             //message: `${JSON.stringify(arr, null, 2)} 모험섬 데이터 가공 종료`,
-            message: `모험섬 데이터 ${retInsert.affectedRows}적재 완료 END`
+            message: `모험섬 데이터 ${totalAffectedRows}건 적재 완료 END`
         });
     } catch (error) {
         // 오류 발생 시 롤백
@@ -195,7 +178,7 @@ cron.schedule('* * * * *', async () => { // 1분마다 실행
     } finally {
         // 연결 반환
         connection.release();
-      }
+    }
 
 });
 
