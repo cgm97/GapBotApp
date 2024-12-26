@@ -2,61 +2,97 @@ import React, { useState, useEffect } from "react";
 import axios from 'axios';
 import '../App.css';
 
-const Calender = () => {
+const Calendar = () => {
   const [activeDay, setActiveDay] = useState(null);
-
-  const daysWithDate = [
-    { day: "일", date: "12/01" },
-    { day: "월", date: "12/02" },
-    { day: "화", date: "12/03" },
-    { day: "수", date: "12/04" },
-    { day: "목", date: "12/05" },
-    { day: "금", date: "12/06" },
-    { day: "토", date: "12/07" },
-  ];
-
-  const content = {
-    "12/01": "일요일의 내용입니다.",
-    "12/02": "월요일의 내용입니다.",
-    "12/03": "화요일의 내용입니다.",
-    "12/04": "수요일의 내용입니다.",
-    "12/05": "목요일의 내용입니다.",
-    "12/06": "금요일의 내용입니다.",
-    "12/07": "토요일의 내용입니다.",
-  };
-
-  useEffect(() => {
-    const today = new Date();
-    const currentDay = today.getDay();
-    const currentDate = daysWithDate[currentDay]?.date;
-    if (currentDate) {
-      setActiveDay(currentDate);
-    } else {
-      console.error("Invalid currentDate:", currentDate);
-    }
-  }, []);
-
+  const [content, setContent] = useState({});
   const [data, setData] = useState(null);
+  const [daysWithDate, setDaysWithDate] = useState([]);
 
+  // API 데이터 호출
   useEffect(() => {
-    // 세션 스토리지에서 데이터 확인
     const storedData = sessionStorage.getItem('gameContents');
+
     if (storedData) {
-      // 세션 스토리지에 데이터가 있으면 바로 사용
-      setData(JSON.parse(storedData));
+      // sessionStorage에서 데이터를 불러온 경우
+      const parsedData = JSON.parse(storedData);
+      setData(parsedData);
     } else {
-      // 세션 스토리지에 데이터가 없으면 API 호출
-      axios.get(process.env.REACT_APP_SERVER_URL+'/api/gameContents')
+      // sessionStorage에 데이터가 없는 경우 API 호출
+      axios.get(process.env.REACT_APP_SERVER_URL + '/api/data')
         .then((response) => {
-          setData(response.data);  // API 응답 데이터를 상태에 저장
-          sessionStorage.setItem('gameContents', JSON.stringify(response.data)); // 로컬 스토리지에 저장
+          setData(response.data);
+          sessionStorage.setItem('gameContents', JSON.stringify(response.data));
         })
         .catch((error) => {
           console.error("API 호출 오류:", error);
-          setData(null);  // 에러 발생 시 null로 설정
         });
     }
-  }, []);  // 컴포넌트가 마운트될 때 한 번만 실행
+  }, []);
+
+  // BASE_DATE 기준으로 daysWithDate 계산
+  useEffect(() => {
+    if (data && data.length > 0) {
+      const baseDate = data[0]?.BASE_DATE;  // 예시로 첫 번째 데이터에서 BASE_DATE 추출
+      if (baseDate) {
+        const baseDateObj = new Date(
+          baseDate.slice(0, 4),
+          baseDate.slice(4, 6) - 1,  // 월은 0부터 시작하므로 -1
+          baseDate.slice(6, 8)
+        );
+
+        const newDaysWithDate = Array.from({ length: 7 }, (_, i) => {
+          const day = new Date(baseDateObj);
+          day.setDate(day.getDate() + i);  // baseDate를 기준으로 i일을 더해줌
+          const month = String(day.getMonth() + 1).padStart(2, '0');
+          const dayOfMonth = String(day.getDate()).padStart(2, '0');
+          const dateFormatted = `${month}/${dayOfMonth}`;
+          const dayOfWeek = day.toLocaleString('default', { weekday: 'short' });
+
+          return { day: dayOfWeek, date: dateFormatted };
+        });
+
+        setDaysWithDate(newDaysWithDate);  // 계산된 날짜들을 상태에 저장
+      }
+    }
+  }, [data]);  // 의존성 배열에 data 추가 (data가 변경될 때마다 실행)
+
+  // 오늘 날짜를 activeDay로 설정
+  useEffect(() => {
+    if (daysWithDate.length > 0) {
+      const today = new Date();
+      const todayDateFormatted = `${String(today.getMonth() + 1).padStart(2, '0')}/${String(today.getDate()).padStart(2, '0')}`;
+
+      // 오늘 날짜를 daysWithDate에서 찾아서 activeDay로 설정
+      const todayDay = daysWithDate.find(({ date }) => date === todayDateFormatted);
+      if (todayDay) {
+        setActiveDay(todayDay.date);  // 오늘 날짜를 활성화된 상태로 설정
+      }
+    }
+  }, [daysWithDate]);  // daysWithDate가 변경될 때마다 실행
+
+  // content 업데이트
+  useEffect(() => {
+    if (data && daysWithDate.length > 0) {
+      const newContent = daysWithDate.reduce((acc, { date }) => {
+        // 해당 날짜에 맞는 모든 아이템을 찾기
+        const matchingItems = data.filter(item => {
+          const baseDateFormatted = item.BASE_DATE.slice(4, 6) + '/' + item.BASE_DATE.slice(6, 8);  // BASE_DATE를 MM/DD로 변환
+          return baseDateFormatted === date;
+        });
+
+        // 찾은 아이템들을 content에 추가
+        if (matchingItems.length > 0) {
+          acc[date] = matchingItems.map(item => "[" + item.BONUS_REWARD_TYPE + "]" + item.NAME).join("\n");  // 여러 아이템의 NAME을 합쳐서 표시
+        } else {
+          acc[date] = "모험 섬이 없습니다."; // 해당 날짜에 데이터가 없으면 기본 메시지
+        }
+
+        return acc;
+      }, {});
+
+      setContent(newContent);
+    }
+  }, [data, daysWithDate]);  // data와 daysWithDate가 변경될 때마다 실행
 
   return (
     <div className="calendar">
@@ -75,19 +111,27 @@ const Calender = () => {
 
       {activeDay && (
         <div className="content">
-          <h3>{activeDay}의 내용</h3>
-          <p>{content[activeDay]}</p>
+          <p>
+            {content[activeDay]
+              .split("\n")
+              .map((line, index) => (
+                <span key={index}>
+                  {line}
+                  <br />
+                </span>
+              ))}
+          </p>
         </div>
       )}
 
-      {data && (
+      {/* {data && (
         <div className="api-data">
           <h3>API 응답 데이터</h3>
           <pre>{JSON.stringify(data, null, 2)}</pre>
         </div>
-      )}
+      )} */}
     </div>
   );
 };
 
-export default Calender;
+export default Calendar;
