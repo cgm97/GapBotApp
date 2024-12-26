@@ -131,7 +131,7 @@ cron.schedule('* * * * *', async () => { // 1분마다 실행
                         TIME_TYPE: allFirstTime ? 1 : 0, // 첫 번째 시간이 19시라면 전체 status를 1로 설정
                         NAME: calender.ContentsName,
                         START_TIME: times,               // `time` 값만 포함된 배열
-                        REWARD_ITEMS: calender.RewardItems,
+                        REWARD_ITEMS: calender.RewardItems||{},
                         BONUS_REWARD_TYPE: category,
                         IMG_URL: calender.ContentsIcon,
                     };
