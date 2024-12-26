@@ -133,7 +133,7 @@ cron.schedule('* * * * *', async () => { // 1분마다 실행
                         START_TIME: times|| [],  // `time` 값만 포함된 배열
                         REWARD_ITEMS: calender.RewardItems||{},
                         BONUS_REWARD_TYPE: category,
-                        IMG_URL: calender.ContentsIcon||'',
+                        IMG_URL: calender.ContentsIcon||''
                     };
                 }));
             }
