@@ -139,8 +139,21 @@ cron.schedule('* * * * *', async () => { // 1분마다 실행
             }
         });
 
+        logger.info({
+            method: '데이터확인1',
+            url: '[CRON]',  // 요청 URL
+            //message: `${JSON.stringify(arr, null, 2)} 모험섬 데이터 가공 종료`,
+            message: `${arr}`
+        });
+
         // 쿼리 실행 (다중 insert Promise.all - 병렬처리)
         const promises = arr.map(island =>
+            logger.info({
+                method: '데이터확인2',
+                url: '[CRON]',  // 요청 URL
+                //message: `${JSON.stringify(arr, null, 2)} 모험섬 데이터 가공 종료`,
+                message: `${island}`
+            });
             connection.execute(insertSql, [
                 island.BASE_DATE,
                 island.TIME_TYPE,
