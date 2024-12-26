@@ -1,7 +1,7 @@
 const cron = require('node-cron');
 const axios = require('axios');
 const logger = require('./logger');  // logger.js 임포트
-const pool = require('../db/connection');
+const pool = require('./db/connection');
 require('dotenv').config(); // .env 파일에서 환경 변수 로드
 
 // 매주 수요일 10시 1분에 실행 - 모험섬 정보
