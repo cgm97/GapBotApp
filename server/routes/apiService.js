@@ -20,7 +20,7 @@ exports.getGameContents = async (req, res, next) => {
 
 exports.getData = async (req, res, next) => {
     try {
-        const [rows] = await pool.query('SELECT * FROM ISLAND_SCHEDULE');
+        const [rows] = await pool.query('SELECT * FROM ISLAND_SCHEDULE WHERE DL_YN = "N" ORDER BY BASE_DATE ');
         res.status(200).json(rows);
     } catch (error) {
         next(new Error(error));  // 에러 객체를 넘겨서 next 미들웨어로 전달
