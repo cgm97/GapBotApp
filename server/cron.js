@@ -164,7 +164,7 @@ cron.schedule('* * * * *', async () => { // 1분마다 실행
                 JSON.stringify(island.START_TIME) || '[]',  // START_TIME이 없으면 빈 배열로 처리
                 JSON.stringify(island.REWARD_ITEMS) || '{}', // REWARD_ITEMS가 없으면 빈 객체로 처리
                 island.BONUS_REWARD_TYPE || '',  // BONUS_REWARD_TYPE이 없으면 빈 문자열로 처리
-                island.IMG_URL || '',  // IMG_URL이 없으면 빈 문자열로 처리
+                island.IMG_URL || ''  // IMG_URL이 없으면 빈 문자열로 처리
             ]);
         });
         logger.info({
