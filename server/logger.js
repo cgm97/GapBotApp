@@ -18,8 +18,8 @@ const getDateString = () => {
 };
 
 // 커스텀 로그 포맷 정의
-const customFormat = winston.format.printf(({ timestamp, level, method, url, message, stack }) => {
-  return `[${timestamp}] ${level.toUpperCase()} ${method} ${url} ${message} ${stack}`;  // 로그 레벨 포함
+const customFormat = winston.format.printf(({ timestamp, level, method, url, message }) => {
+  return `[${timestamp}] ${level.toUpperCase()} ${method} ${url} ${message}`;  // 로그 레벨 포함
 });
 
 const logger = winston.createLogger({

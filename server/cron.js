@@ -168,8 +168,7 @@ cron.schedule('* * * * *', async () => { // 1분마다 실행
         logger.error({
             method: '매주 WED 10:01 모험섬 데이터',
             url: '[CRON]',  // 요청 URL
-            message: error.message,
-            error: error.stack
+            message: error.stack
         });
     } finally {
         // 연결 반환
