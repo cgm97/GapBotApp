@@ -139,15 +139,15 @@ cron.schedule('* * * * *', async () => { // 1분마다 실행
             }
         });
 
-        logger.info({
-            method: '데이터확인',
-            url: '[CRON]',  // 요청 URL
-            message: `${JSON.stringify(arr, null, 2)} 모험섬 데이터 가공 종료`,
-            // message: `${arr}`
-        });
+        // logger.info({
+        //     method: '데이터확인',
+        //     url: '[CRON]',  // 요청 URL
+        //     //message: `${JSON.stringify(arr, null, 2)} 모험섬 데이터 가공 종료`,
+        //     message: `${arr}`
+        // });
 
         // 쿼리 실행 (다중 insert Promise.all - 병렬처리)
-        const promises = arr.map(island => {
+        const promises = arr.flat().map(island => {
             // 각 항목이 올바르게 설정되었는지 확인
             if (!island) {
                 throw new Error("유효하지 않은 데이터가 포함되어 있습니다.1"); // 유효성 검사
