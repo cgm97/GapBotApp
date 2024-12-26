@@ -61,7 +61,7 @@ cron.schedule('* * * * *', async () => { // 1분마다 실행
             message: `이전 데이터 삭제처리 ${retDelete.affectedRows} 건`,
         });
 
-        var arr;
+        var arr = [];
         data.forEach(calender => {
 
             if (calender.CategoryName == '모험 섬') {
