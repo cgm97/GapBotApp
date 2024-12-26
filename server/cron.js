@@ -1,6 +1,7 @@
 const cron = require('node-cron');
 const axios = require('axios');
 const logger = require('./logger');  // logger.js 임포트
+const pool = require('../db/connection');
 require('dotenv').config(); // .env 파일에서 환경 변수 로드
 
 // 매주 수요일 10시 1분에 실행 - 모험섬 정보
@@ -14,7 +15,7 @@ cron.schedule('* * * * *', async () => { // 1분마다 실행
     });
 
     // 여기에 실제로 실행할 작업 코드 작성
-    const connection = await promisePool.getConnection();
+    const connection = await pool.getConnection();
     const API_URL = "https://developer-lostark.game.onstove.com/gamecontents/calendar";
 
     // 쿼리
