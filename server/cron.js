@@ -26,7 +26,7 @@ cron.schedule('* * * * *', async () => { // 1분마다 실행
                         START,
                         REWARD_ITEMS,
                         BONUS_REWARD_TYPE,
-                        IMG_URL,
+                        IMG_URL
                     ) VALUES (?, ?, ?, ?, ?, ?, ?)`;
     const updateSql = `
                         UPDATE ISLAND_SCHEDULE
