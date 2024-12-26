@@ -149,8 +149,17 @@ cron.schedule('* * * * *', async () => { // 1분마다 실행
         // 쿼리 실행 (다중 insert Promise.all - 병렬처리)
         const promises = arr.map(island => {
             // 각 항목이 올바르게 설정되었는지 확인
-            if (!island || !island.BASE_DATE || !island.TIME_TYPE || !island.NAME) {
-                throw new Error("유효하지 않은 데이터가 포함되어 있습니다."); // 유효성 검사
+            if (!island) {
+                throw new Error("유효하지 않은 데이터가 포함되어 있습니다.1"); // 유효성 검사
+            }
+            if (!island.BASE_DATE) {
+                throw new Error("유효하지 않은 데이터가 포함되어 있습니다.2"); // 유효성 검사
+            }
+            if (!island.TIME_TYPE) {
+                throw new Error("유효하지 않은 데이터가 포함되어 있습니다.3"); // 유효성 검사
+            }
+            if (!island.NAME) {
+                throw new Error("유효하지 않은 데이터가 포함되어 있습니다.4"); // 유효성 검사
             }
             console.log(island);
             return connection.execute(insertSql, [
