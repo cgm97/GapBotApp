@@ -10,12 +10,31 @@ cron.schedule('* * * * *', async () => { // 1분마다 실행
     logger.info({
         method: '매주 WED 10:01',
         url: 'CRON',  // 요청 URL
-        message: '모험섬 저장 시작'
+        message: '모험섬 저장 시작 START'
     });
 
     // 여기에 실제로 실행할 작업 코드 작성
+    const connection = await promisePool.getConnection();
     const API_URL = "https://developer-lostark.game.onstove.com/gamecontents/calendar";
+
+    // 쿼리
+    const insertSql = `INSERT INTO ISLAND_SCHEDULE (
+                        BASE_DATE,
+                        TIME_TYPE,
+                        NAME,
+                        START,
+                        REWARD_ITEMS,
+                        BONUS_REWARD_TYPE,
+                        IMG_URL,
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+    const updateSql = `
+                        UPDATE ISLAND_SCHEDULE
+                            SET DL_YN = ?`;
     try {
+        
+        // 트랜잭션 시작
+        await connection.beginTransaction();
+        
         // await 사용
         const response = await axios.get(API_URL, {
             headers: {
@@ -28,12 +47,20 @@ cron.schedule('* * * * *', async () => { // 1분마다 실행
         const data = response.data;
 
         logger.info({
-            method: '매주 WED 10:01',
-            url: 'CRON',  // 요청 URL
-            message: `모험섬 데이터 불러오기 성공 ${data.length} 건`,
+            method: '매주 WED 10:01 모험섬 데이터',
+            url: '[CRON]',  // 요청 URL
+            message: `데이터 불러오기 성공 ${data.length} 건`,
         });
 
-        var arr = [];
+        // 쿼리 실행 - 이전 데이터 DL_YN = Y 처리
+        const [retDelete] = await connection.execute(updateSql, ["Y"]);
+        logger.info({
+            method: '매주 WED 10:01 모험섬 데이터',
+            url: '[CRON]',  // 요청 URL
+            message: `이전 데이터 삭제처리 ${retDelete.affectedRows} 건`,
+        });
+
+        var arr;
         data.forEach(calender => {
 
             if (calender.CategoryName == '모험 섬') {
@@ -70,16 +97,14 @@ cron.schedule('* * * * *', async () => { // 1분마다 실행
                                         const isItemOnTargetDate = startDate === date; // 날짜 비교
 
                                         if (isItemOnTargetDate) {
-                                            if (isItemOnTargetDate) {
-                                                if (item.Name.includes("골드")) {
-                                                    category = "골드";
-                                                } else if (item.Name.includes("카드")) {
-                                                    category = "카드";
-                                                } else if (item.Name.includes("주화")) {
-                                                    category = "주화";
-                                                } else if (item.Name.includes("실링")) {
-                                                    category = "실링";
-                                                }
+                                            if (item.Name.includes("골드")) {
+                                                category = "골드";
+                                            } else if (item.Name.includes("카드")) {
+                                                category = "카드";
+                                            } else if (item.Name.includes("주화")) {
+                                                category = "주화";
+                                            } else if (item.Name.includes("실링")) {
+                                                category = "실링";
                                             }
                                         }
                                     });
@@ -113,19 +138,41 @@ cron.schedule('* * * * *', async () => { // 1분마다 실행
             }
         });
 
+        // 쿼리 실행 (다중 insert Promise.all - 병렬처리)
+        const promises = arr.map(island =>
+            connection.execute(insertSql, [
+                island.BASE_DATE,
+                island.TIME_TYPE,
+                island.NAME,
+                island.START_TIME,
+                island.REWARD_ITEMS,
+                island.BONUS_REWARD_TYPE,
+                island.IMG_URL,
+             ])
+        );
+        const retInsert = await Promise.all(promises);
+
+        // 트랜잭션 커밋
+        await connection.commit();
         logger.info({
-            method: '매주 WED 10:01',
-            url: 'CRON',  // 요청 URL
-            message: `${JSON.stringify(arr, null, 2)} 모험섬 데이터 가공 종료`,
+            method: '매주 WED 10:01 모험섬 데이터',
+            url: '[CRON]',  // 요청 URL
+            //message: `${JSON.stringify(arr, null, 2)} 모험섬 데이터 가공 종료`,
+            message: `모험섬 데이터 ${retInsert.affectedRows}적재 완료 END`
         });
     } catch (error) {
+        // 오류 발생 시 롤백
+        await connection.rollback();
         // 에러 로깅
         logger.error({
-            method: '매주 WED 10:01',
-            url: 'CRON',  // 요청 URL
+            method: '매주 WED 10:01 모험섬 데이터',
+            url: '[CRON]',  // 요청 URL
             message: error.message,
         });
-    }
+    } finally {
+        // 연결 반환
+        connection.release();
+      }
 
 });
 
