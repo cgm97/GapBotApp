@@ -156,21 +156,6 @@ cron.schedule('* * * * *', async () => { // 1분마다 실행
             //message: `${JSON.stringify(arr, null, 2)} 모험섬 데이터 가공 종료`,
             message: `${JSON.stringify(island)}`
         });
-
-            if (!island) {
-                throw new Error("유효하지 않은 데이터가 포함되어 있습니다.1"); // 유효성 검사
-            }
-            if (!island.BASE_DATE) {
-                console.log(JSON.stringify(island));
-                throw new Error("유효하지 않은 데이터가 포함되어 있습니다.2"); // 유효성 검사
-            }
-            if (!island.TIME_TYPE) {
-                throw new Error("유효하지 않은 데이터가 포함되어 있습니다.3"); // 유효성 검사
-            }
-            if (!island.NAME) {
-                throw new Error("유효하지 않은 데이터가 포함되어 있습니다.4"); // 유효성 검사
-            }
-            console.log(island);
             return connection.execute(insertSql, [
                 island.BASE_DATE,
                 island.TIME_TYPE,
