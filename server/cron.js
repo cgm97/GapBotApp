@@ -130,10 +130,10 @@ cron.schedule('* * * * *', async () => { // 1분마다 실행
                         BASE_DATE: date,                 // 날짜 (모든 '-'를 제거한 값)
                         TIME_TYPE: allFirstTime ? 1 : 0, // 첫 번째 시간이 19시라면 전체 status를 1로 설정
                         NAME: calender.ContentsName,
-                        START_TIME: times,               // `time` 값만 포함된 배열
+                        START_TIME: times|| [],  // `time` 값만 포함된 배열
                         REWARD_ITEMS: calender.RewardItems||{},
                         BONUS_REWARD_TYPE: category,
-                        IMG_URL: calender.ContentsIcon,
+                        IMG_URL: calender.ContentsIcon||'',
                     };
                 }));
             }
@@ -145,8 +145,8 @@ cron.schedule('* * * * *', async () => { // 1분마다 실행
                 island.BASE_DATE,
                 island.TIME_TYPE,
                 island.NAME,
-                island.START_TIME,
-                island.REWARD_ITEMS,
+                JSON.stringify(island.START_TIME),   // START_TIME은 배열이므로 JSON 문자열로 저장
+                JSON.stringify(island.REWARD_ITEMS), // REWARD_ITEMS도 JSON 문자열로 저장
                 island.BONUS_REWARD_TYPE,
                 island.IMG_URL,
              ])
