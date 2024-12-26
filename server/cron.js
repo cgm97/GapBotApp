@@ -154,7 +154,7 @@ cron.schedule('* * * * *', async () => { // 1분마다 실행
             method: '데이터확인',
             url: '[CRON]',  // 요청 URL
             //message: `${JSON.stringify(arr, null, 2)} 모험섬 데이터 가공 종료`,
-            message: `${island}`
+            message: `${JSON.stringify(island)}`
         });
 
             if (!island) {
