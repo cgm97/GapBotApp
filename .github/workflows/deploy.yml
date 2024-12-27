@@ -15,15 +15,16 @@ jobs:
       - name: Set CI environment variable to false
         run: echo "CI=false" >> $GITHUB_ENV  # CI 환경 변수 설정
 
-      # 3. 전체 커밋 기록 가져오기  
-      - name: ls -al
-        run: |
-          ls -al ./client  # 빌드 디렉토리 확인
 
 
       # 2. 코드 체크아웃
       - name: Checkout code
         uses: actions/checkout@v3
+        
+      # 3. 전체 커밋 기록 가져오기  
+      - name: ls -al
+        run: |
+          ls -al ./client  # 빌드 디렉토리 확인
 
       # 3. 전체 커밋 기록 가져오기
       - name: Fetch all commits
