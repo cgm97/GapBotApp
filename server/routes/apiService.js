@@ -20,6 +20,7 @@ exports.getGameContents = async (req, res, next) => {
 
 exports.getData = async (req, res, next) => {
     try {
+        console.log("CICD TEST");
         const [rows] = await pool.query('SELECT * FROM ISLAND_SCHEDULE WHERE DL_YN = "N" ORDER BY BASE_DATE ');
         res.status(200).json(rows);
     } catch (error) {
