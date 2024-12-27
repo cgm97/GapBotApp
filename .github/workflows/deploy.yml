@@ -63,7 +63,7 @@ jobs:
       - name: Sync server files to production server
         if: ${{ contains(env.file, 'server') }}
         run: |
-          rsync -avz --progress --delete \
+          rsync -avz --progress \
             -e "ssh -o StrictHostKeyChecking=no -i key.pem" \
             ./server/ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/GapBotApp/server/
 
