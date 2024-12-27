@@ -56,7 +56,7 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           port: 22
           source: "client/build/*"  # 빌드된 파일의 경로
-          target: "/var/www/loagap"  # EC2 서버에 복사할 경로
+          target: "/var/www/loagap/"  # EC2 서버에 복사할 경로
 
       # 7. 변경된 파일을 EC2 서버로 복사 (서버 관련 파일만)
       - name: Copy server files to production server
@@ -68,13 +68,18 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           port: 22
           source: "${{github.workspace}}/server/*"  # 빌드된 파일의 경로
-          target: "/home/ubuntu/GapBotApp/server"  # EC2 서버에 복사할 경로
+          target: "/home/ubuntu/GapBotApp/server/"  # EC2 서버에 복사할 경로
+
+      - name: Save SSH Key
+        run: |
+          echo "${{ secrets.EC2_KEY }}" > key.pem
+          chmod 600 key.pem
 
       # 8. 서버 빌드 및 실행 (서버 파일이 변경된 경우에만 실행)
       - name: Install dependencies and build server
         if: ${{ contains(env.file, 'server') }}  # 서버 파일이 변경되었으면 빌드 실행
         run: |
-          ssh -o StrictHostKeyChecking=no -i ${{ secrets.EC2_KEY }} ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             cd /home/ubuntu/GapBotApp/server
             pm2 restart GapBotAppServer  # pm2로 서버 재시작
           EOF
@@ -83,6 +88,6 @@ jobs:
       - name: Restart Nginx
         if: ${{ contains(env.file, 'client') }}  # client 파일이 변경된 경우에만 Nginx 재시작
         run: |
-          ssh -o StrictHostKeyChecking=no -i ${{ secrets.EC2_KEY }} ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             sudo systemctl restart nginx  # Nginx 재시작
           EOF
