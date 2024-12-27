@@ -3,30 +3,18 @@ const pool = require('../db/connection');
 const logger = require('../logger');  // logger.js 임포트
 require('dotenv').config(); // .env 파일에서 환경 변수 로드
 
-exports.getGameContents = async (req, res, next) => {
-    const API_URL = "https://developer-lostark.game.onstove.com/gamecontents/calendar";
+exports.getIsland = async (req, res, next) => {
     try {
-        const response = await axios.get(API_URL, {
-            headers: {
-                'accept': 'application/json',
-                'authorization': `bearer ${process.env.LOA_API_KEY}`,
-            },
-        });
-        
-        res.status(200).json(response.data);
+        const [rows] = await pool.query('SELECT * FROM ISLAND_SCHEDULE WHERE DL_YN = "N" ORDER BY BASE_DATE ');
+        res.status(200).json(rows);
     } catch (error) {
         next(new Error(error));  // 에러 객체를 넘겨서 next 미들웨어로 전달
     }
-};
+}
 
-exports.getData = async (req, res, next) => {
+exports.getNotice = async (req, res, next) => {
     try {
-        logger.info({
-            method: req.method,
-            url: req.originalUrl,  // 요청 URL
-            message: 'CICD 성공'
-          });
-        const [rows] = await pool.query('SELECT * FROM ISLAND_SCHEDULE WHERE DL_YN = "N" ORDER BY BASE_DATE ');
+        const [rows] = await pool.query('SELECT * FROM LOSARK_NOTICE ORDER BY SNO ');
         res.status(200).json(rows);
     } catch (error) {
         next(new Error(error));  // 에러 객체를 넘겨서 next 미들웨어로 전달
