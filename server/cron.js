@@ -4,13 +4,14 @@ const logger = require('./logger');  // logger.js 임포트
 const pool = require('./db/connection');
 require('dotenv').config(); // .env 파일에서 환경 변수 로드
 
-// 매주 수요일 10시 1분에 실행 - 모험섬 정보
-// cron.schedule('* * * * *', async () => { // 1분마다 실행
-cron.schedule('1 10 * * 3', async () => { // async로 변경
+const url = 'CRON';
 
+// 매주 수요일 10시 1분에 실행 - 모험섬 정보
+cron.schedule('1 10 * * 3', async () => { // async로 변경
+    var method = '매주 WED 10:01 모험섬 데이터';
     logger.info({
-        method: '매주 WED 10:01',
-        url: 'CRON',  // 요청 URL
+        method: method,
+        url: url,  // 요청 URL
         message: '모험섬 저장 시작 START'
     });
 
@@ -35,8 +36,8 @@ cron.schedule('1 10 * * 3', async () => { // async로 변경
         const data = response.data;
 
         logger.info({
-            method: '매주 WED 10:01 모험섬 데이터',
-            url: '[CRON]',  // 요청 URL
+            method: method,
+            url: url,  // 요청 URL
             message: `데이터 불러오기 성공 ${data.length} 건`,
         });
 
@@ -45,8 +46,8 @@ cron.schedule('1 10 * * 3', async () => { // async로 변경
                             SET DL_YN = ?`;
         const [retDelete] = await connection.execute(updateSql, ["Y"]);
         logger.info({
-            method: '매주 WED 10:01 모험섬 데이터',
-            url: '[CRON]',  // 요청 URL
+            method: method,
+            url: url,  // 요청 URL
             message: `이전 데이터 삭제처리 ${retDelete.affectedRows} 건`,
         });
 
@@ -161,8 +162,8 @@ cron.schedule('1 10 * * 3', async () => { // async로 변경
         // 트랜잭션 커밋
         await connection.commit();
         logger.info({
-            method: '매주 WED 10:01 모험섬 데이터',
-            url: '[CRON]',  // 요청 URL
+            method: method,
+            url: url,  // 요청 URL
             //message: `${JSON.stringify(arr, null, 2)} 모험섬 데이터 가공 종료`,
             message: `모험섬 데이터 ${totalAffectedRows}건 적재 완료 END`
         });
@@ -171,8 +172,8 @@ cron.schedule('1 10 * * 3', async () => { // async로 변경
         await connection.rollback();
         // 에러 로깅
         logger.error({
-            method: '매주 WED 10:01 모험섬 데이터',
-            url: '[CRON]',  // 요청 URL
+            method: method,
+            url: url,  // 요청 URL
             message: error.stack
         });
     } finally {
@@ -180,6 +181,113 @@ cron.schedule('1 10 * * 3', async () => { // async로 변경
         connection.release();
     }
 
+});
+
+// 매시 정각에 실행 - 공지사항 정보
+cron.schedule('0 * * * *', async () => {
+    var method = '매일 1시간마다';
+    logger.info({
+        method: method,
+        url: url,  // 요청 URL
+        message: '공지 저장 시작 START'
+    });
+
+    // 여기에 실제로 실행할 작업 코드 작성
+    const connection = await pool.getConnection();
+    const API_URL = "https://developer-lostark.game.onstove.com/news/notices";
+
+    try {
+
+        // 트랜잭션 시작
+        await connection.beginTransaction();
+
+        // await 사용
+        const response = await axios.get(API_URL, {
+            headers: {
+                'accept': 'application/json',
+                'authorization': `bearer ${process.env.LOA_API_KEY}`,
+            },
+        });
+
+        // response.data를 사용
+        const data = response.data;
+
+        logger.info({
+            method: method,
+            url: url,  // 요청 URL
+            message: `데이터 불러오기 성공 ${data.length} 건`,
+        });
+
+        // 쿼리 실행 - 이전 데이터 DL_YN = Y 처리
+        const deleteSql = `DELETE FROM LOSTARK_NOTICE WHERE SNO != 0`;
+        const [retDelete] = await connection.execute(deleteSql);
+        logger.info({
+            method: method,
+            url: url,  // 요청 URL
+            message: `이전 데이터 삭제처리 ${retDelete.affectedRows} 건`,
+        });
+
+        var arr = [];
+        data.forEach(notice => {
+            /* LOSTARK_NOTICE  Table
+                SNO INT AUTO_INCREMENT PRIMARY KEY COMMENT '일련번호',
+                TITLE VARCHAR(100) COMMENT '제목',
+                TYPE VARCHAR(20) COMMENT '타입',
+                URL VARCHAR(100) COMMENT '공지 URL'
+            */
+            arr.push(
+                {
+                    TITLE: notice.Title,
+                    TYPE: notice.Type,
+                    URL: notice.Link
+                }
+            );
+        });
+
+
+        // 쿼리
+        const insertSql = `INSERT INTO LOSTARK_NOTICE (
+            TITLE,
+            TYPE,
+            URL
+        ) VALUES (?, ?, ?)`;
+        // 쿼리 실행 (다중 insert Promise.all - 병렬처리)
+        const promises = arr.flat().map(notice => {
+            return connection.execute(insertSql, [
+                notice.TITLE,
+                notice.TYPE,
+                notice.URL
+            ]);
+        });
+        const retInsert = await Promise.all(promises);
+
+        // 각 삽입 작업의 결과에서 affectedRows 출력
+        let totalAffectedRows = 0;
+        retInsert.forEach(result => {
+            totalAffectedRows += result[0].affectedRows;  // 결과는 배열로 반환되므로 result[0]에 접근
+        });
+
+        // 트랜잭션 커밋
+        await connection.commit();
+        logger.info({
+            method: method,
+            url: url,  // 요청 URL
+            //message: `${JSON.stringify(arr, null, 2)} 모험섬 데이터 가공 종료`,
+            message: `공지 데이터 ${totalAffectedRows}건 적재 완료 END`
+        });
+    } catch (error) {
+        // 오류 발생 시 롤백
+        await connection.rollback();
+        // 에러 로깅
+        logger.error({
+            method: method,
+            url: url,  // 요청 URL
+            message: error.stack
+        });
+    } finally {
+        // 연결 반환
+        connection.release();
+    }
 });
 
 module.exports = cron; // cron을 export하여 다른 파일에서 사용할 수 있게 함
