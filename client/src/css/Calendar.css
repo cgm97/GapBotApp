@@ -1,0 +1,45 @@
+/* 전체 컨테이너 */
+.islandContent {
+    display: flex;
+    flex-wrap: wrap;
+    /* 여러 줄로 감싸기 */
+    gap: 10px;
+    /* 항목 간 간격 */
+}
+
+/* 각 항목 */
+.list-item {
+    flex: 0 0 calc(33.33% - 10px);
+    /* 3등분 너비 설정, 간격 고려 */
+    display: flex;
+    /* 이미지와 이름 가로 정렬 */
+    align-items: center;
+    /* 이미지와 텍스트 세로 가운데 정렬 */
+    box-sizing: border-box;
+    /* 패딩 포함 크기 계산 */
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+/* 이미지 스타일 */
+.image {
+    width: 50px;
+    /* 이미지 고정 크기 */
+    height: 50px;
+    object-fit: cover;
+    /* 비율 유지하며 자르기 */
+    border-radius: 8px;
+    /* 둥근 이미지 */
+    margin-right: 10px;
+    /* 텍스트와 간격 */
+}
+
+/* 텍스트 스타일 */
+.name {
+    font-size: 14px;
+    color: #495057;
+    margin: 0;
+    /* 기본 여백 제거 */
+}
