@@ -20,7 +20,11 @@ exports.getGameContents = async (req, res, next) => {
 
 exports.getData = async (req, res, next) => {
     try {
-        console.log("CICD TEST1");
+        logger.info({
+            method: req.method,
+            url: req.originalUrl,  // 요청 URL
+            message: 'CICD 성공'
+          });
         const [rows] = await pool.query('SELECT * FROM ISLAND_SCHEDULE WHERE DL_YN = "N" ORDER BY BASE_DATE ');
         res.status(200).json(rows);
     } catch (error) {
