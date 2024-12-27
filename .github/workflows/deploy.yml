@@ -52,8 +52,8 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
-          source: "./server/*"  # 서버 관련 파일만 복사
-          target: "/home/ubuntu/GapBotApp/server"  # EC2 서버 경로
+          script: |
+            scp -r ./server/* ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/GapBotApp/server
 
       # 7. 클라이언트 파일을 EC2 서버로 복사 (React 빌드 파일만)
       - name: Copy client build files to production server
@@ -63,8 +63,8 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
-          source: "./client/build/*"  # 빌드된 React 파일만 복사
-          target: "/var/www/loagap"  # Nginx가 서빙할 경로 (React 빌드 파일)
+          script: |
+            scp -r ./client/build/* ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/var/www/loagap
 
       # 8. 서버 빌드 및 실행 (서버 파일이 변경된 경우에만 실행)
       - name: Install dependencies and build server
