@@ -18,7 +18,7 @@ jobs:
       # 3. 전체 커밋 기록 가져오기  
       - name: ls -al
         run: |
-          ls -al ${{ github.workspace }}/client  # 빌드 디렉토리 확인
+          ls -al ./client  # 빌드 디렉토리 확인
 
 
       # 2. 코드 체크아웃
