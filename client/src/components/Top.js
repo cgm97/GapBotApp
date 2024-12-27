@@ -5,7 +5,7 @@ const Top = () => {
   return (
     <div className="top">
       <div className="container">
-        <span><a href="https://open.kakao.com/o/g6Abem1g">빈틈봇 소통방</a></span>
+        <span><a href="https://open.kakao.com/o/g6Abem1g">빈틈봇소통방</a></span>
       </div>
       <div className="container">
         <span><a href="https://open.kakao.com/o/g6Abem1g">로그인</a></span>
