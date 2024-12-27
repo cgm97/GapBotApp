@@ -10,7 +10,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    
       # 1. CI 환경 변수 설정
       - name: Set CI environment variable to false
         run: echo "CI=false" >> $GITHUB_ENV  # CI 환경 변수 설정
@@ -21,70 +20,66 @@ jobs:
 
       # 3. 전체 커밋 기록 가져오기
       - name: Fetch all commits
-        run: |
-          git fetch --prune --unshallow  # 모든 커밋 기록을 가져오기
+        run: git fetch --prune --unshallow
 
-      # 4. 변경된 파일 확인 (Git diff 사용)
+      # 4. 변경된 파일 확인
       - name: Get changed files
         id: changed_files
         run: |
           changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
           echo "Changed files: $changed_files"
-          
-          # 변경된 파일을 각 줄에 대해 처리
-          IFS=$'\n'  # 줄 바꿈을 구분자로 설정
+          IFS=$'\n'
           for file in $changed_files; do
-            echo "file=$file" >> $GITHUB_ENV  # 각 파일을 환경 변수로 설정
+            echo "file=$file" >> $GITHUB_ENV
           done
 
-      # 5. 클라이언트 애플리케이션 빌드 (변경된 파일에 React 빌드가 포함되면 실행)
+      # 5. 클라이언트 빌드
       - name: Build React app if needed
-        if: ${{ contains(env.file, 'client') }}  # client 파일이 변경되었으면 빌드 실행
+        if: ${{ contains(env.file, 'client') }}
         working-directory: ./client
         run: |
-          npm install  # 필요하면 의존성 설치
-          npm run build  # React 애플리케이션 빌드
-          pwd
-    
-      # 6. 클라이언트 파일을 EC2 서버로 복사 (React 빌드 파일만)
-      - name: All Copy client build files to production server
-        if: ${{ contains(env.file, 'client') }}  # client 파일이 변경되었으면 복사
+          npm install
+          npm run build
+
+      # 6. 클라이언트 파일 복사
+      - name: Copy client build files to production server
+        if: ${{ contains(env.file, 'client') }}
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
           port: 22
-          source: "client/build/*"  # 빌드된 파일의 경로
-          target: "/var/www/loagap"  # EC2 서버에 복사할 경로
+          source: "client/build/*"
+          target: "/var/www/loagap/"
           strip_components: 2  # client/build 경로를 제거
-
+      # 7. SSH 키 저장
       - name: Save SSH Key
         run: |
           echo "${{ secrets.EC2_KEY }}" > key.pem
           chmod 600 key.pem
 
-      # 7. 서버 빌드 rsync 수정된 파일만 복사처리
+      # 8. 서버 파일 동기화
       - name: Sync server files to production server
-      if: ${{ contains(env.file, 'server') }}  # server 파일이 변경되었으면 복사
-      run: |
-        rsync -avz --progress --delete \
-          -e "ssh -o StrictHostKeyChecking=no -i key.pem" \
-          ./server/ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/GapBotApp/server/
+        if: ${{ contains(env.file, 'server') }}
+        run: |
+          rsync -avz --progress --delete \
+            -e "ssh -o StrictHostKeyChecking=no -i key.pem" \
+            ./server/ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/GapBotApp/server/
 
-      # 8. 서버 빌드 및 실행 (서버 파일이 변경된 경우에만 실행)
-      - name: pm2 Server Start
-        if: ${{ contains(env.file, 'server') }}  # 서버 파일이 변경되었으면 빌드 실행
+      # 9. PM2 서버 재시작
+      - name: Restart PM2 Server
+        if: ${{ contains(env.file, 'server') }}
         run: |
           ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             cd /home/ubuntu/GapBotApp/server
-            pm2 restart GapBotAppServer  # pm2로 서버 재시작
+            pm2 restart GapBotAppServer
           EOF
 
-      # 9. Nginx 재시작 (React 빌드 후 Nginx에 반영)
+      # 10. Nginx 재시작
       - name: Restart Nginx
-        if: ${{ contains(env.file, 'client') }}  # client 파일이 변경된 경우에만 Nginx 재시작
+        if: ${{ contains(env.file, 'client') }}
         run: |
           ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-            sudo systemctl restart nginx  # Nginx 재시작
+            sudo systemctl restart nginx
           EOF
