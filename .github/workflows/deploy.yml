@@ -54,19 +54,18 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
           script: |
-            scp -r ./build ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/var/www/loagap
+            scp -r ${{ github.workspace }}/client/build/* ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/var/www/loagap
 
       # 7. 변경된 파일을 EC2 서버로 복사 (서버 관련 파일만)
       - name: Copy server files to production server
         if: ${{ contains(env.file, 'server') }}  # server 파일이 변경되었으면 복사
-        working-directory: ./server
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
           script: |
-            scp -r ./server/ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/GapBotApp/server
+            scp -r ${{ github.workspace }}/server/* ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/GapBotApp/server
 
       # 8. 서버 빌드 및 실행 (서버 파일이 변경된 경우에만 실행)
       - name: Install dependencies and build server
