@@ -4,6 +4,7 @@ const path = require('path');
 const logger = require('./logger');  // logger.js 임포트
 const lostarkAPI = require('./routes/api'); // 라우트 등록
 const cron = require('./cron'); // cron.js를 불러옵니다
+// const cronTest = require('./routes/cronTest'); // 라우트 등록
 require('dotenv').config();
 
 const app = express();
@@ -20,31 +21,24 @@ app.use((req, res, next) => {
   logger.info({
     method: req.method,
     url: req.originalUrl,  // 요청 URL
-    message: 'handlerIncepter'
+    message: '[INERCEPTER]'
   });
   next();  // 다음 미들웨어로 전달
 });
 
+// CRON 로컬테스트용 주석처리
+// app.use('/cron', cronTest);
+
 // 로스트아크 API 사용
 app.use('/api', lostarkAPI);
 
-// React 정적 파일 제공
-// app.use(express.static(path.join(__dirname, '../client/build')));
-// React의 index.html로 fallback
-// app.get('*', (req, res) => {
-//   res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
-// });
-
 // 후처리 미들웨어 (에러 처리 및 로깅)
 app.use((err, req, res, next) => {
-  const { requestId } = req;  // 요청 ID를 사용
   // 에러 로그 기록
   logger.error({
-    message: err.message,
-    error: err.stack,
     method: req.method,
     url: req.originalUrl,
-    requestId: requestId,
+    message: err.stack,
   });
   // 에러 응답
   res.status(500).json({ error: err.message });
@@ -52,7 +46,6 @@ app.use((err, req, res, next) => {
 
 // Start server
 app.listen(PORT, () => {
-  // console.log(path.resolve(__dirname, '../routes/service/apiService.js')); // 경로 확인
   console.log(`Server is running on http://localhost:${PORT}`);
 });
 
