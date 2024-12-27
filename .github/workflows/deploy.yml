@@ -47,7 +47,7 @@ jobs:
           pwd
     
       # 6. 클라이언트 파일을 EC2 서버로 복사 (React 빌드 파일만)
-      - name: Copy client build files to production server
+      - name: All Copy client build files to production server
         if: ${{ contains(env.file, 'client') }}  # client 파일이 변경되었으면 복사
         uses: appleboy/scp-action@v0.1.4
         with:
@@ -59,25 +59,21 @@ jobs:
           target: "/var/www/loagap"  # EC2 서버에 복사할 경로
           strip_components: 2  # client/build 경로를 제거
 
-      # 7. 변경된 파일을 EC2 서버로 복사 (서버 관련 파일만)
-      - name: Copy server files to production server
-        if: ${{ contains(env.file, 'server') }}  # server 파일이 변경되었으면 복사
-        uses: appleboy/scp-action@v0.1.4
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_KEY }}
-          port: 22
-          source: "server/*"  # 빌드된 파일의 경로
-          target: "/home/ubuntu/GapBotApp/server/"  # EC2 서버에 복사할 경로
-          strip_components: 1  # client/build 경로를 제거
       - name: Save SSH Key
         run: |
           echo "${{ secrets.EC2_KEY }}" > key.pem
           chmod 600 key.pem
 
+      # 7. 서버 빌드 rsync 수정된 파일만 복사처리
+      - name: Sync server files to production server
+      if: ${{ contains(env.file, 'server') }}  # server 파일이 변경되었으면 복사
+      run: |
+        rsync -avz --progress --delete \
+          -e "ssh -o StrictHostKeyChecking=no -i key.pem" \
+          ./server/ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/GapBotApp/server/
+
       # 8. 서버 빌드 및 실행 (서버 파일이 변경된 경우에만 실행)
-      - name: Install dependencies and build server
+      - name: pm2 Server Start
         if: ${{ contains(env.file, 'server') }}  # 서버 파일이 변경되었으면 빌드 실행
         run: |
           ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
