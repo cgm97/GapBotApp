@@ -33,7 +33,7 @@ jobs:
       # 4. 변경된 파일을 EC2 서버로 복사 (서버 관련 파일만)
       - name: Copy server files to production server
         if: contains(env.files, 'server')  # server 파일이 변경되었으면 복사
-        uses: appleboy/scp-action@v0.2.0
+        uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
@@ -44,7 +44,7 @@ jobs:
       # 5. 클라이언트 파일을 EC2 서버로 복사 (React 빌드 파일만)
       - name: Copy client build files to production server
         if: contains(env.files, 'client')  # client 파일이 변경되었으면 복사
-        uses: appleboy/scp-action@v0.2.0
+        uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
