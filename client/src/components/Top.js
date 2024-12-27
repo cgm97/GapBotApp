@@ -8,7 +8,7 @@ const Top = () => {
         <span><a href="https://open.kakao.com/o/g6Abem1g">빈틈봇커뮤니티</a></span>
       </div>
       <div className="container">
-        <span><a href="#">로그인</a></span>
+        <span><a href="https://open.kakao.com/o/g6Abem1g">로그인</a></span>
       </div>
     </div>
   );
