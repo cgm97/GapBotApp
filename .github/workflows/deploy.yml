@@ -44,7 +44,7 @@ jobs:
         run: |
           npm install  # 필요하면 의존성 설치
           npm run build  # React 애플리케이션 빌드
-          ll
+          ls -al
       # 6. 변경된 파일을 EC2 서버로 복사 (서버 관련 파일만)
       - name: Copy server files to production server
         if: ${{ contains(env.file, 'server') }}  # server 파일이 변경되었으면 복사
