@@ -30,12 +30,15 @@ jobs:
           changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
           echo "Changed files: $changed_files"
           
-          # 변경된 파일 목록을 환경 변수에 저장
-          echo "changed_files=$changed_files" >> $GITHUB_ENV
+          # 변경된 파일을 각 줄에 대해 처리
+          IFS=$'\n'  # 줄 바꿈을 구분자로 설정
+          for file in $changed_files; do
+            echo "file=$file" >> $GITHUB_ENV  # 각 파일을 환경 변수로 설정
+          done
 
       # 5. 클라이언트 애플리케이션 빌드 (변경된 파일에 React 빌드가 포함되면 실행)
       - name: Build React app if needed
-        if: ${{ contains(steps.changed_files.outputs.changed_files, 'client') }}  # client 파일이 변경되었으면 빌드 실행
+        if: ${{ contains(env.file, 'client') }}  # client 파일이 변경되었으면 빌드 실행
         working-directory: ./client
         run: |
           npm install  # 필요하면 의존성 설치
@@ -43,7 +46,7 @@ jobs:
 
       # 6. 변경된 파일을 EC2 서버로 복사 (서버 관련 파일만)
       - name: Copy server files to production server
-        if: ${{ contains(steps.changed_files.outputs.changed_files, 'server') }}  # server 파일이 변경되었으면 복사
+        if: ${{ contains(env.file, 'server') }}  # server 파일이 변경되었으면 복사
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -54,7 +57,7 @@ jobs:
 
       # 7. 클라이언트 파일을 EC2 서버로 복사 (React 빌드 파일만)
       - name: Copy client build files to production server
-        if: ${{ contains(steps.changed_files.outputs.changed_files, 'client') }}  # client 파일이 변경되었으면 복사
+        if: ${{ contains(env.file, 'client') }}  # client 파일이 변경되었으면 복사
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -65,7 +68,7 @@ jobs:
 
       # 8. 서버 빌드 및 실행 (서버 파일이 변경된 경우에만 실행)
       - name: Install dependencies and build server
-        if: ${{ contains(steps.changed_files.outputs.changed_files, 'server') }}  # 서버 파일이 변경되었으면 빌드 실행
+        if: ${{ contains(env.file, 'server') }}  # 서버 파일이 변경되었으면 빌드 실행
         run: |
           ssh -o StrictHostKeyChecking=no -i ${{ secrets.EC2_KEY }} ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             cd /home/ubuntu/GapBotApp/server
@@ -74,7 +77,7 @@ jobs:
 
       # 9. Nginx 재시작 (React 빌드 후 Nginx에 반영)
       - name: Restart Nginx
-        if: ${{ contains(steps.changed_files.outputs.changed_files, 'client') }}  # client 파일이 변경된 경우에만 Nginx 재시작
+        if: ${{ contains(env.file, 'client') }}  # client 파일이 변경된 경우에만 Nginx 재시작
         run: |
           ssh -o StrictHostKeyChecking=no -i ${{ secrets.EC2_KEY }} ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             sudo systemctl restart nginx  # Nginx 재시작
