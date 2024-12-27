@@ -15,16 +15,9 @@ jobs:
       - name: Set CI environment variable to false
         run: echo "CI=false" >> $GITHUB_ENV  # CI 환경 변수 설정
 
-
-
       # 2. 코드 체크아웃
       - name: Checkout code
         uses: actions/checkout@v3
-        
-      # 3. 전체 커밋 기록 가져오기  
-      - name: ls -al
-        run: |
-          ls -al ./client  # 빌드 디렉토리 확인
 
       # 3. 전체 커밋 기록 가져오기
       - name: Fetch all commits
@@ -51,7 +44,7 @@ jobs:
         run: |
           npm install  # 필요하면 의존성 설치
           npm run build  # React 애플리케이션 빌드
-
+          ls -al ./client
       # 6. 변경된 파일을 EC2 서버로 복사 (서버 관련 파일만)
       - name: Copy server files to production server
         if: ${{ contains(env.file, 'server') }}  # server 파일이 변경되었으면 복사
@@ -61,7 +54,7 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
           script: |
-            scp -r ${{ github.workspace }}/server/* ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/GapBotApp/server
+            scp -r ./server/ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/GapBotApp/server
 
       # 7. 클라이언트 파일을 EC2 서버로 복사 (React 빌드 파일만)
       - name: Copy client build files to production server
@@ -72,7 +65,7 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
           script: |
-            scp -r ${{ github.workspace }}/client/build/* ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/var/www/loagap
+            scp -r ./client/build ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/var/www/loagap
 
       # 8. 서버 빌드 및 실행 (서버 파일이 변경된 경우에만 실행)
       - name: Install dependencies and build server
