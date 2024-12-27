@@ -45,6 +45,7 @@ jobs:
           npm install  # 필요하면 의존성 설치
           npm run build  # React 애플리케이션 빌드
           pwd
+          pwd
     
       # 6. 클라이언트 파일을 EC2 서버로 복사 (React 빌드 파일만)
       # 6. 클라이언트 파일을 EC2 서버로 복사 (React 빌드 파일만)
