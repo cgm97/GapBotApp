@@ -44,32 +44,32 @@ jobs:
         run: |
           npm install  # 필요하면 의존성 설치
           npm run build  # React 애플리케이션 빌드
+          pwd
     
+      # 6. 클라이언트 파일을 EC2 서버로 복사 (React 빌드 파일만)
       # 6. 클라이언트 파일을 EC2 서버로 복사 (React 빌드 파일만)
       - name: Copy client build files to production server
         if: ${{ contains(env.file, 'client') }}  # client 파일이 변경되었으면 복사
-        uses: appleboy/ssh-action@v1.2.0
+        uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
-          script: |
-            pwd
-            ls -al
-            ls -al ${{ github.workspace }}/client
-            ls -al ${{ github.workspace }}/client/build
-            scp -r ${{ github.workspace }}/client/build/. ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/var/www/loagap
+          port: 22
+          source: "./client/build/*"  # 빌드된 파일의 경로
+          target: "/var/www/loagap"  # EC2 서버에 복사할 경로
 
       # 7. 변경된 파일을 EC2 서버로 복사 (서버 관련 파일만)
       - name: Copy server files to production server
         if: ${{ contains(env.file, 'server') }}  # server 파일이 변경되었으면 복사
-        uses: appleboy/ssh-action@v1.2.0
+        uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
-          script: |
-            scp -r ${{ github.workspace }}/server/. ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/GapBotApp/server
+          port: 22
+          source: "./server/*"  # 빌드된 파일의 경로
+          target: "/home/ubuntu/GapBotApp/server"  # EC2 서버에 복사할 경로
 
       # 8. 서버 빌드 및 실행 (서버 파일이 변경된 경우에만 실행)
       - name: Install dependencies and build server
