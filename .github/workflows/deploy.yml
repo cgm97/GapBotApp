@@ -14,23 +14,30 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2. 변경된 파일 확인 (Git diff 사용)
+      # 2. 전체 커밋 기록 가져오기
+      - name: Fetch all commits
+        run: |
+          git fetch --prune --unshallow  # 모든 커밋 기록을 가져오기
+
+      # 3. 변경된 파일 확인 (Git diff 사용)
       - name: Get changed files
         id: changed_files
         run: |
           # 변경된 파일을 Git diff로 확인
           changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
           echo "Changed files: $changed_files"
+          
+          # 변경된 파일 목록을 환경 변수에 설정
           echo "files=$changed_files" >> $GITHUB_ENV
 
-      # 3. 클라이언트 애플리케이션 빌드 (변경된 파일에 React 빌드가 포함되면 실행)
+      # 4. 클라이언트 애플리케이션 빌드 (변경된 파일에 React 빌드가 포함되면 실행)
       - name: Build React app if needed
         if: contains(env.files, 'client')  # client 파일이 변경되었으면 빌드 실행
         working-directory: ./client
         run: |
           npm run build  # React 애플리케이션 빌드
 
-      # 4. 변경된 파일을 EC2 서버로 복사 (서버 관련 파일만)
+      # 5. 변경된 파일을 EC2 서버로 복사 (서버 관련 파일만)
       - name: Copy server files to production server
         if: contains(env.files, 'server')  # server 파일이 변경되었으면 복사
         uses: appleboy/ssh-action@v1.2.0
@@ -41,7 +48,7 @@ jobs:
           source: "./server/*"  # 서버 관련 파일만 복사
           target: "/home/ubuntu/GapBotApp/server"  # EC2 서버 경로
 
-      # 5. 클라이언트 파일을 EC2 서버로 복사 (React 빌드 파일만)
+      # 6. 클라이언트 파일을 EC2 서버로 복사 (React 빌드 파일만)
       - name: Copy client build files to production server
         if: contains(env.files, 'client')  # client 파일이 변경되었으면 복사
         uses: appleboy/ssh-action@v1.2.0
@@ -52,7 +59,7 @@ jobs:
           source: "./client/build/*"  # 빌드된 React 파일만 복사
           target: "/var/www/loagap"  # Nginx가 서빙할 경로 (React 빌드 파일)
 
-      # 6. 서버 빌드 및 실행 (서버 파일이 변경된 경우에만 실행)
+      # 7. 서버 빌드 및 실행 (서버 파일이 변경된 경우에만 실행)
       - name: Install dependencies and build server
         if: contains(env.files, 'server')  # 서버 파일이 변경되었으면 빌드 실행
         run: |
@@ -61,7 +68,7 @@ jobs:
             pm2 restart GapBotAppServer  # pm2로 서버 재시작
           EOF
 
-      # 7. Nginx 재시작 (React 빌드 후 Nginx에 반영)
+      # 8. Nginx 재시작 (React 빌드 후 Nginx에 반영)
       - name: Restart Nginx
         if: contains(env.files, 'client')  # client 파일이 변경된 경우에만 Nginx 재시작
         run: |
