@@ -14,7 +14,7 @@ exports.getIsland = async (req, res, next) => {
 
 exports.getNotice = async (req, res, next) => {
     try {
-        const [rows] = await pool.query('SELECT * FROM LOSARK_NOTICE ORDER BY SNO ');
+        const [rows] = await pool.query('SELECT * FROM LOSTARK_NOTICE ORDER BY SNO ');
         res.status(200).json(rows);
     } catch (error) {
         next(new Error(error));  // 에러 객체를 넘겨서 next 미들웨어로 전달
