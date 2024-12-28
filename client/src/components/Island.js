@@ -3,7 +3,7 @@ import axios from 'axios';
 import '../App.css';
 import '../css/Island.css'; // CSS 파일 (위에서 작성한 스타일을 참조)
 
-const Calendar = () => {
+const Island = () => {
   const [activeDay, setActiveDay] = useState(null);
   const [content, setContent] = useState({});
   const [data, setData] = useState(null);
@@ -124,4 +124,4 @@ const Calendar = () => {
   );
 };
 
-export default Calendar;
+export default Island;
