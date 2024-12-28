@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from 'axios';
 import '../App.css';
-import '../css/Calendar.css'; // CSS 파일 (위에서 작성한 스타일을 참조)
+import '../css/Island.css'; // CSS 파일 (위에서 작성한 스타일을 참조)
 
 const Calendar = () => {
   const [activeDay, setActiveDay] = useState(null);

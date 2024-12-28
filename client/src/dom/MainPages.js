@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from 'axios';
 import '../App.css'; // CSS 파일 (위에서 작성한 스타일을 참조)
-import Calender from '../components/Calenders';
+import Island from '../components/Island';
 
 const MainPages = () => {
   const [data, setData] = useState(null);
@@ -28,7 +28,7 @@ const MainPages = () => {
   }, []);
   return (
     <div>
-      <Calender />
+      <Island />
       <div className="ad-content">
         <div>광고</div>
       </div>
