@@ -111,15 +111,61 @@ const Island = () => {
       </div>
       <div className="islandContent">
         {activeDay && (
-          content[activeDay].map((island, index) => (
-            <div className="list-item" key={index}>
-              <img src={island.IMG_URL} alt={island.NAME} className="image" />
-              <p className="name">[{island.BONUS_REWARD_TYPE}] {island.NAME}
-              </p>
-            </div>
-          ))
+          Object.entries(
+            content[activeDay].reduce((groups, island) => {
+              const { TIME_TYPE } = island;
+              if (!groups[TIME_TYPE]) groups[TIME_TYPE] = [];
+              groups[TIME_TYPE].push(island);
+              return groups;
+            }, {})
+          ).map(([timeType, islands]) => {
+            // 중복 제거한 START_TIME 추출
+            const uniqueStartTimes = [
+              ...new Set(
+                islands
+                  .map((island) => {
+                    // START_TIME이 배열일 경우, 배열의 각 항목을 처리하고 trim() 적용
+                    if (Array.isArray(island.START_TIME)) {
+                      return island.START_TIME.map((time) => typeof time === 'string' ? time.trim() : '')
+                    }
+                    return [];
+                  })
+                  .flat()  // 중첩된 배열을 평탄화
+                  .filter((time) => time !== '') // 빈 문자열 제거
+              )
+            ];
+
+            return (
+              <div className="time-group" key={timeType}>
+                {/* TIME_TYPE 헤더 및 START_TIME 표시 */}
+                <h3 className="time-header">
+                  {uniqueStartTimes.map((time, index) => (
+                    <div key={index} className="time-box">
+                      {time}
+                    </div>
+                  ))}
+                </h3>
+
+                {/* TIME_TYPE에 해당하는 Island 리스트 */}
+                <div className="island-list">
+                  {islands.map((island, index) => (
+                    <div className="list-item" key={index}>
+                      <img src={island.IMG_URL} alt={island.NAME} className="image" />
+                      <p className="name">
+                        [{island.BONUS_REWARD_TYPE}] {island.NAME}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })
         )}
       </div>
+
+
+
+
     </div>
   );
 };
