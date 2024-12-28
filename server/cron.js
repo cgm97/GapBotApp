@@ -234,12 +234,14 @@ cron.schedule('0 * * * *', async () => {
                 TITLE VARCHAR(100) COMMENT '제목',
                 TYPE VARCHAR(20) COMMENT '타입',
                 URL VARCHAR(100) COMMENT '공지 URL'
+                DATE 등록일자
             */
             arr.push(
                 {
                     TITLE: notice.Title,
                     TYPE: notice.Type,
-                    URL: notice.Link
+                    URL: notice.Link,
+                    DATE: notice.Date
                 }
             );
         });
@@ -249,14 +251,16 @@ cron.schedule('0 * * * *', async () => {
         const insertSql = `INSERT INTO LOSTARK_NOTICE (
             TITLE,
             TYPE,
-            URL
-        ) VALUES (?, ?, ?)`;
+            URL,
+            DATE
+        ) VALUES (?, ?, ?, ?)`;
         // 쿼리 실행 (다중 insert Promise.all - 병렬처리)
         const promises = arr.flat().map(notice => {
             return connection.execute(insertSql, [
                 notice.TITLE,
                 notice.TYPE,
-                notice.URL
+                notice.URL,
+                notice.DATE
             ]);
         });
         const retInsert = await Promise.all(promises);
@@ -290,4 +294,110 @@ cron.schedule('0 * * * *', async () => {
     }
 });
 
+// 매주 수요일 10시 1분에 실행 - 이벤트 정보
+cron.schedule('1 10 * * 3', async () => { // async로 변경
+    var method = '매주 WED 10:01 이벤트 데이터';
+    logger.info({
+        method: method,
+        url: url,  // 요청 URL
+        message: '이벤트 저장 시작 START'
+    });
+
+    // 여기에 실제로 실행할 작업 코드 작성
+    const connection = await pool.getConnection();
+    const API_URL = "https://developer-lostark.game.onstove.com/news/events";
+
+    try {
+
+        // 트랜잭션 시작
+        await connection.beginTransaction();
+
+        // await 사용
+        const response = await axios.get(API_URL, {
+            headers: {
+                'accept': 'application/json',
+                'authorization': `bearer ${process.env.LOA_API_KEY}`,
+            },
+        });
+
+        // response.data를 사용
+        const data = response.data;
+
+        logger.info({
+            method: method,
+            url: url,  // 요청 URL
+            message: `데이터 불러오기 성공 ${data.length} 건`,
+        });
+
+        // 쿼리 실행 - 이전 데이터 DL_YN = Y 처리
+        const deleteSql = `DELETE FROM LOSTARK_EVENT WHERE SNO != 0`;
+        const [retDelete] = await connection.execute(deleteSql);
+        logger.info({
+            method: method,
+            url: url,  // 요청 URL
+            message: `이전 데이터 삭제처리 ${retDelete.affectedRows} 건`,
+        });
+
+        var arr = [];
+        data.forEach(event => {
+            /* LOSTARK_EVENT  Table
+                SNO INT [pk, increment, note: '일련번호']
+                TITLE VARCHAR(100) [note: '제목']
+                URL VARCHAR(100) [note: '이벤트 URL']
+                IMG_URL VARCHAR(100) [note: '이미지 URL']
+            */
+            arr.push(
+                {
+                    TITLE: event.Title,
+                    URL: event.Link,
+                    IMG_URL: event.Thumbnail
+                }
+            );
+        });
+
+
+        // 쿼리
+        const insertSql = `INSERT INTO LOSTARK_EVENT (
+            TITLE,
+            URL,
+            IMG_URL
+        ) VALUES (?, ?, ?)`;
+        // 쿼리 실행 (다중 insert Promise.all - 병렬처리)
+        const promises = arr.flat().map(event => {
+            return connection.execute(insertSql, [
+                event.TITLE,
+                event.URL,
+                event.IMG_URL
+            ]);
+        });
+        const retInsert = await Promise.all(promises);
+
+        // 각 삽입 작업의 결과에서 affectedRows 출력
+        let totalAffectedRows = 0;
+        retInsert.forEach(result => {
+            totalAffectedRows += result[0].affectedRows;  // 결과는 배열로 반환되므로 result[0]에 접근
+        });
+
+        // 트랜잭션 커밋
+        await connection.commit();
+        logger.info({
+            method: method,
+            url: url,  // 요청 URL
+            //message: `${JSON.stringify(arr, null, 2)} 모험섬 데이터 가공 종료`,
+            message: `이벤트 데이터 ${totalAffectedRows}건 적재 완료 END`
+        });
+    } catch (error) {
+        // 오류 발생 시 롤백
+        await connection.rollback();
+        // 에러 로깅
+        logger.error({
+            method: method,
+            url: url,  // 요청 URL
+            message: error.stack
+        });
+    } finally {
+        // 연결 반환
+        connection.release();
+    }
+});
 module.exports = cron; // cron을 export하여 다른 파일에서 사용할 수 있게 함
