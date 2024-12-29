@@ -28,13 +28,15 @@ jobs:
         run: |
           changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
           echo "Changed files: $changed_files"
-          echo "changed_files=$changed_files" >> $GITHUB_ENV
           
-          # changed_files 변수에서 client 관련 파일만 필터링해서 환경 변수에 저장
+          # 변경된 파일 목록을 환경 변수로 저장 (줄바꿈 기준)
+          echo "changed_files=$changed_files" >> $GITHUB_ENV
+
+          # client 파일만 필터링하여 환경 변수에 저장
           client_files=$(echo "$changed_files" | grep '^client/')
           echo "client_files=$client_files" >> $GITHUB_ENV
 
-          # server 관련 파일만 필터링해서 환경 변수에 저장
+          # server 파일만 필터링하여 환경 변수에 저장
           server_files=$(echo "$changed_files" | grep '^server/')
           echo "server_files=$server_files" >> $GITHUB_ENV
 
