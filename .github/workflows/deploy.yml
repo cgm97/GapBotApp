@@ -60,12 +60,24 @@ jobs:
           chmod 600 key.pem
 
       # 8. 서버 파일 동기화
-      - name: Sync server files to production server
+      # - name: Sync server files to production server
+      #   if: ${{ contains(env.file, 'server') }}
+      #   run: |
+      #     rsync -avz --progress \
+      #       -e "ssh -o StrictHostKeyChecking=no -i key.pem" \
+      #       ./server/ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/GapBotApp/server/
+      - name: Sync changed server files to production server
         if: ${{ contains(env.file, 'server') }}
         run: |
-          rsync -avz --progress \
-            -e "ssh -o StrictHostKeyChecking=no -i key.pem" \
-            ./server/ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/GapBotApp/server/
+          IFS=$'\n'  # Newline을 기준으로 파일을 분리
+          for file in $changed_files; do
+            echo "Syncing changed file: $file"
+            # rsync 명령에 상대 경로 옵션을 사용하여 정확한 위치에 복사
+            rsync -avz --progress \
+              -e "ssh -o StrictHostKeyChecking=no -i key.pem" \
+              --relative \
+              "$file" ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/GapBotApp/server/
+          done
 
       # 9. PM2 서버 재시작
       - name: Restart PM2 Server
