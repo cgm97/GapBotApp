@@ -71,7 +71,7 @@ const MainPages = () => {
           </ul>
         </div>
         <div className="content">
-          <h4>빈틈봇 서버현황</h4>
+          <h4>빈틈봇 패치노트</h4>
           <ul>
             <li>Item 1</li>
             <li>Item 2</li>
