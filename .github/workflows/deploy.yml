@@ -29,10 +29,18 @@ jobs:
           changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
           echo "Changed files: $changed_files"
           echo "changed_files=$changed_files" >> $GITHUB_ENV
+          
+          # changed_files 변수에서 client 관련 파일만 필터링해서 환경 변수에 저장
+          client_files=$(echo "$changed_files" | grep '^client/')
+          echo "client_files=$client_files" >> $GITHUB_ENV
+
+          # server 관련 파일만 필터링해서 환경 변수에 저장
+          server_files=$(echo "$changed_files" | grep '^server/')
+          echo "server_files=$server_files" >> $GITHUB_ENV
 
       # 5. 클라이언트 빌드
       - name: Build React app if needed
-        if: ${{ contains(steps.changed_files.outputs.changed_files, 'client') }}
+        if: ${{ env.client_files }}
         working-directory: ./client
         run: |
           npm install
@@ -40,7 +48,7 @@ jobs:
 
       # 6. 클라이언트 파일 복사
       - name: Copy client build files to production server
-        if: ${{ contains(steps.changed_files.outputs.changed_files, 'client') }}
+        if: ${{ env.client_files }}
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -59,22 +67,20 @@ jobs:
 
       # 8. 서버 파일 동기화
       - name: Sync changed server files to production server
-        if: ${{ contains(steps.changed_files.outputs.changed_files, 'server') }}
+        if: ${{ env.server_files }}
         run: |
           IFS=$'\n'  # Newline을 기준으로 파일을 분리
-          for file in $changed_files; do
-            if [[ "$file" == server/* ]]; then
-              echo "Syncing server file: $file"
-              rsync -avz --progress \
-                -e "ssh -o StrictHostKeyChecking=no -i key.pem" \
-                --relative \
-                "$file" ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/GapBotApp/server/
-            fi
+          for file in ${{ env.server_files }}; do
+            echo "Syncing server file: $file"
+            rsync -avz --progress \
+              -e "ssh -o StrictHostKeyChecking=no -i key.pem" \
+              --relative \
+              "$file" ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/GapBotApp/server/
           done
 
       # 9. PM2 서버 재시작
       - name: Restart PM2 Server
-        if: ${{ contains(steps.changed_files.outputs.changed_files, 'server') }}
+        if: ${{ env.server_files }}
         run: |
           ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             cd /home/ubuntu/GapBotApp/server
@@ -83,7 +89,7 @@ jobs:
 
       # 10. Nginx 재시작
       - name: Restart Nginx
-        if: ${{ contains(steps.changed_files.outputs.changed_files, 'client') }}
+        if: ${{ env.client_files }}
         run: |
           ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             sudo systemctl restart nginx
