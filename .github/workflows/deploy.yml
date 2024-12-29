@@ -26,23 +26,31 @@ jobs:
       - name: Get changed files
         id: changed_files
         run: |
+          # 변경된 파일 목록 가져오기
           changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
           echo "Changed files: $changed_files"
-          
-          # 파일 목록을 GITHUB_ENV에 저장
-          echo "changed_files=$changed_files" >> $GITHUB_ENV
-          
-          # client와 server 관련 파일을 분리하여 저장
+
+          # 변경된 파일을 GITHUB_ENV에 한 줄씩 저장
+          IFS=$'\n'  # newline 기준으로 파일 분리
+          for file in $changed_files; do
+            echo "changed_file=$file" >> $GITHUB_ENV
+          done
+
+          # client와 server 관련 파일을 필터링
           client_files=$(echo "$changed_files" | grep '^client/')
           server_files=$(echo "$changed_files" | grep '^server/')
-          
-          # GITHUB_ENV에 각각 저장
-          echo "client_files=$client_files" >> $GITHUB_ENV
-          echo "server_files=$server_files" >> $GITHUB_ENV
+
+          # client와 server 관련 파일을 GITHUB_ENV에 한 줄씩 저장
+          for client_file in $client_files; do
+            echo "client_file=$client_file" >> $GITHUB_ENV
+          done
+          for server_file in $server_files; do
+            echo "server_file=$server_file" >> $GITHUB_ENV
+          done
 
       # 5. 클라이언트 빌드
       - name: Build React app if needed
-        if: ${{ env.client_files }}
+        if: ${{ env.client_file }}
         working-directory: ./client
         run: |
           npm install
@@ -50,7 +58,7 @@ jobs:
 
       # 6. 클라이언트 파일 복사
       - name: Copy client build files to production server
-        if: ${{ env.client_files }}
+        if: ${{ env.client_file }}
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -69,7 +77,7 @@ jobs:
 
       # 8. 서버 파일 동기화
       - name: Sync server files to production server
-        if: ${{ env.server_files }}
+        if: ${{ env.server_file }}
         run: |
           rsync -avz --progress \
             -e "ssh -o StrictHostKeyChecking=no -i key.pem" \
@@ -77,7 +85,7 @@ jobs:
 
       # 9. PM2 서버 재시작
       - name: Restart PM2 Server
-        if: ${{ env.server_files }}
+        if: ${{ env.server_file }}
         run: |
           ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             cd /home/ubuntu/GapBotApp/server
@@ -86,7 +94,7 @@ jobs:
 
       # 10. Nginx 재시작
       - name: Restart Nginx
-        if: ${{ env.client_files }}
+        if: ${{ env.client_file }}
         run: |
           ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             sudo systemctl restart nginx
