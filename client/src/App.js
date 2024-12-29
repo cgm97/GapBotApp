@@ -1,12 +1,11 @@
 import React from "react";
-import axios from 'axios';
 import './App.css';
 import Header from './components/Header';
 import Top from './components/Top';
 import MainPages from './dom/MainPages';
 import Command from './dom/Command';
 import CalendarUI from './dom/CalendarUI';
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route} from "react-router-dom";
 
 function App() {
 return (

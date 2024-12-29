@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from 'axios';
 import '../App.css';
+import '../css/Island.css'; // CSS 파일 (위에서 작성한 스타일을 참조)
 
-const Calendar = () => {
+const Island = () => {
   const [activeDay, setActiveDay] = useState(null);
   const [content, setContent] = useState({});
   const [data, setData] = useState(null);
@@ -10,7 +11,7 @@ const Calendar = () => {
 
   // API 데이터 호출
   useEffect(() => {
-    const storedData = sessionStorage.getItem('gameContents');
+    const storedData = sessionStorage.getItem('island');
 
     if (storedData) {
       // sessionStorage에서 데이터를 불러온 경우
@@ -18,10 +19,10 @@ const Calendar = () => {
       setData(parsedData);
     } else {
       // sessionStorage에 데이터가 없는 경우 API 호출
-      axios.get(process.env.REACT_APP_SERVER_URL + '/api/data')
+      axios.get(process.env.REACT_APP_SERVER_URL + '/api/island')
         .then((response) => {
           setData(response.data);
-          sessionStorage.setItem('gameContents', JSON.stringify(response.data));
+          sessionStorage.setItem('island', JSON.stringify(response.data));
         })
         .catch((error) => {
           console.error("API 호출 오류:", error);
@@ -82,9 +83,9 @@ const Calendar = () => {
 
         // 찾은 아이템들을 content에 추가
         if (matchingItems.length > 0) {
-          acc[date] = matchingItems.map(item => "[" + item.BONUS_REWARD_TYPE + "]" + item.NAME).join("\n");  // 여러 아이템의 NAME을 합쳐서 표시
+          acc[date] = matchingItems;
         } else {
-          acc[date] = "모험 섬이 없습니다."; // 해당 날짜에 데이터가 없으면 기본 메시지
+          acc[date] = [{}]; // 해당 날짜에 데이터가 없으면 기본 메시지
         }
 
         return acc;
@@ -108,30 +109,65 @@ const Calendar = () => {
           </div>
         ))}
       </div>
+      <div className="islandContent">
+        {activeDay && (
+          Object.entries(
+            content[activeDay].reduce((groups, island) => {
+              const { TIME_TYPE } = island;
+              if (!groups[TIME_TYPE]) groups[TIME_TYPE] = [];
+              groups[TIME_TYPE].push(island);
+              return groups;
+            }, {})
+          ).map(([timeType, islands]) => {
+            // 중복 제거한 START_TIME 추출
+            const uniqueStartTimes = [
+              ...new Set(
+                islands
+                  .map((island) => {
+                    // START_TIME이 배열일 경우, 배열의 각 항목을 처리하고 trim() 적용
+                    if (Array.isArray(island.START_TIME)) {
+                      return island.START_TIME.map((time) => typeof time === 'string' ? time.trim() : '')
+                    }
+                    return [];
+                  })
+                  .flat()  // 중첩된 배열을 평탄화
+                  .filter((time) => time !== '') // 빈 문자열 제거
+              )
+            ];
 
-      {activeDay && (
-        <div className="content">
-          <p>
-            {content[activeDay]
-              .split("\n")
-              .map((line, index) => (
-                <span key={index}>
-                  {line}
-                  <br />
-                </span>
-              ))}
-          </p>
-        </div>
-      )}
+            return (
+              <div className="time-group" key={timeType}>
+                {/* TIME_TYPE 헤더 및 START_TIME 표시 */}
+                <h3 className="time-header">
+                  {uniqueStartTimes.map((time, index) => (
+                    <div key={index} className="time-box">
+                      {time}
+                    </div>
+                  ))}
+                </h3>
 
-      {/* {data && (
-        <div className="api-data">
-          <h3>API 응답 데이터</h3>
-          <pre>{JSON.stringify(data, null, 2)}</pre>
-        </div>
-      )} */}
+                {/* TIME_TYPE에 해당하는 Island 리스트 */}
+                <div className="island-list">
+                  {islands.map((island, index) => (
+                    <div className="list-item" key={index}>
+                      <img src={island.IMG_URL} alt={island.NAME} className="image" />
+                      <p className="name">
+                        [{island.BONUS_REWARD_TYPE}] {island.NAME}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+
+
+
+
     </div>
   );
 };
 
-export default Calendar;
+export default Island;
