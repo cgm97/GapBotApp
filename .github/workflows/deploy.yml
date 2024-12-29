@@ -32,16 +32,15 @@ jobs:
 
       # 5. 클라이언트 빌드
       - name: Build React app if needed
-        if: ${{ contains(env.changed_files, 'client') }}
+        if: ${{ contains(steps.changed_files.outputs.changed_files, 'client') }}
         working-directory: ./client
         run: |
           npm install
           npm run build
-          echo "Client build completed."
 
       # 6. 클라이언트 파일 복사
       - name: Copy client build files to production server
-        if: ${{ contains(env.changed_files, 'client') }}
+        if: ${{ contains(steps.changed_files.outputs.changed_files, 'client') }}
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -60,7 +59,7 @@ jobs:
 
       # 8. 서버 파일 동기화
       - name: Sync changed server files to production server
-        if: ${{ contains(env.changed_files, 'server') }}
+        if: ${{ contains(steps.changed_files.outputs.changed_files, 'server') }}
         run: |
           IFS=$'\n'  # Newline을 기준으로 파일을 분리
           for file in $changed_files; do
@@ -75,7 +74,7 @@ jobs:
 
       # 9. PM2 서버 재시작
       - name: Restart PM2 Server
-        if: ${{ contains(env.changed_files, 'server') }}
+        if: ${{ contains(steps.changed_files.outputs.changed_files, 'server') }}
         run: |
           ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             cd /home/ubuntu/GapBotApp/server
@@ -84,7 +83,7 @@ jobs:
 
       # 10. Nginx 재시작
       - name: Restart Nginx
-        if: ${{ contains(env.changed_files, 'client') }}
+        if: ${{ contains(steps.changed_files.outputs.changed_files, 'client') }}
         run: |
           ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             sudo systemctl restart nginx
