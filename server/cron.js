@@ -69,7 +69,7 @@ cron.schedule('1 10 * * 3', async () => { // async로 변경
                     return acc;
                 }, {});
 
-                arr.push(Object.entries(groupedByDate).map(([date, { times }]) => {
+                arr.push(...Object.entries(groupedByDate).map(([date, { times }]) => {
                     // 첫 번째 시간
                     const firstTime = times[0];
 
@@ -140,7 +140,7 @@ cron.schedule('1 10 * * 3', async () => { // async로 변경
             IMG_URL
         ) VALUES (?, ?, ?, ?, ?, ?, ?)`;
         // 쿼리 실행 (다중 insert Promise.all - 병렬처리)
-        const promises = arr.flat().map(island => {
+        const promises = arr.map(island => {
             return connection.execute(insertSql, [
                 island.BASE_DATE,
                 island.TIME_TYPE,
@@ -218,6 +218,19 @@ cron.schedule('0 * * * *', async () => {
             message: `데이터 불러오기 성공 ${data.length} 건`,
         });
 
+        // 최신 공지가 현재 저장된 공지 이름이 같으면 변동사항이 없기 때문에 Pass처리
+        const selectSql = `SELECT * FROM LOSTARK_NOTICE ORDER BY DATE DESC LIMIT 1`;
+        const [retNotice] = await connection.execute(selectSql);
+
+        if(retNotice.length > 0 && data[0].Title == retNotice[0].TITLE){
+            logger.info({
+                method: method,
+                url: url,  // 요청 URL
+                message: `추가된 공지 데이터 없음 END`,
+            });
+            return;
+        }
+
         // 쿼리 실행 - 이전 데이터 DL_YN = Y 처리
         const deleteSql = `DELETE FROM LOSTARK_NOTICE WHERE SNO != 0`;
         const [retDelete] = await connection.execute(deleteSql);
@@ -246,7 +259,6 @@ cron.schedule('0 * * * *', async () => {
             );
         });
 
-
         // 쿼리
         const insertSql = `INSERT INTO LOSTARK_NOTICE (
             TITLE,
@@ -254,8 +266,9 @@ cron.schedule('0 * * * *', async () => {
             URL,
             DATE
         ) VALUES (?, ?, ?, ?)`;
+
         // 쿼리 실행 (다중 insert Promise.all - 병렬처리)
-        const promises = arr.flat().map(notice => {
+        const promises = arr.map(notice => {
             return connection.execute(insertSql, [
                 notice.TITLE,
                 notice.TYPE,
@@ -363,7 +376,7 @@ cron.schedule('1 10 * * 3', async () => { // async로 변경
             IMG_URL
         ) VALUES (?, ?, ?)`;
         // 쿼리 실행 (다중 insert Promise.all - 병렬처리)
-        const promises = arr.flat().map(event => {
+        const promises = arr.map(event => {
             return connection.execute(insertSql, [
                 event.TITLE,
                 event.URL,
@@ -400,4 +413,5 @@ cron.schedule('1 10 * * 3', async () => { // async로 변경
         connection.release();
     }
 });
+
 module.exports = cron; // cron을 export하여 다른 파일에서 사용할 수 있게 함
