@@ -57,7 +57,7 @@ const MainPages = () => {
       </div>
       <div className="notice">
         <div className="content">
-          <h4>로스트아크 공지사항1</h4>
+          <h4>로스트아크 공지사항</h4>
           <ul>
             {noticeData && (
               noticeData.slice(0, 20).map((notice, index) => (
