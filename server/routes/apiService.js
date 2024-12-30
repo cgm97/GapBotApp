@@ -29,3 +29,12 @@ exports.getEvent = async (req, res, next) => {
         next(new Error(error));  // 에러 객체를 넘겨서 next 미들웨어로 전달
     }
 }
+
+exports.getPatchNote = async (req, res, next) => {
+    try {
+        const [rows] = await pool.query('SELECT * FROM GAP_PATCHNOTE WHERE DL_YN = "N" ORDER BY SNO ');
+        res.status(200).json(rows);
+    } catch (error) {
+        next(new Error(error));  // 에러 객체를 넘겨서 next 미들웨어로 전달
+    }
+}

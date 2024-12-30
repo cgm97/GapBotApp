@@ -6,7 +6,7 @@ const apiService = require('./apiService'); // 상대 경로로 apiService 불�
  * @swagger
  * tags:
  *   - name: LostArk API
- *     description: 로스트아크 관련 API 목록
+ *     description: 로스트아크 관련 API 목록 (메인화면)
  */
 
 /**
@@ -154,5 +154,40 @@ router.get('/notice', apiService.getNotice);
  *                     description: 최초등록일시.
  */
 router.get('/event', apiService.getEvent);
+
+/**
+ * @swagger
+ * /api/patchNote:
+ *   get:
+ *     summary: 빈틈봇 패치노트를 가져옵니다.
+ *     tags: [LostArk API]
+ *     responses:
+ *       200:
+ *         description: 빈틈봇 패치노트 데이터 목록.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   SNO:
+ *                     type: integer
+ *                     description: 일련번호.
+ *                   TITLE:
+ *                     type: string
+ *                     description: 제목.
+ *                   CONTENTS:
+ *                     type: string
+ *                     description: 내용.
+ *                   FST_DTTI:
+ *                     type: string
+ *                     description: 최초등록일시.
+ *                   DL_YN:
+ *                     type: string
+ *                     format: date-time
+ *                     description: 삭제여부.
+ */
+router.get('/patchNote', apiService.getPatchNote);
 
 module.exports = router;
