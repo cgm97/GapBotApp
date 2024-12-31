@@ -2,10 +2,18 @@ import React, { useState, useEffect } from "react";
 import axios from 'axios';
 import '../App.css'; // CSS 파일 (위에서 작성한 스타일을 참조)
 import Island from '../components/Island';
+import '../css/Command.css'; // CSS 파일 (위에서 작성한 스타일을 참조)
 
 const MainPages = () => {
   const [noticeData, setNoticeData] = useState(null);
   const [eventData, setEventData] = useState(null);
+  const [patchNoteData, setPatchNoteData] = useState(null);
+
+  // 각 항목의 카드가 열려 있는지 여부를 상태로 관리
+  const [activeCard, setActiveCard] = useState(null);
+  const toggleCard = (id) => {
+    setActiveCard(activeCard === id ? null : id); // 카드 토글
+  };
 
   // 공지사항 API 데이터 호출
   useEffect(() => {
@@ -28,7 +36,7 @@ const MainPages = () => {
     }
   }, []);
 
-  // 공지사항 API 데이터 호출
+  // 이벤트 API 데이터 호출
   useEffect(() => {
     const storedData = sessionStorage.getItem('event');
 
@@ -42,6 +50,27 @@ const MainPages = () => {
         .then((response) => {
           setEventData(response.data);
           sessionStorage.setItem('event', JSON.stringify(response.data));
+        })
+        .catch((error) => {
+          console.error("API 호출 오류:", error);
+        });
+    }
+  }, []);
+
+  // 패치노트 API 데이터 호출
+  useEffect(() => {
+    const storedData = sessionStorage.getItem('patchNote');
+
+    if (storedData) {
+      // sessionStorage에서 데이터를 불러온 경우
+      const parsedData = JSON.parse(storedData);
+      setPatchNoteData(parsedData);
+    } else {
+      // sessionStorage에 데이터가 없는 경우 API 호출
+      axios.get(process.env.REACT_APP_SERVER_URL + '/api/patchNote')
+        .then((response) => {
+          setPatchNoteData(response.data);
+          sessionStorage.setItem('patchNote', JSON.stringify(response.data));
         })
         .catch((error) => {
           console.error("API 호출 오류:", error);
@@ -73,11 +102,19 @@ const MainPages = () => {
         <div className="content">
           <h4>빈틈봇 패치노트</h4>
           <ul>
-            <li>Item 1</li>
-            <li>Item 2</li>
-            <li>Item 3</li>
-            <li>Item 4</li>
-            <li>Item 5</li>
+            {patchNoteData && (
+              patchNoteData.map((patchNote) => (
+                <li key={patchNote.SNO} onClick={() => toggleCard(patchNote.SNO)}>
+                  {patchNote.TITLE}
+                  {activeCard === patchNote.SNO && (
+                    <div className="card active"> {/* active 클래스 추가 */}
+                      {patchNote.TITLE}
+                      {patchNote.CONTENTS && <p>{patchNote.CONTENTS}</p>}
+                    </div>
+                  )}
+                </li>
+              ))
+            )}
           </ul>
         </div>
         <div className="content">
@@ -87,8 +124,8 @@ const MainPages = () => {
               eventData.map((event, index) => (
                 <li key={index} className="truncate-text">
                   <a href={event.URL} className="link-style" target="_blank" rel="noopener noreferrer">
-                     {/* {event.TITLE} */}
-                     <img src={event.IMG_URL} alt={event.TITLE} className="image" />
+                    {/* {event.TITLE} */}
+                    <img src={event.IMG_URL} alt={event.TITLE} className="image" />
                   </a>
                 </li>
               ))

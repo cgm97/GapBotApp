@@ -5,6 +5,8 @@ import Top from './components/Top';
 import MainPages from './dom/MainPages';
 import Command from './dom/Command';
 import CalendarUI from './dom/CalendarUI';
+import Login from './dom/Login';
+import Register from './dom/Register';
 import { BrowserRouter as Router, Routes, Route} from "react-router-dom";
 
 function App() {
@@ -20,6 +22,8 @@ return (
       <Header />
       <Routes>
         <Route path="/" element={<MainPages />} />
+        <Route path="/login" element={<div className="centered"><Login /></div>} />
+        <Route path="/register" element={<div className="centered"><Register /></div>} />
         <Route path="/cmd" element={<Command />} />
         <Route path="/character" element={<div>전투정보실</div>} />
         <Route path="/homework" element={<div>숙제</div>} />

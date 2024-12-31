@@ -3,7 +3,12 @@ body {
   margin: 0;
   font-family: Arial, sans-serif;
 }
-
+.centered {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 600px; /* 부모 컨테이너 높이를 기준으로 중앙 정렬 */
+}
 /* 광고 영역 (왼쪽과 오른쪽) */
 .advertise {
   width: 200px;  /* 광고 영역 너비 */
