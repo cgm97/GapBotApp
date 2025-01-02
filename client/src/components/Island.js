@@ -102,10 +102,9 @@ const Island = () => {
           <div
             key={date}
             className={`day ${activeDay === date ? "active" : ""}`}
-            onClick={() => setActiveDay(date)}
-          >
-            <div className="day-date">{date}</div>
-            <div className="day-name">{day}</div>
+            onClick={() => setActiveDay(date)}>
+            <div className={`day-date ${day === '토' || day === '일' ? 'holiday' : ''}`}>{date}</div>
+            <div className={`day-name ${day === '토' || day === '일' ? 'holiday' : ''}`}>{day}</div>
           </div>
         ))}
       </div>
