@@ -1,6 +1,6 @@
 import React from "react";
 import './App.css';
-import ProtectedRoute from "./components/ProtectedRoute";
+import ProtectedRoute from "./context/ProtectedRoute";
 import Header from './components/Header';
 import Top from './components/Top';
 import MainPages from './dom/MainPages';
@@ -8,6 +8,7 @@ import Command from './dom/Command';
 import CalendarUI from './dom/CalendarUI';
 import Login from './dom/Login';
 import Register from './dom/Register';
+import PatchNote from './dom/PatchNote';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
             <Route path="/register" element={<div className="centered"><Register /></div>} />
             <Route path="/cmd" element={<Command />} />
             <Route path="/character" element={<div>전투정보실</div>} />
+            <Route path="/patchNote" element={<PatchNote />} />
             {/* Protected Routes */}
             <Route
               path="/mypage"
