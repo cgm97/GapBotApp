@@ -8,6 +8,17 @@ export const UserProvider = ({ children }) => {
     const [user, setUser] = useState(null); // 사용자 정보 상태
     const [token, setToken] = useState(null); // 토큰 상태
 
+    // 로그인 정보 동기화
+    useEffect(() => {
+        const storedUser = sessionStorage.getItem("user");
+        const storedToken = sessionStorage.getItem("token");
+
+        if (storedUser && storedToken) {
+            setUser(JSON.parse(storedUser)); // 저장된 user 값을 객체로 변환
+            setToken(storedToken);
+        }
+    }, []);
+
     const login = (userData, tokenData) => {
         setUser(userData);
         setToken(tokenData);
