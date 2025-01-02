@@ -29,6 +29,14 @@ function App() {
             <Route path="/character" element={<div>전투정보실</div>} />
             {/* Protected Routes */}
             <Route
+              path="/mypage"
+              element={
+                <ProtectedRoute>
+                  <div>마이페이지</div>
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/todo"
               element={
                 <ProtectedRoute>

@@ -5,5 +5,5 @@ const cronTestService = require('./cronTestService'); // 상대 경로로 apiSer
 // GET - /api/gameContents
 router.get('/island', cronTestService.getIsland);
 router.get('/notice', cronTestService.getNotice);
-
+router.get('/event', cronTestService.getEvent);
 module.exports = router;
