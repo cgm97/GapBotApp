@@ -7,7 +7,7 @@ const user = require('./routes/user'); // 라우트 등록
 const cron = require('./cron'); // cron.js를 불러옵니다
 const swaggerUi = require('swagger-ui-express');
 const swaggerJSDoc = require('swagger-jsdoc');
-// const cronTest = require('./routes/cronTest'); // 라우트 등록
+const cronTest = require('./routes/cronTest'); // 라우트 등록
 require('dotenv').config();
 
 const app = express();
@@ -62,7 +62,7 @@ app.use((req, res, next) => {
 });
 
 // CRON 로컬테스트용 주석처리
-// app.use('/cron', cronTest);
+app.use('/cron', cronTest);
 
 // 로스트아크 API 사용
 app.use('/api', lostarkAPI);
