@@ -3,17 +3,12 @@ import axios from 'axios';
 import '../App.css'; // CSS 파일 (위에서 작성한 스타일을 참조)
 import Island from '../components/Island';
 import '../css/Command.css'; // CSS 파일 (위에서 작성한 스타일을 참조)
+import { Link } from "react-router-dom";
 
 const MainPages = () => {
   const [noticeData, setNoticeData] = useState(null);
   const [eventData, setEventData] = useState(null);
   const [patchNoteData, setPatchNoteData] = useState(null);
-
-  // 각 항목의 카드가 열려 있는지 여부를 상태로 관리
-  const [activeCard, setActiveCard] = useState(null);
-  const toggleCard = (id) => {
-    setActiveCard(activeCard === id ? null : id); // 카드 토글
-  };
 
   // 공지사항 API 데이터 호출
   useEffect(() => {
@@ -103,15 +98,9 @@ const MainPages = () => {
           <h4>빈틈봇 패치노트</h4>
           <ul>
             {patchNoteData && (
-              patchNoteData.map((patchNote) => (
-                <li key={patchNote.SNO} onClick={() => toggleCard(patchNote.SNO)}>
-                  {patchNote.TITLE}
-                  {activeCard === patchNote.SNO && (
-                    <div className="card active"> {/* active 클래스 추가 */}
-                      {patchNote.TITLE}
-                      {patchNote.CONTENTS && <p>{patchNote.CONTENTS}</p>}
-                    </div>
-                  )}
+              patchNoteData.slice(0, 20).map((patchNote) => (
+                <li key={patchNote.SNO} className="truncate-text">
+                  <Link to="/patchNote" className="link-style"> {patchNote.TITLE} </Link>
                 </li>
               ))
             )}
