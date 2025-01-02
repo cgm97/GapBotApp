@@ -290,7 +290,7 @@ exports.getEvent = async (req, res, next) => {
     var method = '매주 WED 10:01 이벤트 데이터';
     logger.info({
         method: method,
-        url: url,  // 요청 URL
+        url: '[CRON]',  // 요청 URL
         message: '이벤트 저장 시작 START'
     });
 
@@ -316,7 +316,7 @@ exports.getEvent = async (req, res, next) => {
 
         logger.info({
             method: method,
-            url: url,  // 요청 URL
+            url: '[CRON]',  // 요청 URL
             message: `데이터 불러오기 성공 ${data.length} 건`,
         });
 
@@ -325,7 +325,7 @@ exports.getEvent = async (req, res, next) => {
         const [retDelete] = await connection.execute(deleteSql);
         logger.info({
             method: method,
-            url: url,  // 요청 URL
+            url: '[CRON]',  // 요청 URL
             message: `이전 데이터 삭제처리 ${retDelete.affectedRows} 건`,
         });
 
@@ -373,7 +373,7 @@ exports.getEvent = async (req, res, next) => {
         await connection.commit();
         logger.info({
             method: method,
-            url: url,  // 요청 URL
+            url: '[CRON]',  // 요청 URL
             //message: `${JSON.stringify(arr, null, 2)} 모험섬 데이터 가공 종료`,
             message: `이벤트 데이터 ${totalAffectedRows}건 적재 완료 END`
         });
@@ -383,7 +383,7 @@ exports.getEvent = async (req, res, next) => {
         // 에러 로깅
         logger.error({
             method: method,
-            url: url,  // 요청 URL
+            url: '[CRON]',  // 요청 URL
             message: error.stack
         });
     } finally {

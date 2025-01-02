@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useEffect  } from "react";
 
 // Context 생성
 export const UserContext = createContext();
@@ -14,7 +14,7 @@ export const UserProvider = ({ children }) => {
         const storedToken = sessionStorage.getItem("token");
 
         if (storedUser && storedToken) {
-            setUser(JSON.parse(storedUser)); // 저장된 user 값을 객체로 변환
+            setUser(storedUser); // 저장된 user 값을 객체로 변환
             setToken(storedToken);
         }
     }, []);
