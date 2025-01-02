@@ -3,6 +3,7 @@ const cors = require('cors');
 const path = require('path');
 const logger = require('./logger');  // logger.js 임포트
 const lostarkAPI = require('./routes/api'); // 라우트 등록
+const user = require('./routes/user'); // 라우트 등록
 const cron = require('./cron'); // cron.js를 불러옵니다
 const swaggerUi = require('swagger-ui-express');
 const swaggerJSDoc = require('swagger-jsdoc');
@@ -65,6 +66,8 @@ app.use((req, res, next) => {
 
 // 로스트아크 API 사용
 app.use('/api', lostarkAPI);
+// 유저 API 사용
+app.use('/user', user);
 
 // 후처리 미들웨어 (에러 처리 및 로깅)
 app.use((err, req, res, next) => {

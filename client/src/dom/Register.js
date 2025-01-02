@@ -1,15 +1,17 @@
 import React, { useState } from "react";
-import { Link } from 'react-router-dom';
+import axios from 'axios';
+import { Link , useNavigate  } from 'react-router-dom';
 import '../css/Login.css'; // CSS 파일 (위에서 작성한 스타일을 참조)
 
 const Register = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [isSuccess, setIsSuccess] = useState(false);
     const [error, setError] = useState('');
-    const [success, setSuccess] = useState('');
-
-    const handleSubmit = (event) => {
+    const navigate = useNavigate(); // useNavigate 훅 사용
+    
+    const handleSubmit = async (event) => {
         event.preventDefault();
 
         // Basic validation
@@ -23,10 +25,41 @@ const Register = () => {
             return;
         }
 
-        // Dummy validation for demonstration
-        // Replace this with actual API call to register the user
-        setSuccess('Registration successful! You can now log in.');
-        setError(''); // Clear any previous error
+        const data = {
+            email: email,
+            password: password
+        };
+
+        try {
+            const response = await axios.post(process.env.REACT_APP_SERVER_URL + '/user/register', data, {
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+        
+            // 회원가입 성공 시 처리
+            if (response.status === 201) {
+                setError('');
+                setIsSuccess(true); // 회원가입 성공 표시
+            }
+        
+        } catch (error) {
+            if (error.response) {
+                // 서버 응답이 있는 경우 (4xx, 5xx 상태 코드)
+                if (error.response.status === 409) {
+                    setError(error.response.data.message);
+                } else {
+                    setError('서버 오류: ' + error.response.status);
+                }
+            } else {
+                // 네트워크 오류 또는 서버에서 응답이 없는 경우
+                setError('네트워크 오류: ' + error.message);
+            }
+        }
+    };
+
+    const handleModalClose = () => {
+        navigate('/login'); // 로그인 페이지로 리디렉션
     };
 
     return (
@@ -71,8 +104,18 @@ const Register = () => {
                     <p>Already have an account? <Link to="/login" style={{ color: "black" }}>로그인</Link></p>
                 </div>
                 {error && <p className="error">{error}</p>}
-                {success && <p className="success">{success}</p>}
             </form>
+            {/* 회원가입 성공 모달 */}
+            {isSuccess && (
+                <div className="modal">
+                    <div className="modal-content">
+                        <h2>회원가입 성공!</h2>
+                        {email}
+                        <p>회원가입이 성공적으로 완료되었습니다.</p><br />
+                        <button onClick={handleModalClose} className="login-button">확인</button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
