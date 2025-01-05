@@ -29,6 +29,7 @@ npm install axios
 npm install node-cron  
 npm install swagger-jsdoc swagger-ui-express express  
 npm install bcryptjs jsonwebtoken  
+npm install nodemailer  
 ```
 1-2. Nodemon 설정 (옵션)  
 package.json의 scripts 수정

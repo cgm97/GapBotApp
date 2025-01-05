@@ -33,8 +33,13 @@ export const UserProvider = ({ children }) => {
         sessionStorage.removeItem("token");
     };
 
+    const resetToken = (tokenData) => {
+        setToken(tokenData);
+        sessionStorage.setItem("token", tokenData);
+    };
+
     return (
-        <UserContext.Provider value={{ user, token, login, logout }}>
+        <UserContext.Provider value={{ user, token, login, logout, resetToken }}>
             {children}
         </UserContext.Provider>
     );

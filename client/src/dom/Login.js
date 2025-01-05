@@ -78,7 +78,7 @@ const Login = () => {
                         required
                     />
                 </div>
-                <button type="submit" className="login-button">Login</button>
+                <button type="submit" className="login-button">로그인</button>
                 <div className="register-link">
                     <p>Don't have an account? <Link to="/register" style={{ color: "black" }}>회원가입</Link></p>
                 </div>

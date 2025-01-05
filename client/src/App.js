@@ -3,6 +3,7 @@ import './App.css';
 import ProtectedRoute from "./context/ProtectedRoute";
 import Header from './components/Header';
 import Top from './components/Top';
+import VerifyEmail from './components/VerifyEmail';
 import MainPages from './dom/MainPages';
 import Command from './dom/Command';
 import CalendarUI from './dom/CalendarUI';
@@ -10,6 +11,7 @@ import Login from './dom/Login';
 import Register from './dom/Register';
 import PatchNote from './dom/PatchNote';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import MyPage from "./dom/MyPage";
 
 function App() {
   return (
@@ -29,12 +31,14 @@ function App() {
             <Route path="/cmd" element={<Command />} />
             <Route path="/character" element={<div>전투정보실</div>} />
             <Route path="/patchNote" element={<PatchNote />} />
+            <Route path="/verifyEmail" element={<VerifyEmail />} />
+
             {/* Protected Routes */}
             <Route
               path="/mypage"
               element={
                 <ProtectedRoute>
-                  <div>마이페이지</div>
+                  <MyPage />
                 </ProtectedRoute>
               }
             />
