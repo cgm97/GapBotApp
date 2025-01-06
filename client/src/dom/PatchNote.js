@@ -7,12 +7,17 @@ const PatchNote = () => {
   return (
     <div className="container-patch">
       <h2>빈틈봇 패치노트</h2>
-      {patchNote.map(({ TITLE, CONTENTS }) => (
-        <div className="release">
+      {patchNote.map(({ TITLE, CONTENTS }, index) => (
+        <div className="release" key={index}>
           <h3>{TITLE}</h3>
-          <ul>
-            {CONTENTS}
-          </ul>
+          <p>
+            {CONTENTS.split("\n").map((line, lineIndex) => (
+              <React.Fragment key={lineIndex}>
+                {line}
+                <br />
+              </React.Fragment>
+            ))}
+          </p>
         </div>
       ))}
     </div>

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from 'axios';
-import { Link , useNavigate  } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import '../css/Login.css'; // CSS 파일 (위에서 작성한 스타일을 참조)
 
 const Register = () => {
@@ -9,8 +9,9 @@ const Register = () => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [isSuccess, setIsSuccess] = useState(false);
     const [error, setError] = useState('');
+    const [isLoading, setIsLoading] = useState(false); // 로딩 상태 추가
     const navigate = useNavigate(); // useNavigate 훅 사용
-    
+
     const handleSubmit = async (event) => {
         event.preventDefault();
 
@@ -30,19 +31,23 @@ const Register = () => {
             password: password
         };
 
+        // 로딩 시작
+        setIsLoading(true);
+        setError('');
+
         try {
             const response = await axios.post(process.env.REACT_APP_SERVER_URL + '/user/register', data, {
                 headers: {
                     'Content-Type': 'application/json',
                 }
             });
-        
+
             // 회원가입 성공 시 처리
             if (response.status === 201) {
                 setError('');
                 setIsSuccess(true); // 회원가입 성공 표시
             }
-        
+
         } catch (error) {
             if (error.response) {
                 // 서버 응답이 있는 경우 (4xx, 5xx 상태 코드)
@@ -55,6 +60,9 @@ const Register = () => {
                 // 네트워크 오류 또는 서버에서 응답이 없는 경우
                 setError('네트워크 오류: ' + error.message);
             }
+        } finally {
+            // 로딩 끝
+            setIsLoading(false);
         }
     };
 
@@ -99,7 +107,9 @@ const Register = () => {
                         required
                     />
                 </div>
-                <button type="submit" className="login-button">Register</button>
+                <button type="submit" className="login-button" disabled={isLoading}>
+                    {isLoading ? '처리중...' : '회원가입'}
+                </button>
                 <div className="register-link">
                     <p>Already have an account? <Link to="/login" style={{ color: "black" }}>로그인</Link></p>
                 </div>

@@ -36,4 +36,10 @@ router.post('/login', userService.executeLogin);
 
 router.post('/register', userService.executeRegister);
 
+router.post('/mypage', userService.getMypage);
+
+router.post('/save', userService.saveUserInfo);
+
+router.get('/verifyEmail', userService.verifyEmail);
+
 module.exports = router;

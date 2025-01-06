@@ -1,64 +1,261 @@
 const axios = require('axios');
 const pool = require('../db/connection');
 const logger = require('../logger');  // logger.js 임포트
+const { sendVerificationEmail } = require('../nodeMail'); // 이메일인증
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 require('dotenv').config(); // .env 파일에서 환경 변수 로드
 
-// 더미 사용자 데이터 (데이터베이스 사용 시 대체)
-const users = [
-    { id: 1, email: 'admin@11', password: '$2a$10$qpJQ1cdzxya0Igt6VCrwW.eu0DgncCNlO0K8uFDf5itJ618J9bIzm'} // 이미 암호화된 비밀번호
-];
-
 exports.executeLogin = async (req, res, next) => {
-
     const { email, password } = req.body;
 
-    // 이메일로 사용자 찾기
-    const user = users.find(u => u.email === email);
-    if (!user) return res.status(401).json({ message: '아이디 또는 패스워드를 확인해주세요.' });
+    // DB 연결
+    const connection = await pool.getConnection();
 
-    // 비밀번호 비교
-    const salt = await bcrypt.genSalt(10); // salt 생성
-    const hashedPassword = await bcrypt.hash(password, salt); // 비밀번호 해시화
+    try {
+        // 사용자 정보 조회
+        const selectSql = `
+            SELECT USERNAME, PASSWORD, NICKNAME, ROOM_CODE, USER_CODE ,EMAIL_VERIFIED
+            FROM USER_INFO 
+            WHERE USERNAME = ? AND DL_YN = 'N';
+        `;
+        const [userInfo] = await connection.execute(selectSql, [email]);
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(401).json({ message: '아이디 또는 패스워드를 확인해주세요.' });
+        logger.info({
+            method: req.method,
+            url: req.url,  // 요청 URL
+            message: `\nSql ${selectSql} \nParam ${email}`
+        });
 
-    // JWT 생성
-    const payload = { userId: user.id, email: user.email };
-    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' }); // 1시간 만료
+        // 사용자 존재 여부 확인
+        if (userInfo.length === 0) {
+            return res.status(401).json({ message: '아이디 또는 패스워드를 확인해주세요.' });
+        }
 
-    // HttpOnly 쿠키로 토큰 설정
-    // res.cookie('token', token, {
-    //     httpOnly: true,        // JavaScript에서 접근 불가
-    //     secure: process.env.SERVER_ENV === 'PROD', // 프로덕션에서는 https에서만 전송
-    //     sameSite: 'Strict',    // 다른 도메인에서 쿠키를 전송하지 않도록 설정
-    //     maxAge: 3600000        // 쿠키 만료 시간 (1시간)
-    // });
+        const user = userInfo[0];
 
-    return res.status(200).json({ token:token,email:email }); // 유저 정보 반환
-    // return res.status(200).json(token); // 유저 정보 반환
-}
+        // 비밀번호 검증
+        const isMatch = await bcrypt.compare(password, user.PASSWORD);
+        if (!isMatch) {
+            return res.status(401).json({ message: '아이디 또는 패스워드를 확인해주세요.' });
+        }
+
+        const isVerificationEmail = user.EMAIL_VERIFIED;
+        if (isVerificationEmail == 'N') {
+            return res.status(401).json({ message: '이메일 인증이 완료되지 않았습니다.' });
+        }
+
+        // JWT 생성
+        const payload = {
+            USERNAME: user.USERNAME,
+            NICKNAME: user.NICKNAME,
+            ROOM_CODE: user.ROOM_CODE,
+            USER_CODE: user.USER_CODE
+        };
+        const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+        // 응답
+        return res.status(200).json({ token: token, email: user.USERNAME });
+    } catch (error) {
+        next(new Error(err));  // 에러 객체를 넘겨서 next 미들웨어로 전달
+        return res.status(500).json({ message: '서버 오류가 발생했습니다.' });
+    } finally {
+        // DB 연결 해제
+        if (connection) connection.release();
+    }
+};
 
 exports.executeRegister = async (req, res, next) => {
 
     const { email, password } = req.body;
+
+    const connection = await pool.getConnection();
+
     try {
+        // 트랜잭션 시작
+        await connection.beginTransaction();
+
+        // 쿼리 실행 - 이전 데이터 DL_YN = Y 처리
+        const selectSql = `SELECT USERNAME FROM USER_INFO WHERE USERNAME =?`;
+        const [userInfo] = await connection.execute(selectSql, [email]);
 
         // 등록된 사용자 체크
-        const user = users.find(u => u.email === email);
-        if (user) return res.status(409).json({ message: '이미 등록된 계정입니다.' });
+        if (userInfo.length > 0) {
+            return res.status(409).json({ message: '이미 등록된 계정입니다.' });
+        }
 
         const salt = await bcrypt.genSalt(10); // salt 생성
         const hashedPassword = await bcrypt.hash(password, salt); // 비밀번호 해시화
 
-        // 데이터베이스에 저장하는 과정 (여기서는 더미 데이터 사용)
-        users.push({ id: users.length + 1, email, password: hashedPassword });
+        // 쿼리 실행 - 이전 데이터 DL_YN = Y 처리
+        const insertSql = `INSERT INTO USER_INFO (
+            USERNAME,
+            PASSWORD
+        ) VALUES (?,?)`;
+        const [insertUser] = await connection.execute(insertSql, [email, hashedPassword]);
 
+        logger.info({
+            method: req.method,
+            url: req.url,  // 요청 URL
+            message: `\nSql ${insertSql} \nParam ${email}`
+        });
+
+        // 트랜잭션 커밋
+        
+        const verificationToken = generateVerificationToken(email);
+        // 이메일 인증 링크 발송
+        try {
+            await sendVerificationEmail(email, verificationToken); // 이메일 전송 시 오류가 발생하면 에러가 던져짐
+        } catch (error) {
+            // 이메일 발송 오류가 발생하면 롤백
+            await connection.rollback();
+            next(new Error(err));  // 에러 객체를 넘겨서 next 미들웨어로 전달
+            return res.status(500).json({ message: '이메일 발송 오류가 발생했습니다. 다시 시도해주세요.' });
+        }
+        
+        await connection.commit();
         res.status(201).json({ message: '회원가입 정상처리되었습니다.' });
     } catch (err) {
+        // 오류 발생 시 롤백
+        await connection.rollback();
+
         res.status(500).json({ message: 'Server error' });
+        next(new Error(err));  // 에러 객체를 넘겨서 next 미들웨어로 전달
+    } finally {
+        // DB 연결 해제
+        if (connection) connection.release();
     }
+}
+
+// 이메일 인증코드(토큰)
+const generateVerificationToken = (userEmail) => {
+    const payload = { email: userEmail };
+    const secret = process.env.JWT_SECRET;  // JWT 비밀 키
+    const options = { expiresIn: '1h' };  // 토큰 만료 시간 설정
+
+    return jwt.sign(payload, secret, options);
+};
+
+exports.getMypage = async (req, res, next) => {
+
+    // 요청 헤더에서 Authorization 추출
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ message: '토큰이 제공되지 않았습니다.' });
+    }
+
+    try {
+
+        // 토큰 추출
+        const token = authHeader.split(' ')[1];
+
+        // 토큰 검증 및 디코딩
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const { USERNAME, NICKNAME, ROOM_CODE, USER_CODE } = decoded;
+
+        // 사용자 정보 응답
+        return res.status(200).json({ email: USERNAME, nickName: NICKNAME, roomCode: ROOM_CODE, userCode: USER_CODE });
+    } catch (err) {
+        console.log(err);
+        next(new Error(err));  // 에러 객체를 넘겨서 next 미들웨어로 전달
+        return res.status(401).json({ message: '유효하지 않은 토큰입니다.' });
+    }
+}
+
+exports.saveUserInfo = async (req, res, next) => {
+
+    // 요청 헤더에서 Authorization 추출
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ message: '토큰이 제공되지 않았습니다.' });
+    }
+
+    const { email, nickName, roomCode, userCode } = req.body;
+
+    console.log(req.body);
+    const connection = await pool.getConnection();
+
+    try {
+        // 트랜잭션 시작
+        await connection.beginTransaction();
+
+        // 쿼리 실행 유저 정보 수정
+        const updateSql = `UPDATE USER_INFO 
+        SET NICKNAME=?,
+        ROOM_CODE=?,
+        USER_CODE=?
+        WHERE USERNAME=?`;
+        const [userInfo] = await connection.execute(updateSql, [nickName, roomCode, userCode, email]);
+
+        logger.info({
+            method: req.method,
+            url: req.url,  // 요청 URL
+            message: `\nSql ${updateSql} \nParam ${[nickName, roomCode, userCode, email]}`
+        });
+
+        // JWT 생성
+        const payload = {
+            USERNAME: email,
+            NICKNAME: nickName,
+            ROOM_CODE: roomCode,
+            USER_CODE: userCode
+        };
+        const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+        // 트랜잭션 커밋
+        await connection.commit();
+
+        res.status(200).json({ token: token, userInfo: { email: email, nickName: nickName, roomCode: roomCode, userCode: userCode } });
+    } catch (err) {
+        // 오류 발생 시 롤백
+        await connection.rollback();
+
+        res.status(500).json({ message: 'Server error' });
+        next(new Error(err));  // 에러 객체를 넘겨서 next 미들웨어로 전달
+    } finally {
+        // DB 연결 해제
+        if (connection) connection.release();
+    }
+}
+
+exports.verifyEmail = async (req, res, next) => {
+
+    const { token } = req.query;
+    const connection = await pool.getConnection();
+    try {
+        // JWT 토큰 검증
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const email = decoded.email;
+
+        // 사용자의 이메일 인증 처리 (예: DB에서 인증 상태 업데이트)
+        // 쿼리 실행 유저 정보 수정
+
+        // 트랜잭션 시작
+        await connection.beginTransaction();
+        const updateSql = `UPDATE USER_INFO 
+            SET EMAIL_VERIFIED='Y'
+        WHERE USERNAME=?`;
+        const [userInfo] = await connection.execute(updateSql, [email]);
+
+        logger.info({
+            method: req.method,
+            url: req.url,  // 요청 URL
+            message: `\nSql ${updateSql} \nParam ${[email]}`
+        });
+
+        // 트랜잭션 커밋
+        await connection.commit();
+
+        res.status(200).send('이메일 인증이 완료되었습니다.');
+    } catch (err) {
+        // 오류 발생 시 롤백
+        await connection.rollback();
+        next(new Error(err));  // 에러 객체를 넘겨서 next 미들웨어로 전달
+        res.status(400).send('유효하지 않거나 만료된 인증 토큰입니다.');
+    } finally {
+        // DB 연결 해제
+        if (connection) connection.release();
+    }
+
 }
