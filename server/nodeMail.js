@@ -4,7 +4,9 @@ require('dotenv').config();
 // 이메일 발송 함수
 const sendVerificationEmail = async (userEmail, verificationToken) => {
   const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false, // TLS 사용 시 false로 설정
     auth: {
       user: process.env.LOAGAP_EAMIL,  // 발송할 이메일 주소
       pass: process.env.LOAGAP_PWD,   // 이메일 계정 비밀번호
