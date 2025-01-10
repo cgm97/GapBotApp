@@ -17,7 +17,9 @@ jobs:
       # 2. 코드 체크아웃
       - name: Checkout code
         uses: actions/checkout@v3
-
+        with:
+          fetch-depth: 0  # 전체 커밋을 가져옵니다
+          
       # 3. 전체 커밋 기록 가져오기
       - name: Fetch all commits
         run: git fetch --prune --unshallow
