@@ -11,25 +11,16 @@ body {
 }
 /* 광고 영역 (왼쪽과 오른쪽) */
 .advertise {
-  width: 200px;  /* 광고 영역 너비 */
-  background-color: #f0f0f0;  /* 광고 영역 배경색 */
-  padding: 20px;
-  text-align: center;
-  box-sizing: border-box;
-}
-
-.left {
-  /* 왼쪽 광고 영역 스타일 */
-}
-
-.right {
-  /* 오른쪽 광고 영역 스타일 */
+  max-width: 200px; /* 최대 너비 설정 */
+  flex-shrink: 0; /* 광고 영역 크기를 고정 */
+  margin: 0 10px; /* 콘텐츠와의 간격 추가 */
 }
 
 /* wrapper는 콘텐츠 영역을 가운데 정렬 */
 .wrapper {
-  display: flex;  /* Flexbox 활성화 */
-  justify-content: center;  /* 콘텐츠 영역을 가운데로 정렬 */
+  display: flex;
+  justify-content: space-between; /* 광고와 콘텐츠를 양 끝으로 배치 */
+  align-items: flex-start;
   padding: 10px;
 }
 
@@ -163,11 +154,6 @@ main {
   padding: 20px;
 }
 
-/* Content 영역 */
-.content {
-
-}
-
 /* ad Content 영역 */
 .ad-content {
   margin-top: 20px;
@@ -261,9 +247,29 @@ main {
   }
 }
 
+@media (max-width: 1024px) {
+
+  .advertise{
+    display: none;
+  }
+
+  .search-container{
+    display: none;
+  }
+
+}
+
 /* 모바일 화면 크기에서 그리드 간격 및 너비 조정 */
 @media (max-width: 768px) {
   .calendar {
     grid-template-columns: 1fr;  /* 모바일에서는 두 열을 하나로 배치 */
+  }
+}
+
+/* 모바일 화면에서 .nav 스타일 변경 */
+@media (max-width: 768px) {
+
+  .nav li {
+    padding: auto; /* 세로 간격 */
   }
 }

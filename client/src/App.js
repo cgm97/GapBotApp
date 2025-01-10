@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import './App.css';
 import ProtectedRoute from "./context/ProtectedRoute";
 import Header from './components/Header';
@@ -15,13 +15,30 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import MyPage from "./dom/MyPage";
 
 function App() {
+  useEffect(() => {
+      const script = document.createElement('script');
+      script.type = 'text/javascript';
+      script.src = '//t1.daumcdn.net/kas/static/ba.min.js';
+      script.async = true;
+      document.body.appendChild(script);
+    
+      return () => {
+        // 컴포넌트 언마운트 시 스크립트를 제거
+        document.body.removeChild(script);
+      };
+    }, []);
   return (
     <Router>
       <div className="wrapper">
         <div className="advertise left">
-          <p>왼쪽 광고 영역</p>
+        <ins
+          className="kakao_ad_area"
+          style={{ display: 'none' }}
+          data-ad-unit = "DAN-Qnq0ez9rvfuNOCVh"
+          data-ad-width = "160"
+          data-ad-height = "600">
+        </ins>
         </div>
-
         <div className="content">
           <Top />
           <Header />
@@ -67,7 +84,13 @@ function App() {
         </div>
 
         <div className="advertise right">
-          <p>오른쪽 광고 영역</p>
+        <ins
+          className="kakao_ad_area"
+          style={{ display: 'none' }}
+          data-ad-unit = "DAN-sj5267WiC2Xirn0q"
+          data-ad-width = "160"
+          data-ad-height = "600">
+        </ins>
         </div>
       </div>
     </Router>
