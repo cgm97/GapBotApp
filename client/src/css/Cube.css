@@ -1,0 +1,305 @@
+/* cube-contains 전체 레이아웃 */
+.cube-contains {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px; /* 항목 간 간격을 좀 더 넓게 설정 */
+    justify-content: flex-start; /* 왼쪽에 정렬 */
+    padding: 15px; /* 전체 패딩을 조금 줄여줌 */
+}
+
+/* content 스타일 */
+.cube-contains .content {
+    flex: 0 1 calc(25% - 20px); /* 5등분된 너비 설정, 항목 간 간격 고려 */
+    min-width: 250px; /* 최소 너비 설정 */
+    display: flex;
+    flex-direction: column;
+    padding: 20px; /* 더 넉넉한 내부 여백 */
+    border: 1px solid #ddd;
+    background-color: #fafafa;
+    border-radius: 12px; /* 둥근 모서리 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 그림자 효과 강화 */
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+/* 제목 스타일 */
+.cube-contains .content .title {
+    font-size: 16px;  /* 크기 줄임 */
+    font-weight: bold;
+    color: #333;
+}
+
+.cube-contains .content .sub-title {
+    font-size: 13px;  /* 크기 줄임 */
+    color: #777;
+    margin-bottom: 3px; /* 부제목과 내용 사이에 여백 추가 */
+}
+
+/* 3티어, 4티어 레이블과 리스트 */
+.cube-contains .content .tier-section {
+    margin-top: 10px;
+}
+
+.cube-contains .content .tier-title {
+    font-size: 16px;  /* 크기 줄임 */
+    font-weight: bold;
+    color: #2c3e50;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 6px; /* 레이블과 항목 사이에 여백 추가 */
+    margin-bottom: 8px; /* 레이블과 항목 사이에 여백 추가 */
+}
+
+.cube-contains .content .tier-list {
+    list-style-type: none;
+    padding-left: 0;
+    margin-top: 10px; /* 리스트 항목과 레이블 사이에 여백 추가 */
+}
+
+/* 리스트 항목 기본 스타일 */
+.cube-contains .content .tier-list li {
+    font-size: 14px;  /* 크기 줄임 */
+    color: #555;
+    padding: 6px 0;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between; /* 양쪽 끝에 배치 */
+    align-items: center; /* 수직 정렬 */
+    transition: background-color 0.3s ease;
+}
+
+/* 항목 호버 시 강조 */
+.cube-contains .content .tier-list li:hover {
+    background-color: #ecf0f1;
+    cursor: pointer;
+}
+
+/* 마지막 항목의 하단 경계선 없애기 */
+.cube-contains .content .tier-list li:last-child {
+    border-bottom: none;
+}
+
+/* 항목 이름 스타일 */
+.cube-contains .content .tier-list li .tier-name {
+    font-size: 15px;
+    color: #555;
+    width: 50%; /* 왼쪽 항목은 60% */
+}
+
+/* 수량 입력 스타일 */
+.cube-contains .content .tier-list li input.quantity-input {
+    width: 30%; /* 오른쪽 입력 칸은 30% */
+    padding: 5px;
+    margin-left: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    text-align: center;
+}
+
+/* 수량 입력 칸 포커스 시 스타일 */
+.cube-contains .content .tier-list li input.quantity-input:focus {
+    outline: none;
+    border-color: #3498db;
+}
+
+/* 기존 그리드 스타일 */
+.grid-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;  /* 두 개의 열 */
+    grid-template-rows: 1fr 1fr;     /* 두 개의 행 */
+    width: 16px;  /* 그리드 크기 */
+    height: 16px; /* 그리드 크기 */
+    margin: 1px 0px 0px 1px;
+}
+
+/* 각 칸을 채우는 스타일 */
+.grid-item {
+    background-color: #ffffffb3;  /* 기본 배경 색 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    border: 1px solid #bbbbbb;  /* 그리드 전체 테두리 */
+}
+
+/* 3T 특별한 색으로 칠하기 */
+.grid-item.t3 {
+    background-color: #ffcc00 
+}
+
+/* 4T 특별한 색으로 칠하기 */
+.grid-item.t4 {
+    background-color: #e74c3c 
+}
+
+/* cube-contains 전체 레이아웃 */
+.jewellery-contains {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px; /* 항목 간 간격을 좀 더 넓게 설정 */
+    justify-content: flex-start; /* 왼쪽에 정렬 */
+    padding: 1px; /* 전체 패딩을 조금 줄여줌 */
+}
+
+/* content 스타일 */
+.jewellery-contains .content {
+    flex: 0 1 calc(50% - 5px); /* 5등분된 너비 설정, 항목 간 간격 고려 */
+    min-width: 40px; /* 최소 너비 설정 */
+    display: flex;
+    flex-direction: column;
+    padding: 1px; /* 더 넉넉한 내부 여백 */
+    border: 1px solid #ddd;
+    background-color: #fafafa;
+    border-radius: 10px; /* 둥근 모서리 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 그림자 효과 강화 */
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+/* span 요소: 내부 내용 정렬 */
+.rewardSpan {
+    display: flex;
+    flex-direction: column; /* 내용이 세로로 쌓이도록 설정 */
+    align-items: center;     /* 모든 내용을 수평 중앙 정렬 */
+    text-align: center;      /* 텍스트도 중앙 정렬 */
+  }
+/* goldSpan 전체 스타일: flex로 중앙 정렬 */
+.goldSpan {
+    display: flex;
+    align-items: center;  /* 수직 정렬 */
+    justify-content: center;  /* 수평 중앙 정렬 */
+    gap: 10px;  /* 이미지와 텍스트 사이 간격 */
+  }
+  /* 금액 텍스트 스타일 */
+.goldAmount {
+    font-size: 18px;  /* 텍스트 크기 */
+    font-weight: bold;  /* 볼드체 */
+    color: #242323;  /* 금색 계열의 색상 */
+    letter-spacing: 1px;  /* 글자 간격을 조금 띄워서 깔끔한 느낌 */
+  }
+   /* 아이콘 스타일: 중앙 상단에 위치하도록 설정 */
+   .icon_gold {
+    width: 16px;  /* 아이콘 크기 */
+    height: 16px; /* 아이콘 크기 */
+    object-fit: contain; /* 이미지가 영역에 맞게 잘리도록 설정 */
+  }
+    /* 아이콘 스타일: 중앙 상단에 위치하도록 설정 */
+    .icon-jewellery {
+        width: 25px;  /* 아이콘 크기 */
+        height: 25px; /* 아이콘 크기 */
+        object-fit: contain; /* 이미지가 영역에 맞게 잘리도록 설정 */
+      }
+      
+  /* 아이콘 스타일: 중앙 상단에 위치하도록 설정 */
+  .icon {
+    width: 16px;  /* 아이콘 크기 */
+    height: 16px; /* 아이콘 크기 */
+    object-fit: contain; /* 이미지가 영역에 맞게 잘리도록 설정 */
+    margin-top: 2px;
+  }
+  
+  /* dl 요소 스타일: 세로로 나열되도록 설정 */
+  dl {
+    margin: 0;
+    padding: 0;
+    display: block; /* 기본적으로 블록 요소로 배치 */
+  }
+  
+  /* dt 스타일: 레벨 제목 */
+  dt {
+    font-weight: bold;
+    font-size: 14px;
+    color: #747171; /* 텍스트 색상 */
+  }
+  
+  /* dd 스타일: 수량 항목 */
+  dd {
+    font-size: 13px;
+    color: #000000; /* 텍스트 색상 */
+  }
+  
+  /* cube-contains 전체 레이아웃 */
+.item-contains {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px; /* 항목 간 간격을 좀 더 넓게 설정 */
+    justify-content: flex-start; /* 왼쪽에 정렬 */
+    padding: 1px; /* 전체 패딩을 조금 줄여줌 */
+}
+
+/* content 스타일 */
+.item-contains .content {
+    flex: 0 1 calc(50% - 5px); /* 5등분된 너비 설정, 항목 간 간격 고려 */
+    min-width: 40px; /* 최소 너비 설정 */
+    display: flex;
+    flex-direction: column;
+    padding: 1px; /* 더 넉넉한 내부 여백 */
+    border: 1px solid #ddd;
+    background-color: #fafafa;
+    border-radius: 10px; /* 둥근 모서리 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 그림자 효과 강화 */
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.save-button {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    border: none;
+    border-radius: 10px;
+    color: #ffffff;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.save-button:hover {
+    background-color: #0056b3;
+}
+.save-button.disabled {
+    background-color: #ccc; /* 비활성화 색상 */
+    color: #666;
+    cursor: not-allowed;
+  }
+
+  .total-rewards {
+    padding: 10px;
+    background-color: #ffffff;
+    border-radius: 8px;
+  }
+  
+  .reward-summary {
+    display: flex;
+    flex-wrap: wrap; /* 항목들이 넘칠 경우 줄바꿈 */
+    justify-content: space-between; /* 항목들이 고르게 배치되도록 */
+  }
+  
+  .reward-item {
+    display: flex;
+    align-items: center;
+    margin-right: 20px;
+    margin-bottom: 10px; /* 한 줄에 너무 많은 항목이 들어가지 않도록 여백을 추가 */
+  }
+  
+  .icon_gold, .icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 8px;
+  }
+  
+  .label {
+    font-weight: bold;
+    margin-right: 5px;
+  }
+  
+  .value {
+    font-size: 16px;
+    color: #333;
+  }
+  
+  .jewel-info {
+    display: inline-block;
+    margin-right: 10px;
+  }
+  

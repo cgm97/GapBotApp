@@ -120,8 +120,9 @@ const Register = () => {
                 <div className="modal">
                     <div className="modal-content">
                         <h2>회원가입 성공!</h2>
-                        {email}
-                        <p>회원가입이 성공적으로 완료되었습니다.</p><br />
+                        <p>{email}님, 가입이 완료되었습니다!</p>
+                        <p>인증메일이 발송되었습니다. 이메일을 확인하고 인증을 완료해주세요.</p><br />
+                        <p>인증 메일을 받지 못한 경우, 스팸 메일함을 확인해주세요.</p>
                         <button onClick={handleModalClose} className="login-button">확인</button>
                     </div>
                 </div>

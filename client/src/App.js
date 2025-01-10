@@ -10,6 +10,7 @@ import CalendarUI from './dom/CalendarUI';
 import Login from './dom/Login';
 import Register from './dom/Register';
 import PatchNote from './dom/PatchNote';
+import Cube from './dom/Cube';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import MyPage from "./dom/MyPage";
 
@@ -45,25 +46,21 @@ function App() {
             <Route
               path="/todo"
               element={
-                <ProtectedRoute>
+                // <ProtectedRoute>
                   <div>숙제</div>
-                </ProtectedRoute>
+                // </ProtectedRoute>
               }
             />
             <Route
               path="/cube"
-              element={
-                <ProtectedRoute>
-                  <div>큐브</div>
-                </ProtectedRoute>
-              }
+              element={<Cube />}
             />
             <Route
               path="/calendar"
               element={
-                <ProtectedRoute>
+                // <ProtectedRoute>
                   <CalendarUI />
-                </ProtectedRoute>
+                // </ProtectedRoute>
               }
             />
           </Routes>
