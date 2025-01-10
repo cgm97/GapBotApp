@@ -160,7 +160,7 @@ const Cube = () => {
   }
 
   // 수량 변경 처리
-  const handleCountChange = (characterIndex, tierName, value) => {
+  const handleCountChange = (characterIndex, tierName, value) => { 
     const newValue = Math.max(0, Number(value) || 0);
 
     setCharacterInfo((prevState) => {
