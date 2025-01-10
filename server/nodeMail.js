@@ -26,7 +26,6 @@ const sendVerificationEmail = async (userEmail, verificationToken) => {
 
   try {
     await transporter.sendMail(mailOptions);
-    console.log('인증 이메일이 발송되었습니다!');
   } catch (error) {
     console.error('이메일 발송 오류:', error);
   }
