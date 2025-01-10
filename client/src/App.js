@@ -21,7 +21,7 @@ function App() {
       script.src = '//t1.daumcdn.net/kas/static/ba.min.js';
       script.async = true;
       document.body.appendChild(script);
-    
+     
       return () => {
         // 컴포넌트 언마운트 시 스크립트를 제거
         document.body.removeChild(script);
