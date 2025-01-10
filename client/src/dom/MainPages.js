@@ -10,6 +10,19 @@ const MainPages = () => {
   const [eventData, setEventData] = useState(null);
   const [patchNoteData, setPatchNoteData] = useState(null);
 
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = '//t1.daumcdn.net/kas/static/ba.min.js';
+    script.async = true;
+    document.body.appendChild(script);
+  
+    return () => {
+      // 컴포넌트 언마운트 시 스크립트를 제거
+      document.body.removeChild(script);
+    };
+  }, []);
+
   // 공지사항 API 데이터 호출
   useEffect(() => {
     const storedData = sessionStorage.getItem('notice');
@@ -77,7 +90,13 @@ const MainPages = () => {
     <div>
       <Island />
       <div className="ad-content">
-        <div>광고</div>
+        <ins
+          className="kakao_ad_area"
+          style={{ display: 'none' }}
+          data-ad-unit="DAN-lOG6HPbp08gmb26g"
+          data-ad-width="728"
+          data-ad-height="90"
+        ></ins>
       </div>
       <div className="notice">
         <div className="content">
