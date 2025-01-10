@@ -102,7 +102,7 @@ exports.executeRegister = async (req, res, next) => {
         });
 
         // 트랜잭션 커밋
-        
+
         const verificationToken = generateVerificationToken(email);
         // 이메일 인증 링크 발송
         try {
@@ -113,7 +113,7 @@ exports.executeRegister = async (req, res, next) => {
             next(new Error(err));  // 에러 객체를 넘겨서 next 미들웨어로 전달
             return res.status(500).json({ message: '이메일 발송 오류가 발생했습니다. 다시 시도해주세요.' });
         }
-        
+
         await connection.commit();
         res.status(201).json({ message: '회원가입 정상처리되었습니다.' });
     } catch (err) {
@@ -139,13 +139,9 @@ const generateVerificationToken = (userEmail) => {
 
 exports.getMypage = async (req, res, next) => {
 
-    // 요청 헤더에서 Authorization 추출
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({ message: '토큰이 제공되지 않았습니다.' });
-    }
-
     try {
+        // 요청 헤더에서 Authorization 추출
+        const authHeader = req.headers.authorization;
 
         // 토큰 추출
         const token = authHeader.split(' ')[1];
@@ -157,7 +153,6 @@ exports.getMypage = async (req, res, next) => {
         // 사용자 정보 응답
         return res.status(200).json({ email: USERNAME, nickName: NICKNAME, roomCode: ROOM_CODE, userCode: USER_CODE });
     } catch (err) {
-        console.log(err);
         next(new Error(err));  // 에러 객체를 넘겨서 next 미들웨어로 전달
         return res.status(401).json({ message: '유효하지 않은 토큰입니다.' });
     }
@@ -165,33 +160,121 @@ exports.getMypage = async (req, res, next) => {
 
 exports.saveUserInfo = async (req, res, next) => {
 
-    // 요청 헤더에서 Authorization 추출
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({ message: '토큰이 제공되지 않았습니다.' });
-    }
-
     const { email, nickName, roomCode, userCode } = req.body;
-
-    console.log(req.body);
     const connection = await pool.getConnection();
 
     try {
         // 트랜잭션 시작
         await connection.beginTransaction();
 
-        // 쿼리 실행 유저 정보 수정
-        const updateSql = `UPDATE USER_INFO 
-        SET NICKNAME=?,
-        ROOM_CODE=?,
-        USER_CODE=?
-        WHERE USERNAME=?`;
-        const [userInfo] = await connection.execute(updateSql, [nickName, roomCode, userCode, email]);
+        // 원정대 캐릭터 조회
+        const API_URL = `https://developer-lostark.game.onstove.com/characters/${nickName}/siblings`;
+        const response = await axios.get(API_URL, {
+            headers: {
+                accept: 'application/json',
+                authorization: `Bearer ${process.env.LOA_API_KEY}`,
+            },
+        });
 
+        const data = response.data;
+
+        // CHARACTER_INFO 삽입 SQL
+        const charInsertSql = `
+            INSERT INTO CHARACTER_INFO (
+                NICKNAME, USERNAME, SERVER, JOB, CHARACTER_LEVEL, ITEM_LEVEL, IS_LINKED
+            ) VALUES (
+                ?, ?, ?, ?, ?, ?, ?
+            )
+            ON DUPLICATE KEY UPDATE
+                SERVER = VALUES(SERVER),
+                USERNAME = VALUES(USERNAME),
+                JOB = VALUES(JOB),
+                CHARACTER_LEVEL = VALUES(CHARACTER_LEVEL),
+                ITEM_LEVEL = VALUES(ITEM_LEVEL),
+                IS_LINKED = VALUES(IS_LINKED)
+        `;
+
+        // 다중 INSERT Promise
+        const charPromises = data.map(character => {
+            const server = character.ServerName;
+            const nickname = character.CharacterName;
+            const job = character.CharacterClassName;
+            const level = character.CharacterLevel;
+            const itemLevel = parseFloat(character.ItemMaxLevel.replace(/,/g, ''));
+
+            // 로깅
+            logger.info({
+                method: req.method,
+                url: req.url,
+                message: `character info insert: ${server} ${job} ${nickname}}`,
+            });
+
+            return connection.execute(charInsertSql, [
+                nickname,
+                email,
+                server,
+                job,
+                level,
+                itemLevel,
+                'Y'
+            ]);
+        });
+
+        // CHARACTER_CUBE 삽입 SQL
+        const cubeInsertSql = `
+            INSERT INTO CHARACTER_CUBE (
+                NICKNAME, CUBES
+            ) VALUES (
+                ?, ?
+            )
+            ON DUPLICATE KEY UPDATE
+                NICKNAME = VALUES(NICKNAME),
+                CUBES = VALUES(CUBES)
+        `;
+
+        // 다중 INSERT Promise
+        const cubePromises = data.map(character => {
+            const nickname = character.CharacterName;
+            const cubes = [
+                { "name": "1금제", "count": 0 },
+                { "name": "2금제", "count": 0 },
+                { "name": "3금제", "count": 0 },
+                { "name": "4금제", "count": 0 },
+                { "name": "5금제", "count": 0 },
+                { "name": "1해금", "count": 0 },
+                { "name": "2해금", "count": 0 }
+            ];
+
+            // 로깅
+            logger.info({
+                method: req.method,
+                url: req.url,
+                message: `character cube insert: ${nickname}}`,
+            });
+
+            return connection.execute(cubeInsertSql, [
+                nickname,
+                cubes
+            ]);
+        });
+
+        // 모든 삽입 작업 실행
+        await Promise.all(charPromises);
+        await Promise.all(cubePromises);
+
+        // 유저 정보 업데이트 SQL
+        const updateSql = `
+            UPDATE USER_INFO 
+            SET NICKNAME = ?, ROOM_CODE = ?, USER_CODE = ?
+            WHERE USERNAME = ?
+        `;
+        await connection.execute(updateSql, [nickName, roomCode, userCode, email]);
+
+        // 로깅
         logger.info({
             method: req.method,
-            url: req.url,  // 요청 URL
-            message: `\nSql ${updateSql} \nParam ${[nickName, roomCode, userCode, email]}`
+            url: req.url,
+            message: `User info updated: ${JSON.stringify({ nickName, roomCode, userCode, email })}`,
         });
 
         // JWT 생성
@@ -199,25 +282,30 @@ exports.saveUserInfo = async (req, res, next) => {
             USERNAME: email,
             NICKNAME: nickName,
             ROOM_CODE: roomCode,
-            USER_CODE: userCode
+            USER_CODE: userCode,
         };
         const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
 
         // 트랜잭션 커밋
         await connection.commit();
 
-        res.status(200).json({ token: token, userInfo: { email: email, nickName: nickName, roomCode: roomCode, userCode: userCode } });
+        // 응답
+        res.status(200).json({
+            token,
+            userInfo: { email, nickName, roomCode, userCode },
+        });
     } catch (err) {
-        // 오류 발생 시 롤백
+        // 트랜잭션 롤백
         await connection.rollback();
 
-        res.status(500).json({ message: 'Server error' });
         next(new Error(err));  // 에러 객체를 넘겨서 next 미들웨어로 전달
+        res.status(500).json({ message: '서버 에러가 발생했습니다.' });
     } finally {
-        // DB 연결 해제
+        // 연결 해제
         if (connection) connection.release();
     }
-}
+};
+
 
 exports.verifyEmail = async (req, res, next) => {
 
