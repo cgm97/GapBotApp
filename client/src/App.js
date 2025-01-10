@@ -15,7 +15,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import MyPage from "./dom/MyPage";
 
 function App() {
-  useEffect(() => {
+  useEffect(() => { 
       const script = document.createElement('script');
       script.type = 'text/javascript';
       script.src = '//t1.daumcdn.net/kas/static/ba.min.js';
