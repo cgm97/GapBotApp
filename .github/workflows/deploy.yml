@@ -30,6 +30,11 @@ jobs:
           changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
           echo "Changed files: $changed_files"
 
+          if [ -z "$changed_files" ]; then
+            echo "No files changed."
+            exit 0  # 변경된 파일이 없으면 워크플로우를 종료
+          fi
+
           # 변경된 파일을 GITHUB_ENV에 한 줄씩 저장
           IFS=$'\n'  # newline 기준으로 파일 분리
           for file in $changed_files; do

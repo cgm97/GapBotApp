@@ -248,11 +248,9 @@ main {
 }
 
 @media (max-width: 1024px) {
-
   .advertise{
     display: none;
   }
-
   .search-container{
     display: none;
   }
@@ -267,7 +265,6 @@ main {
 
 /* 모바일 화면에서 .nav 스타일 변경 */
 @media (max-width: 768px) {
-
   .nav li {
     padding: auto; /* 세로 간격 */
   }
