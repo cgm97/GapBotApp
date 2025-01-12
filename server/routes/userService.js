@@ -220,7 +220,6 @@ exports.saveUserInfo = async (req, res, next) => {
             ]);
         });
 
-        // CHARACTER_CUBE 삽입 SQL
         const cubeInsertSql = `
             INSERT INTO CHARACTER_CUBE (
                 NICKNAME, CUBES
@@ -228,11 +227,9 @@ exports.saveUserInfo = async (req, res, next) => {
                 ?, ?
             )
             ON DUPLICATE KEY UPDATE
-                NICKNAME = VALUES(NICKNAME),
-                CUBES = VALUES(CUBES)
+                CUBES = IF(CUBES = '', VALUES(CUBES), CUBES)
         `;
 
-        // 다중 INSERT Promise
         const cubePromises = data.map(character => {
             const nickname = character.CharacterName;
             const cubes = [
@@ -245,7 +242,6 @@ exports.saveUserInfo = async (req, res, next) => {
                 { "name": "2해금", "count": 0 }
             ];
 
-            // 로깅
             logger.info({
                 method: req.method,
                 url: req.url,
@@ -254,7 +250,7 @@ exports.saveUserInfo = async (req, res, next) => {
 
             return connection.execute(cubeInsertSql, [
                 nickname,
-                cubes
+                JSON.stringify(cubes), // JSON 문자열로 저장
             ]);
         });
 

@@ -160,7 +160,7 @@ const Cube = () => {
   }
 
   // 수량 변경 처리
-  const handleCountChange = (characterIndex, tierName, value) => { 
+  const handleCountChange = (characterIndex, tierName, value) => {
     const newValue = Math.max(0, Number(value) || 0);
 
     setCharacterInfo((prevState) => {
@@ -408,7 +408,7 @@ const Cube = () => {
 
             {/* 금제(3티어) 보석 */}
             <div className="reward-item">
-              <img src={jewellery3Icon} alt="금제 보석"/>
+              <img src={jewellery3Icon} alt="금제 보석" />
               <span className="value">
                 {calculatejewelryGrad(calculateTotalRewards(characterInfo).jewelry3Tier).map((jewel) => (
                   <span key={jewel.level} className="jewel-info">
@@ -420,7 +420,7 @@ const Cube = () => {
 
             {/* 해금(4티어) 보석 */}
             <div className="reward-item">
-              <img src={jewellery4Icon} alt="해금 보석"/>
+              <img src={jewellery4Icon} alt="해금 보석" />
               <span className="value">
                 {calculatejewelryGrad(calculateTotalRewards(characterInfo).jewelry4Tier).map((jewel) => (
                   <span key={jewel.level} className="jewel-info">
@@ -484,17 +484,32 @@ const Cube = () => {
                           value={cube.count}
                           placeholder="수량"
                           className="quantity-input"
-                          onChange={(e) => handleCountChange(characterIndex, tierName, e.target.value)}  // 캐릭터별 수량 변경 이벤트 처리
+                          onChange={(e) => handleCountChange(characterIndex, tierName, parseInt(e.target.value, 10) || 0)} // 0으로 fallback
                           onInput={(e) => {
-                            // 키보드 입력 시 값이 min, max 범위를 벗어나지 않도록 처리
-                            const value = parseInt(e.target.value, 10);
-                            if (value < 0) {
+                            // 입력된 값의 숫자화 처리
+                            let value = e.target.value;
+
+                            // 숫자가 아닌 경우 초기화
+                            if (!/^\d+$/.test(value)) {
                               e.target.value = 0;
-                            } else if (value > 999) {
-                              e.target.value = 999;
+                              return;
                             }
+
+                            // 숫자 변환 및 앞의 0 제거
+                            value = parseInt(value, 10);
+
+                            // 최소/최대값 처리
+                            if (value < 0) {
+                              value = 0;
+                            } else if (value > 999) {
+                              value = 999;
+                            }
+
+                            // 수정된 값을 다시 반영
+                            e.target.value = value;
                           }}
                         />
+
                       </li>
                     );
                   })}
@@ -538,17 +553,32 @@ const Cube = () => {
                           value={cube.count}
                           placeholder="수량"
                           className="quantity-input"
-                          onChange={(e) => handleCountChange(characterIndex, tierName, e.target.value)}  // 캐릭터별 수량 변경 이벤트 처리
+                          onChange={(e) => handleCountChange(characterIndex, tierName, parseInt(e.target.value, 10) || 0)} // 0으로 fallback
                           onInput={(e) => {
-                            // 키보드 입력 시 값이 min, max 범위를 벗어나지 않도록 처리
-                            const value = parseInt(e.target.value, 10);
-                            if (value < 0) {
+                            // 입력된 값의 숫자화 처리
+                            let value = e.target.value;
+
+                            // 숫자가 아닌 경우 초기화
+                            if (!/^\d+$/.test(value)) {
                               e.target.value = 0;
-                            } else if (value > 999) {
-                              e.target.value = 999;
+                              return;
                             }
+
+                            // 숫자 변환 및 앞의 0 제거
+                            value = parseInt(value, 10);
+
+                            // 최소/최대값 처리
+                            if (value < 0) {
+                              value = 0;
+                            } else if (value > 999) {
+                              value = 999;
+                            }
+
+                            // 수정된 값을 다시 반영
+                            e.target.value = value;
                           }}
                         />
+
                       </li>
                     );
                   })}
