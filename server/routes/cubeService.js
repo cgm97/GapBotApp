@@ -1,6 +1,7 @@
 const pool = require('../db/connection');
 const logger = require('../logger');  // logger.js 임포트
 const jwt = require('jsonwebtoken');
+const { sessionCache } = require('../sessionUtil'); // 세션 모듈 가져오기
 require('dotenv').config(); // .env 파일에서 환경 변수 로드
 
 // 유저 캐릭터 큐브 조회
@@ -48,36 +49,36 @@ exports.getCharacterCubeInfo = async (req, res, next) => {
         `;
     
         // 큐브 정보 조회 SQL
-        const cubeInfoSql = `
-            SELECT 
-                NAME,
-                LEVEL,
-                CARD_EXP,
-                JEWELRY,
-                JEWELRY_PRICE,
-                STONES,
-                SILLING,
-                ETC1,
-                ETC2,
-                ETC3
-            FROM 
-                CUBE_INFO
-            WHERE 
-                DL_YN = 'N'
-            ORDER BY 
-                LEVEL ASC;
-        `;
+        // const cubeInfoSql = `
+        //     SELECT 
+        //         NAME,
+        //         LEVEL,
+        //         CARD_EXP,
+        //         JEWELRY,
+        //         JEWELRY_PRICE,
+        //         STONES,
+        //         SILLING,
+        //         ETC1,
+        //         ETC2,
+        //         ETC3
+        //     FROM 
+        //         CUBE_INFO
+        //     WHERE 
+        //         DL_YN = 'N'
+        //     ORDER BY 
+        //         LEVEL ASC;
+        // `;
     
         // SQL 실행
         const [characterInfo] = await connection.execute(characterSql, [USERNAME]);
-        const [cubeInfo] = await connection.execute(cubeInfoSql);
+        // const [cubeInfo] = await connection.execute(cubeInfoSql);
     
         // 응답 데이터
         res.status(200).json({
             success: true,
             return: {
                 characterInfo,
-                cubeInfo
+                cubeInfo:sessionCache.get("cubeInfo")
             }
         });
     
@@ -85,7 +86,7 @@ exports.getCharacterCubeInfo = async (req, res, next) => {
         logger.info({
             method: req.method,
             url: req.url,
-            message: `\nCharacter SQL: ${characterSql} \nParam: ${USERNAME} \nCube SQL: ${cubeInfoSql}`
+            message: `\nCharacter SQL: ${characterSql} \nParam: ${USERNAME}`
         });
     
     } catch (error) {

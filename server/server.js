@@ -5,15 +5,21 @@ const logger = require('./logger');  // logger.js 임포트
 const lostarkAPI = require('./routes/api'); // 라우트 등록
 const user = require('./routes/user'); // 라우트 등록
 const cube = require('./routes/cube'); // 라우트 등록
+const bot = require('./routes/bot'); // 라우트 등록
 const cron = require('./cron'); // cron.js를 불러옵니다
 const swaggerUi = require('swagger-ui-express');
 const swaggerJSDoc = require('swagger-jsdoc');
 const cronTest = require('./routes/cronTest'); // 라우트 등록
 const jwtMiddleware = require('./middlewares/jwtMiddleware'); // JWT 미들웨어 임포트
+const { initializeCache } = require('./sessionUtil'); // 캐시 모듈 가져오기
+
 require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// 서버 시작 시 캐시 초기화
+initializeCache();
 
 // Middleware
 app.use(cors());
@@ -88,6 +94,9 @@ app.use('/user', user);
 
 // cube API 사용
 app.use('/cube', cube);
+
+// bot 전용 API 사용
+app.use('/bot', bot);
 
 // 후처리 미들웨어 (에러 처리 및 로깅)
 app.use((err, req, res, next) => {
