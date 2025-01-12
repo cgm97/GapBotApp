@@ -152,24 +152,19 @@ exports.getCharacterCube = async (req, res, next) => {
             message: `\nSql ${selectSql} \nParam ${[roomCode, userCode]}`
         });
 
-        let retJson = [];
-        let charactersCubeInfo = cubeInfo.map(character => {
+        let retJson = {};
+        retJson.cubes = cubeInfo.map(character => {
             return {
                 nickName: character.NICKNAME,       // NICKNAME 값을 반환
                 itemLevel: character.ITEM_LEVEL,
-                server: character.SERVER,       // SERVER 값을 반환
-                job: character.JOB, // JOB 값을 반환
+                server: character.SERVER,           // SERVER 값을 반환
+                job: character.JOB,                 // JOB 값을 반환
                 cubes: calculateCubes(character.CUBES)   // calculateCubes 함수의 결과 반환
             };
         });
 
-        retJson.push({
-            cubes: charactersCubeInfo
-        })
-        // totalRewards를 charactersCubeInfo에 추가
-        retJson.push({
-            totalRewards: calculateTotalRewards(cubeInfo)
-        });
+        // 총 합계
+        retJson.totalRewards = calculateTotalRewards(cubeInfo);
         
         // 트랜잭션 커밋
         await connection.commit();
