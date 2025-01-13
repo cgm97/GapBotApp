@@ -31,7 +31,7 @@ const MyPage = () => {
                 setRoomCode(response.data.roomCode);
                 setUserCode(response.data.userCode);
                 setNickName(response.data.nickName);
-            } catch (err) {
+            } catch (error) {
                 setError('사용자 정보를 가져오는 데 실패했습니다.');
             } finally {
                 setLoading(false);
@@ -47,10 +47,6 @@ const MyPage = () => {
 
     if (loading) {
         return <div>로딩 중...</div>;
-    }
-
-    if (error) {
-        return <div>{error}</div>;
     }
 
     const handleSave = async (e) => {
@@ -74,8 +70,18 @@ const MyPage = () => {
             resetToken(response.data.token) // 내정보 수정시 토큰 재발급
             setUserInfo(response.data.userInfo); // 최신 정보로 업데이트
             setIsSuccess(true);
-        } catch (err) {
-            setError('사용자 정보를 저장하는데 실패했습니다.');
+        } catch (error) {
+            if (error.response) {
+                // 서버 응답이 있는 경우 (4xx, 5xx 상태 코드)
+                if (error.response.status === 401) {
+                    setError(error.response.data.message);
+                } else {
+                    setError('서버 오류: ' + error.response.status);
+                }
+            } else {
+                // 네트워크 오류 또는 서버에서 응답이 없는 경우
+                setError('네트워크 오류: ' + error.message);
+            }
         } finally {
             setLoading(false);
         }
@@ -135,19 +141,32 @@ const MyPage = () => {
                     </button>
                 </div>
             </form>
-            {/* 회원가입 성공 모달 */}
+            
+            {/* 성공 메시지 모달 */}
             {isSuccess && (
                 <div className="modal">
                     <div className="modal-content">
                         <h2>내정보 수정</h2>
-                        {userInfo.email}
-                        <p>성공적으로 완료되었습니다.</p><br />
+                        <p>성공적으로 완료되었습니다.</p>
                         <button onClick={handleModalClose} className="login-button">확인</button>
+                    </div>
+                </div>
+            )}
+    
+            {/* 에러 메시지 모달 */}
+            {error && (
+                <div className="modal">
+                    <div className="modal-content error">
+                        <h2>내정보 수정</h2>
+                        <p>오류가 발생하였습니다.</p>
+                        <p>{error}</p>
+                        <button onClick={() => setError('')} className="login-button">닫기</button>
                     </div>
                 </div>
             )}
         </div>
     );
+    
 };
 
 export default MyPage;
