@@ -269,3 +269,7 @@ main {
     padding: auto; /* 세로 간격 */
   }
 }
+/* 미구현 임시 숨김 */
+.search-container{
+  display: none;
+}
