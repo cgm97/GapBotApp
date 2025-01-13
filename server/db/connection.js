@@ -13,15 +13,12 @@ const pool = mysql.createPool({
   connectionLimit: 50,                // 최대 연결 수 (트래픽에 맞게 조정)
   queueLimit: 1000,                   // 대기 중인 요청 최대 수
   connectTimeout: 10000,              // 연결 시도 제한 시간 (ms)
-  acquireTimeout: 10000,              // 풀에서 연결 획득 제한 시간 (ms)
-  timeout: 30000,                     // 요청 처리 시간 제한 (ms)
 
   // 추가 옵션
   supportBigNumbers: true,            // 큰 숫자 처리 지원
   bigNumberStrings: true,             // 큰 숫자를 문자열로 반환
 });
 
-// Promise 기반으로 사용하려면 다음을 추가
 const promisePool = pool.promise();
 
-module.exports = promisePool; // Pool을 모듈로 내보내기
+module.exports = promisePool;

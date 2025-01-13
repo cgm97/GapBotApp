@@ -178,6 +178,28 @@ exports.saveUserInfo = async (req, res, next) => {
 
         const data = response.data;
 
+        // 입력된 캐릭터가 이미 다른유저에게 할당되어있는지 체크
+        const isCharacterSql = `
+            SELECT count(*) AS count 
+            FROM CHARACTER_INFO
+            WHERE NICKNAME = ?
+            AND USERNAME != ?
+        `;
+
+        const [rows] = await connection.execute(isCharacterSql, [nickName, email]);
+        // rows는 배열이므로, rows[0].count를 사용해야 함
+        if (rows[0].count > 0) {
+            return res.status(401).json({ message: '이미 등록되어있는 다른 유저의 캐릭터입니다.' });
+        }
+
+
+        // CHARACTER_INFO 유저의 기존 캐릭터 데이터 초기화 처리
+        const resetUserCharacterSql = `
+            UPDATE CHARACTER_INFO SET USERNAME = null , IS_LINKED = 'N'
+            WHERE USERNAME = ?
+        `;
+        await connection.execute(resetUserCharacterSql, [email]);
+
         // CHARACTER_INFO 삽입 SQL
         const charInsertSql = `
             INSERT INTO CHARACTER_INFO (
@@ -220,6 +242,7 @@ exports.saveUserInfo = async (req, res, next) => {
             ]);
         });
 
+        // 캐릭터의 큐브데이터 생성
         const cubeInsertSql = `
             INSERT INTO CHARACTER_CUBE (
                 NICKNAME, CUBES

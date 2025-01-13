@@ -168,6 +168,10 @@ exports.getCharacterCube = async (req, res, next) => {
         
         // 트랜잭션 커밋
         await connection.commit();
+
+        if(cubeInfo.length == 0){
+          retJson ={};
+        }
         res.status(200).send(retJson);
     } catch (err) {
         // 오류 발생 시 롤백
