@@ -26,7 +26,9 @@ initializeCache();
 // CORS 설정
 app.use(
   cors({
-    origin: process.env.REACT_APP_SERVER_URL, // 클라이언트 도메인
+    origin: [process.env.REACT_APP_SERVER_URL1,
+             process.env.REACT_APP_SERVER_URL2
+            ], // 클라이언트 도메인
     credentials: true, // 쿠키를 포함한 요청을 허용
   })
 );
