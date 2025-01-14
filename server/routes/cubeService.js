@@ -12,7 +12,7 @@ exports.getCharacterCubeInfo = async (req, res, next) => {
     const authHeader = req.headers.authorization;
 
     if (!authHeader) {
-        res.status(401).json({ message: "Authorization header is missing" });
+        res.status(401).json({ message: "Access Token이 없습니다." });
         return;
     }
     
@@ -107,12 +107,12 @@ exports.saveCubeInfo = async (req, res, next) => {
     // DB 연결
     const connection = await pool.getConnection();
     const authHeader = req.headers.authorization;
-
+    
     if (!authHeader) {
-        res.status(401).json({ message: "Authorization header is missing" });
+        res.status(401).json({ message: "Access Token이 없습니다." });
         return;
     }
-    
+
     try {
         // 토큰 추출
         const token = authHeader.split(' ')[1];

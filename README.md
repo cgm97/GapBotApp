@@ -30,6 +30,7 @@ npm install node-cron
 npm install swagger-jsdoc swagger-ui-express express  
 npm install bcryptjs jsonwebtoken  
 npm install nodemailer  
+npm install cookie-parser  
 ```
 1-2. Nodemon 설정 (옵션)  
 package.json의 scripts 수정

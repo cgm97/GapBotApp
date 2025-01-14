@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { useUserContext } from "../context/UserContext";
+// import axios from "axios";
+import api from '../utils/api'; // 설정된 Axios 인스턴스
+import { useUserContext, } from "../context/UserContext";
+import { useNavigate } from "react-router-dom";
 import '../css/Cube.css'; // CSS 파일 (위에서 작성한 스타일을 참조)
 import goldIcon from '../img/cube/gold.png';
 import jewellery3Icon from '../img/cube/jewellery3.png';
@@ -18,8 +20,10 @@ import stone4Icon from '../img/cube/stone4.png';
 const Cube = () => {
   const [characterInfo, setCharacterInfo] = useState(null);
   const [cubeInfo, setCubeInfo] = useState(null);
-  const { token } = useUserContext(); // Context에서 사용자 정보 가져오기
+  // const { token } = useUserContext(); // Context에서 사용자 정보 가져오기
   const [loading, setLoading] = useState(true); const [error, setError] = useState('');
+  const { logout } = useUserContext(); // Context에서 사용자 정보 가져오기
+  const navigate = useNavigate();
 
   // 저장 처리
   const handleSave = (characterIndex) => {
@@ -31,20 +35,28 @@ const Cube = () => {
       return newCharacterInfo;
     });
 
-    if (token) {
+    if (sessionStorage.getItem("token")) {
       const saveCube = async () => {
-        console.log(characterInfo[characterIndex]);
         try {
-          await axios.post(
-            process.env.REACT_APP_SERVER_URL + '/cube/save',
+          await api.post(
+            '/cube/save',
             characterInfo[characterIndex],
             {
               headers: {
-                Authorization: `Bearer ${token}`,
+                Authorization: `Bearer ${sessionStorage.getItem("token")}`,
               },
+              withCredentials: true // 쿠키도 자동으로 포함되어 전송
             });
         } catch (err) {
-          setError('사용자 정보를 가져오는 데 실패했습니다.');
+          if (err.response.status === 403) {
+            setError('로그인기한이 만료되어 로그아웃 되었습니다.');
+            logout();
+            navigate("/login");
+          } else {
+            setError('사용자 정보를 가져오는 데 실패했습니다.');
+            logout();
+            navigate("/login");
+          }
         } finally {
           setLoading(false);
         }
@@ -170,7 +182,7 @@ const Cube = () => {
       if (cubeIndex !== -1) {
         character.CUBES[cubeIndex].count = newValue;
       }
-      if (token) {
+      if (sessionStorage.getItem("token")) {
         character.isSaveEnabled = false; // 수정 시 무조건 저장 버튼 활성화
       }
       return newCharacterInfo;
@@ -180,24 +192,33 @@ const Cube = () => {
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
-        const response = await axios.post(
-          process.env.REACT_APP_SERVER_URL + '/cube',
+        const response = await api.post(
+          '/cube',
           {},
           {
             headers: {
-              Authorization: `Bearer ${token}`,
+              Authorization: `Bearer ${sessionStorage.getItem("token")}`,
             },
+            withCredentials: true, // 쿠키 사용
           });
         setCharacterInfo(response.data.return.characterInfo); // 사용자 정보 저장
         setCubeInfo(response.data.return.cubeInfo)
       } catch (err) {
-        setError('사용자 정보를 가져오는 데 실패했습니다.');
+        if (err.response.status === 403) {
+          setError('로그인기한이 만료되어 로그아웃 되었습니다.');
+          logout();
+          navigate("/login");
+        } else {
+          setError('사용자 정보를 가져오는 데 실패했습니다.');
+          logout();
+          navigate("/login");
+        }
       } finally {
         setLoading(false);
       }
     };
 
-    if (token) {
+    if (sessionStorage.getItem("token")) {
       fetchUserInfo(); // 토큰이 있을 때만 사용자 정보 호출
     } else {
       // 임시 데이터로 설정
@@ -366,7 +387,7 @@ const Cube = () => {
       ])
       setLoading(false); // 임시 데이터 로딩 완료 처리
     }
-  }, [token]);
+  }, [navigate,logout]);
 
   if (loading) {
     return <div>로딩 중...</div>; // 로딩 상태 표시

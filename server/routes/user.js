@@ -36,6 +36,8 @@ router.post('/login', userService.executeLogin);
 
 router.post('/register', userService.executeRegister);
 
+router.post('/refresh', userService.executeRefresh);
+
 router.post('/mypage', userService.getMypage);
 
 router.post('/save', userService.saveUserInfo);

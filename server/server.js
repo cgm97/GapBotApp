@@ -12,6 +12,7 @@ const swaggerJSDoc = require('swagger-jsdoc');
 const cronTest = require('./routes/cronTest'); // 라우트 등록
 const jwtMiddleware = require('./middlewares/jwtMiddleware'); // JWT 미들웨어 임포트
 const { initializeCache } = require('./sessionUtil'); // 캐시 모듈 가져오기
+const cookieParser = require('cookie-parser');
 
 require('dotenv').config();
 
@@ -22,8 +23,17 @@ const PORT = process.env.PORT || 5000;
 initializeCache();
 
 // Middleware
-app.use(cors());
+// CORS 설정
+app.use(
+  cors({
+    origin: 'http://localhost:3000', // 클라이언트 도메인
+    credentials: true, // 쿠키를 포함한 요청을 허용
+  })
+);
+
 app.use(express.json());
+
+app.use(cookieParser());
 
 // Swagger 정의 설정
 const swaggerDefinition = {
