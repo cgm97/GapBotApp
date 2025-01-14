@@ -25,12 +25,13 @@ const Command = () => {
     { id: 17, prefix: ".거래소", img: require("../img/cmd/rjfoth.png"), description: "각인서만 지원(인기 각인서는 약자 가능 ex:예둔)" },
     { id: 18, prefix: ".시세 (.시세 상 유물or고대 1~3)", img: require("../img/cmd/tkdwnd.png"), description: "상,상상,상중,상하,중,중중,중하,유각,전각,재료,식물,벌목,낚시,고고학,채광,수렵" },
     { id: 19, prefix: ".사사게", img: null , description:".사사게 키워드"},
-    { id: 20, prefix: ".클골", img: null}
+    { id: 20, prefix: ".클골", img: null},
+    { id: 21, prefix: ".큐브", img: null}
   ];
 
   const listUtilItems = [
     { id: 101, prefix: "이모티콘", img: null, description: "씨익콩,더줘콩,뿅콩,감사콩,꺼억콩,도망콩,머쓱해요,놀자에요,뭐라구요" },
-    { id: 102, prefix: "/로또", img: require("../img/cmd/tkdwnd.png"), description: "1 ~ 4 확정 로또번호 지원" },
+    { id: 102, prefix: "/로또", img: require("../img/cmd/lotto.png"), description: "1 ~ 4 확정 로또번호 지원" },
     { id: 103, prefix: "채팅레벨(중지)", img: null, description: "/레벨, /랭킹, /칭호" },
     { id: 104, prefix: "/재련", img: null, description: "/재련, /재련랭킹" }
   ];
