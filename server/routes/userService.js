@@ -53,10 +53,22 @@ exports.executeLogin = async (req, res, next) => {
             ROOM_CODE: user.ROOM_CODE,
             USER_CODE: user.USER_CODE
         };
-        const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const payload1 = {
+            USERNAME: user.USERNAME
+        };
+        // const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const accessToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: process.env.EXPIRES_TIME_ACCESS }); // 15분 만료
+        const refreshToken = jwt.sign(payload1, process.env.JWT_SECRET_REFRESH, { expiresIn: process.env.EXPIRES_TIME_REFRESH }); // 7일 만료
+
+        // Refresh Token을 HttpOnly 쿠키로 설정
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'PROD', // 프로덕션 환경에서만 secure 옵션 활성화
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
+        });
 
         // 응답
-        return res.status(200).json({ token: token, email: user.USERNAME });
+        return res.status(200).json({ token: accessToken, email: user.USERNAME });
     } catch (error) {
         next(new Error(err));  // 에러 객체를 넘겨서 next 미들웨어로 전달
         return res.status(500).json({ message: '서버 오류가 발생했습니다.' });
@@ -65,6 +77,48 @@ exports.executeLogin = async (req, res, next) => {
         if (connection) connection.release();
     }
 };
+
+exports.executeRefresh = async (req, res, next) => {
+    const { refreshToken } = req.cookies;
+
+    // Refresh Token이 없는 경우
+    if (!refreshToken) {
+        return res.status(401).json({ message: '로그인이 필요합니다.' });
+    }
+
+    try {
+        // Refresh Token 검증
+        const user = jwt.verify(refreshToken, process.env.JWT_SECRET_REFRESH);
+
+        const connection = await pool.getConnection();
+
+        const selectSql = `SELECT USERNAME, NICKNAME, ROOM_CODE, USER_CODE FROM USER_INFO WHERE USERNAME =?`;
+        const [userInfo] = await connection.execute(selectSql, [user.USERNAME]);
+        
+        // userInfo가 없으면, 해당 사용자가 존재하지 않음
+        if (!userInfo || userInfo.length === 0) {
+            return res.status(404).json({ message: '사용자를 찾을 수 없습니다.' });
+        }
+        
+        // 새로운 Access Token 생성
+        const payload = {
+            USERNAME: userInfo[0].USERNAME,
+            NICKNAME: userInfo[0].NICKNAME,
+            ROOM_CODE: userInfo[0].ROOM_CODE,
+            USER_CODE: userInfo[0].USER_CODE,
+        };
+
+        const newAccessToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: process.env.EXPIRES_TIME_ACCESS });
+
+        console.log("서버 갱신");
+
+        return res.status(200).json({ message: 'Access Token 재발급 되었습니다.', token: newAccessToken });
+    } catch (error) {
+        console.error(error);
+        return res.status(403).json({ message: 'RefreshToken이 만료되었습니다.' });
+    }
+};
+
 
 exports.executeRegister = async (req, res, next) => {
 
@@ -132,7 +186,7 @@ exports.executeRegister = async (req, res, next) => {
 const generateVerificationToken = (userEmail) => {
     const payload = { email: userEmail };
     const secret = process.env.JWT_SECRET;  // JWT 비밀 키
-    const options = { expiresIn: '1h' };  // 토큰 만료 시간 설정
+    const options = { expiresIn: process.env.EXPIRES_TIME_ACCESS };  // 토큰 만료 시간 설정
 
     return jwt.sign(payload, secret, options);
 };
@@ -303,13 +357,14 @@ exports.saveUserInfo = async (req, res, next) => {
             ROOM_CODE: roomCode,
             USER_CODE: userCode,
         };
-        const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: process.env.EXPIRES_TIME_ACCESS });
 
         // 트랜잭션 커밋
         await connection.commit();
 
         // 응답
         res.status(200).json({
+            message: "성공적으로 완료되었습니다.",
             token,
             userInfo: { email, nickName, roomCode, userCode },
         });

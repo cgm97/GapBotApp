@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { useUserContext } from "../context/UserContext";
-import axios from "axios";
+import { useUserContext, } from "../context/UserContext";
+// import axios from "axios";
+import api from '../utils/api'; // 설정된 Axios 인스턴스
 import { useNavigate } from "react-router-dom";
 import '../css/MyPage.css';
 
@@ -11,20 +12,21 @@ const MyPage = () => {
     const [nickName, setNickName] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const { token, resetToken } = useUserContext(); // Context에서 사용자 정보 가져오기
+    const { resetToken, logout } = useUserContext(); // Context에서 사용자 정보 가져오기
     const [isSuccess, setIsSuccess] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
         const fetchUserInfo = async () => {
             try {
-                const response = await axios.post(
-                    process.env.REACT_APP_SERVER_URL + '/user/mypage',
+                const response = await api.post(
+                    '/user/mypage',
                     {},
                     {
                         headers: {
-                            Authorization: `Bearer ${token}`,
+                            Authorization: `Bearer ${sessionStorage.getItem("token")}`,
                         },
+                        withCredentials: true // 쿠키도 자동으로 포함되어 전송
                     }
                 );
                 setUserInfo(response.data); // 사용자 정보 저장
@@ -32,18 +34,26 @@ const MyPage = () => {
                 setUserCode(response.data.userCode);
                 setNickName(response.data.nickName);
             } catch (error) {
-                setError('사용자 정보를 가져오는 데 실패했습니다.');
+                if(error.response.status === 403){
+                    setError('로그인기한이 만료되어 로그아웃 되었습니다.');
+                    logout();
+                    navigate("/login");
+                }else{
+                    setError('사용자 정보를 가져오는 데 실패했습니다.');
+                    logout();
+                    navigate("/login");
+                }
             } finally {
                 setLoading(false);
             }
         };
     
-        if (token) {
+        if (sessionStorage.getItem("token")) {
             fetchUserInfo(); // 함수 호출
         } else {
             navigate("/login");
         }
-    }, [token, navigate]); // `fetchUserInfo` 제거
+    }, [navigate, logout]); // `fetchUserInfo` 제거
 
     if (loading) {
         return <div>로딩 중...</div>;
@@ -53,8 +63,23 @@ const MyPage = () => {
         e.preventDefault(); // 폼 기본 동작 방지
         try {
             setLoading(true); // 저장 중 상태
-            const response = await axios.post(
-                process.env.REACT_APP_SERVER_URL + '/user/save',
+            // const response = await axios.post(
+            //     process.env.REACT_APP_SERVER_URL + '/user/save',
+            //     {
+            //         email: userInfo.email,
+            //         nickName: nickName,
+            //         roomCode: roomCode,
+            //         userCode: userCode,
+            //     },
+            //     {
+            //         headers: {
+            //             Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+            //         },
+            //         withCredentials: true // 쿠키도 자동으로 포함되어 전송
+            //     }
+            // );
+            const response = await api.post(
+                '/user/save',
                 {
                     email: userInfo.email,
                     nickName: nickName,
@@ -63,8 +88,9 @@ const MyPage = () => {
                 },
                 {
                     headers: {
-                        Authorization: `Bearer ${token}`,
+                        Authorization: `Bearer ${sessionStorage.getItem("token")}`,
                     },
+                    withCredentials: true // 쿠키도 자동으로 포함되어 전송
                 }
             );
             resetToken(response.data.token) // 내정보 수정시 토큰 재발급
@@ -75,8 +101,10 @@ const MyPage = () => {
                 // 서버 응답이 있는 경우 (4xx, 5xx 상태 코드)
                 if (error.response.status === 401) {
                     setError(error.response.data.message);
-                } else {
-                    setError('서버 오류: ' + error.response.status);
+                } else if(error.response.status === 403){
+                    setError('로그인기한이 만료되어 로그아웃 되었습니다.');
+                    logout();
+                    navigate("/login");
                 }
             } else {
                 // 네트워크 오류 또는 서버에서 응답이 없는 경우

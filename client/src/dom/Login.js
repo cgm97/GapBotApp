@@ -23,7 +23,8 @@ const Login = () => {
             const response = await axios.post(process.env.REACT_APP_SERVER_URL + '/user/login', data, {
                 headers: {
                     'Content-Type': 'application/json',
-                }
+                },
+                withCredentials: true // 쿠키도 자동으로 포함되어 전송
             });
         
             // 로그인 성공 시 처리
