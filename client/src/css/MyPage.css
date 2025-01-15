@@ -69,3 +69,11 @@
     border-radius: 10px;
     text-align: center;
 }
+
+.code-section {
+    border: 1px solid #ddd; /* 테두리 추가 */
+    padding: 15px; /* 내부 여백 */
+    margin-top: 20px; /* 위 요소와 간격 */
+    border-radius: 5px; /* 둥근 테두리 */
+    background-color: #f9f9f9; /* 배경색 */
+}

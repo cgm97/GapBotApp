@@ -34,11 +34,11 @@ const MyPage = () => {
                 setUserCode(response.data.userCode);
                 setNickName(response.data.nickName);
             } catch (error) {
-                if(error.response.status === 403){
+                if (error.response.status === 403) {
                     setError('로그인기한이 만료되어 로그아웃 되었습니다.');
                     logout();
                     navigate("/login");
-                }else{
+                } else {
                     setError('사용자 정보를 가져오는 데 실패했습니다.');
                     logout();
                     navigate("/login");
@@ -47,7 +47,7 @@ const MyPage = () => {
                 setLoading(false);
             }
         };
-    
+
         if (sessionStorage.getItem("token")) {
             fetchUserInfo(); // 함수 호출
         }
@@ -99,7 +99,7 @@ const MyPage = () => {
                 // 서버 응답이 있는 경우 (4xx, 5xx 상태 코드)
                 if (error.response.status === 401) {
                     setError(error.response.data.message);
-                } else if(error.response.status === 403){
+                } else if (error.response.status === 403) {
                     setError('로그인기한이 만료되어 로그아웃 되었습니다.');
                     logout();
                     navigate("/login");
@@ -121,53 +121,66 @@ const MyPage = () => {
         <div className="user-profile-container">
             <h2>내 정보</h2>
             <form onSubmit={handleSave}>
-                <div className="user-info">
-                    <div className="form-group">
-                        <label htmlFor="email">Email</label>
-                        <input
-                            type="email"
-                            id="email"
-                            value={userInfo?.email || ''}
-                            readOnly
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="character">대표 캐릭터</label>
-                        <input
-                            type="text"
-                            id="character"
-                            value={nickName}
-                            onChange={(e) => setNickName(e.target.value)}
-                            placeholder="로스트아크 본인 대표 캐릭터 닉네임"
-                            required
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="roomCode">채팅방 CODE</label>
-                        <input
-                            type="text"
-                            id="roomCode"
-                            value={roomCode}
-                            onChange={(e) => setRoomCode(e.target.value)}
-                            placeholder="빈틈봇이 발급해준 CODE"
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="userCode">유저 CODE</label>
-                        <input
-                            type="text"
-                            id="userCode"
-                            value={userCode}
-                            onChange={(e) => setUserCode(e.target.value)}
-                            placeholder="빈틈봇이 발급해준 CODE 또는 명"
-                        />
-                    </div>
-                    <button type="submit" className="button">
-                        저장
-                    </button>
-                </div>
-            </form>
-            
+    <div className="user-info">
+        <div className="form-group">
+            <label htmlFor="email">Email</label>
+            <input
+                type="email"
+                id="email"
+                value={userInfo?.email || ''}
+                readOnly
+            />
+        </div>
+        <div className="form-group">
+            <label htmlFor="character">대표 캐릭터</label>
+            <input
+                type="text"
+                id="character"
+                value={nickName}
+                onChange={(e) => setNickName(e.target.value)}
+                placeholder="로스트아크 본인 대표 캐릭터 닉네임"
+                required
+            />
+        </div>
+
+        {/* CODE 그룹 섹션 시작 */}
+        <div className="code-section">
+            {/* 설명 문구 */}
+            <p>
+                카카오톡방에서 빈틈봇에게 <strong>'빈틈봇연동'</strong>을 입력하세요.
+            </p>
+            <p>
+            이후 빈틈봇이 발급한 <strong>채팅방CODE</strong>, <strong>유저CODE</strong>를 입력해주세요.
+            </p>
+            <div className="form-group">
+                <label htmlFor="roomCode">채팅방 CODE</label>
+                <input
+                    type="text"
+                    id="roomCode"
+                    value={roomCode}
+                    onChange={(e) => setRoomCode(e.target.value)}
+                    placeholder="빈틈봇이 발급해준 CODE"
+                />
+            </div>
+            <div className="form-group">
+                <label htmlFor="userCode">유저 CODE</label>
+                <input
+                    type="text"
+                    id="userCode"
+                    value={userCode}
+                    onChange={(e) => setUserCode(e.target.value)}
+                    placeholder="빈틈봇이 발급해준 CODE 또는 명"
+                />
+            </div>
+        </div>
+        {/* CODE 그룹 섹션 끝 */}
+
+        <button type="submit" className="button">
+            저장
+        </button>
+    </div>
+</form>
+
             {/* 성공 메시지 모달 */}
             {isSuccess && (
                 <div className="modal">
@@ -178,7 +191,7 @@ const MyPage = () => {
                     </div>
                 </div>
             )}
-    
+
             {/* 에러 메시지 모달 */}
             {error && (
                 <div className="modal">
@@ -192,7 +205,7 @@ const MyPage = () => {
             )}
         </div>
     );
-    
+
 };
 
 export default MyPage;
