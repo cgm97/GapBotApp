@@ -34,6 +34,8 @@ const userService = require('./userService'); // 상대 경로로 apiService 불
  */
 router.post('/login', userService.executeLogin);
 
+router.post('/logout', userService.executeLogout);
+
 router.post('/register', userService.executeRegister);
 
 router.post('/refresh', userService.executeRefresh);

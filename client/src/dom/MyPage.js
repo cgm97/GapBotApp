@@ -50,8 +50,6 @@ const MyPage = () => {
     
         if (sessionStorage.getItem("token")) {
             fetchUserInfo(); // 함수 호출
-        } else {
-            navigate("/login");
         }
     }, [navigate, logout]); // `fetchUserInfo` 제거
 

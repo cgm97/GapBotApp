@@ -12,9 +12,13 @@ import Register from './dom/Register';
 import PatchNote from './dom/PatchNote';
 import Cube from './dom/Cube';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { useUserContext } from "./context/UserContext";
+import api from './utils/api'; // 설정된 Axios 인스턴스
 import MyPage from "./dom/MyPage";
 
 function App() {
+    const { login } = useUserContext(); // Context에서 login 함수 가져오기
+
   useEffect(() => { 
       const script = document.createElement('script');
       script.type = 'text/javascript';
@@ -27,6 +31,29 @@ function App() {
         document.body.removeChild(script);
       };
     }, []);
+
+      // 자동로그인
+  useEffect(() => {
+
+    if(!sessionStorage.getItem("token")){
+
+      api.post('/user/refresh', {}, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true // 쿠키도 자동으로 포함되어 전송
+      })
+        .then((response) => {
+          login(response.data.user,response.data.token);
+          
+        })
+        .catch((error) => {
+          // console.error("API 호출 오류:", error);
+        });
+    }
+
+  }, [login]);
+
   return (
     <Router>
       <div className="wrapper">
