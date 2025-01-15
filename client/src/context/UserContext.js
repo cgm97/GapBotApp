@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect  } from "react";
+import axios from 'axios';
 
 // Context 생성
 export const UserContext = createContext();
@@ -27,16 +28,28 @@ export const UserProvider = ({ children }) => {
     };
 
     const logout = () => {
-        setUser(null);
-        // setToken(null);
-        sessionStorage.removeItem("user");
-        sessionStorage.removeItem("token");
+        handleLogout();
     };
 
     const resetToken = (tokenData) => {
         // setToken(tokenData);
         sessionStorage.setItem("token", tokenData);
     };
+
+    const handleLogout = async () => {
+        try {
+          // 서버에 로그아웃 요청
+          await axios.post(process.env.REACT_APP_SERVER_URL+'/user/logout', {}, { withCredentials: true });
+      
+          setUser(null);
+          // setToken(null);
+          sessionStorage.removeItem("user");
+          sessionStorage.removeItem("token");
+
+        } catch (error) {
+          console.error('로그아웃 실패:', error);
+        }
+      };
 
     return (
         <UserContext.Provider value={{ user, login, logout, resetToken }}>

@@ -64,6 +64,8 @@ exports.executeLogin = async (req, res, next) => {
         res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'PROD', // 프로덕션 환경에서만 secure 옵션 활성화
+            domain: process.env.COOKIE_DOMAIN, // 상위 도메인(.loagap.com)으로 설정하여 서브도메인 간 쿠키 공유 가능
+            path: '/',             // 모든 경로에서 유효하도록 설정
             maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
         });
 
@@ -78,12 +80,30 @@ exports.executeLogin = async (req, res, next) => {
     }
 };
 
+exports.executeLogout = async (req, res, next) => {
+
+    res.clearCookie('refreshToken', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'PROD', // 프로덕션 환경에서만 secure 옵션 활성화
+        domain: process.env.COOKIE_DOMAIN, // 상위 도메인(.loagap.com)으로 설정하여 서브도메인 간 쿠키 공유 가능
+        path: '/'             // 모든 경로에서 유효하도록 설정
+      });
+    
+      // 추가적으로 서버에서 refreshToken 무효화 (DB 또는 캐시에서 삭제)
+      const refreshToken = req.cookies.refreshToken;
+      if (refreshToken) {
+        // 토큰 블랙리스트 추가 등 무효화 로직 구현 
+      }
+    
+      return res.status(200).json({ message: '로그아웃 되었습니다.' });
+}
+
 exports.executeRefresh = async (req, res, next) => {
     const { refreshToken } = req.cookies;
 
     // Refresh Token이 없는 경우
     if (!refreshToken) {
-        return res.status(401).json({ message: '로그인이 필요합니다.' });
+        return res.status(403).json({ message: '로그인이 필요합니다.' });
     }
 
     try {
@@ -112,7 +132,7 @@ exports.executeRefresh = async (req, res, next) => {
 
         console.log("서버 갱신");
 
-        return res.status(200).json({ message: 'Access Token 재발급 되었습니다.', token: newAccessToken });
+        return res.status(200).json({ message: 'Access Token 재발급 되었습니다.', token: newAccessToken , user:userInfo[0].USERNAME});
     } catch (error) {
         console.error(error);
         return res.status(403).json({ message: 'RefreshToken이 만료되었습니다.' });
