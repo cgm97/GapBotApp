@@ -26,7 +26,7 @@ const Command = () => {
     { id: 18, prefix: ".시세 (.시세 상 유물or고대 1~3)", img: require("../img/cmd/tkdwnd.png"), description: "상,상상,상중,상하,중,중중,중하,유각,전각,재료,식물,벌목,낚시,고고학,채광,수렵" },
     { id: 19, prefix: ".사사게", img: null , description:".사사게 키워드"},
     { id: 20, prefix: ".클골", img: null},
-    { id: 21, prefix: ".큐브", img: null}
+    { id: 21, prefix: ".큐브", img: require("../img/cmd/cube.png"), description: "LOAGAP 사이트와 연동이 되어야합니다." }
   ];
 
   const listUtilItems = [
