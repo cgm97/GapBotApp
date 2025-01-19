@@ -1,6 +1,7 @@
 const axios = require('axios');
 const pool = require('../db/connection');
 const logger = require('../logger');  // logger.js 임포트
+const spec = require('../calculator/specPoint');
 const { sessionCache } = require('../sessionUtil'); // 세션 모듈 가져오기
 
   // 전체 큐브 보상아이템 합계 게산
@@ -183,4 +184,22 @@ exports.getCharacterCube = async (req, res, next) => {
         if (connection) connection.release();
     }
 
+}
+
+exports.getBangleOption = async (req, res, next) => {
+    try {
+        const { nickName } = req.query;
+        res.status(200).json(await spec.getBangleOption(nickName));
+    } catch (error) {
+        next(new Error(error));  // 에러 객체를 넘겨서 next 미들웨어로 전달
+    }
+}
+
+exports.getAccValue = async (req, res, next) => {
+  try {
+      const { nickName } = req.query;
+      res.status(200).json(await spec.getAccValue(nickName));
+  } catch (error) {
+      next(new Error(error));  // 에러 객체를 넘겨서 next 미들웨어로 전달
+  }
 }
