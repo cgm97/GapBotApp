@@ -139,4 +139,6 @@ const botService = require('./botService'); // 상대 경로로 botService 불�
 
 router.get('/cube', botService.getCharacterCube);
 
+router.get('/bangleOption', botService.getBangleOption);
+router.get('/accValue', botService.getAccValue);
 module.exports = router;
