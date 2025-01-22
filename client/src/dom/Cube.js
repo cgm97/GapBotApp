@@ -179,8 +179,11 @@ const Cube = () => {
       const newCharacterInfo = [...prevState];
       const character = newCharacterInfo[characterIndex];
       const cubeIndex = character.CUBES.findIndex((cube) => cube.name === tierName);
+      console.log(character.CUBES);
       if (cubeIndex !== -1) {
         character.CUBES[cubeIndex].count = newValue;
+      } else{
+        character.CUBES[character.CUBES.length] = { name: tierName, count: newValue};
       }
       if (sessionStorage.getItem("token")) {
         character.isSaveEnabled = false; // 수정 시 무조건 저장 버튼 활성화
@@ -384,6 +387,19 @@ const Cube = () => {
           "ETC2": 5,
           "ETC3": 0
         }
+        ,
+        {
+          "NAME": "3해금",
+          "LEVEL": 8,
+          "CARD_EXP": 20000,
+          "JEWELRY": 24,
+          "JEWELRY_PRICE": 0,
+          "STONES": 32,
+          "SILLING": 159631,
+          "ETC1": 6,
+          "ETC2": 6,
+          "ETC3": 0
+        }
       ])
       setLoading(false); // 임시 데이터 로딩 완료 처리
     }
@@ -541,7 +557,7 @@ const Cube = () => {
               <div className="tier-section">
                 <h3 className="tier-title">4티어</h3>
                 <ul className="tier-list">
-                  {["1해금", "2해금"].map((tierName, index) => {
+                  {["1해금", "2해금","3해금"].map((tierName, index) => {
                     const cube = CUBES.find((c) => c.name === tierName) || { count: 0 };
                     return (
                       <li key={index}>
