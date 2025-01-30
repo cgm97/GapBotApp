@@ -51,19 +51,19 @@ exports.getIsland = async (req, res, next) => {
 
             if (calender.CategoryName == '모험 섬') {
 
-                const groupedByDate = calender.StartTimes.reduce((acc, dateTime) => {
+                const groupedByDate = calender.StartTimes ? calender.StartTimes.reduce((acc, dateTime) => {
                     const date = dateTime.split('T')[0].replace(/-/g, ''); // 날짜만 추출 (2024-12-25 -> 20241225)
                     const time = dateTime.split('T')[1]; // 시간만 추출 (예: 19:00:00)
-
+                
                     if (!acc[date]) {
                         acc[date] = { times: [] }; // 날짜 키가 없으면 초기화
                     }
-
+                
                     acc[date].times.push(time);
-
+                
                     return acc;
-                }, {});
-
+                }, {}) : {};  // StartTimes가 null이면 빈 객체 반환
+                
                 arr.push(Object.entries(groupedByDate).map(([date, { times }]) => {
                     // 첫 번째 시간
                     const firstTime = times[0];
