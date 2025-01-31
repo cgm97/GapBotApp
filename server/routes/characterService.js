@@ -96,7 +96,7 @@ exports.getCharacterInfo = async (req, res, next) => {
 
         const [rows] = await pool.query(query, [nickName]);
 
-        if (rows.length > 0) {
+        if (rows.length > 0 &&  rows[0].characterData.equipItems != null) {
             // 조회된 데이터가 있을 경우
             const characterData = rows[0].characterData;
 
