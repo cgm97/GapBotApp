@@ -1,7 +1,7 @@
 const axios = require('axios');
 const pool = require('../db/connection');
 const logger = require('../logger');  // logger.js 임포트
-const spec = require('../calculator/specPoint');
+const characterUtil = require('../characterUtil');
 require('dotenv').config(); // .env 파일에서 환경 변수 로드
 
 exports.getIsland = async (req, res, next) => {
@@ -35,15 +35,6 @@ exports.getPatchNote = async (req, res, next) => {
     try {
         const [rows] = await pool.query('SELECT * FROM GAP_PATCHNOTE WHERE DL_YN = "N" ORDER BY SNO DESC');
         res.status(200).json(rows);
-    } catch (error) {
-        next(new Error(error));  // 에러 객체를 넘겨서 next 미들웨어로 전달
-    }
-}
-
-exports.getCharacterInfo = async (req, res, next) => {
-    try {
-        const { nickName } = req.query;
-        res.status(200).json(await spec.getCharacterProfile(nickName));
     } catch (error) {
         next(new Error(error));  // 에러 객체를 넘겨서 next 미들웨어로 전달
     }

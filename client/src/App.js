@@ -11,26 +11,28 @@ import Login from './dom/Login';
 import Register from './dom/Register';
 import PatchNote from './dom/PatchNote';
 import Cube from './dom/Cube';
+import Character from './dom/Character';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useUserContext } from "./context/UserContext";
 import api from './utils/api'; // 설정된 Axios 인스턴스
 import MyPage from "./dom/MyPage";
+import KakaoAdFit from "./components/KakaoAdFit";
 
 function App() {
     const { login } = useUserContext(); // Context에서 login 함수 가져오기
 
-  useEffect(() => { 
-      const script = document.createElement('script');
-      script.type = 'text/javascript';
-      script.src = '//t1.daumcdn.net/kas/static/ba.min.js';
-      script.async = true;
-      document.body.appendChild(script);
+  // useEffect(() => { 
+  //     const script = document.createElement('script');
+  //     script.type = 'text/javascript';
+  //     script.src = '//t1.daumcdn.net/kas/static/ba.min.js';
+  //     script.async = true;
+  //     document.body.appendChild(script);
      
-      return () => {
-        // 컴포넌트 언마운트 시 스크립트를 제거
-        document.body.removeChild(script);
-      };
-    }, []);
+  //     return () => {
+  //       // 컴포넌트 언마운트 시 스크립트를 제거
+  //       document.body.removeChild(script);
+  //     };
+  //   }, []);
 
       // 자동로그인
   useEffect(() => {
@@ -58,13 +60,14 @@ function App() {
     <Router>
       <div className="wrapper">
         <div className="advertise left">
-        <ins
+        <KakaoAdFit unit="DAN-Qnq0ez9rvfuNOCVh" width={160} height={600} disabled={true} />
+        {/* <ins
           className="kakao_ad_area"
           style={{ display: 'none' }}
           data-ad-unit = "DAN-Qnq0ez9rvfuNOCVh"
           data-ad-width = "160"
           data-ad-height = "600">
-        </ins>
+        </ins> */}
         </div>
         <div className="content">
           <Top />
@@ -74,7 +77,7 @@ function App() {
             <Route path="/login" element={<div className="centered"><Login /></div>} />
             <Route path="/register" element={<div className="centered"><Register /></div>} />
             <Route path="/cmd" element={<Command />} />
-            <Route path="/character" element={<div>전투정보실</div>} />
+            <Route path="/character/:nickName" element={<Character />} />
             <Route path="/patchNote" element={<PatchNote />} />
             <Route path="/verifyEmail" element={<VerifyEmail />} />
 
@@ -111,13 +114,14 @@ function App() {
         </div>
 
         <div className="advertise right">
-        <ins
+        {/* <ins
           className="kakao_ad_area"
           style={{ display: 'none' }}
           data-ad-unit = "DAN-sj5267WiC2Xirn0q"
           data-ad-width = "160"
           data-ad-height = "600">
-        </ins>
+        </ins> */}
+        <KakaoAdFit unit="DAN-sj5267WiC2Xirn0q" width={160} height={600} disabled={true} />
         </div>
       </div>
     </Router>

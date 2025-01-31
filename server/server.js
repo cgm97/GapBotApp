@@ -6,6 +6,7 @@ const lostarkAPI = require('./routes/api'); // 라우트 등록
 const user = require('./routes/user'); // 라우트 등록
 const cube = require('./routes/cube'); // 라우트 등록
 const bot = require('./routes/bot'); // 라우트 등록
+const character = require('./routes/character'); // 라우트 등록
 const cron = require('./cron'); // cron.js를 불러옵니다
 const swaggerUi = require('swagger-ui-express');
 const swaggerJSDoc = require('swagger-jsdoc');
@@ -106,6 +107,9 @@ app.use('/user', user);
 
 // cube API 사용
 app.use('/cube', cube);
+
+// character API 사용
+app.use('/character', character);
 
 // bot 전용 API 사용
 app.use('/bot', bot);

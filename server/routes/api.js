@@ -190,6 +190,4 @@ router.get('/event', apiService.getEvent);
  */
 router.get('/patchNote', apiService.getPatchNote);
 
-router.get('/character', apiService.getCharacterInfo);
-
 module.exports = router;
