@@ -108,6 +108,7 @@ a:hover {
 /* 검색 박스 컨테이너 */
 .search-container {
   position: absolute;
+  margin-top: 50px;
   left: 50%;
   transform: translateX(-50%); /* 중앙 정렬 */
   display: flex;
@@ -251,10 +252,15 @@ main {
   .advertise{
     display: none;
   }
-  .search-container{
+  /* .search-container{
     display: none;
-  }
+  } */
+  /* 미구현 임시 숨김 */
+  /* .search-container{
+    display: none;
+  } */
 }
+
 
 /* 모바일 화면 크기에서 그리드 간격 및 너비 조정 */
 @media (max-width: 768px) {
@@ -268,8 +274,4 @@ main {
   .nav li {
     padding: auto; /* 세로 간격 */
   }
-}
-/* 미구현 임시 숨김 */
-.search-container{
-  display: none;
 }

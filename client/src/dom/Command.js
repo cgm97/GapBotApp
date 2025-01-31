@@ -1,9 +1,23 @@
 import React, { useState } from "react";
 import '../css/Command.css'; // CSS 파일 (위에서 작성한 스타일을 참조)
+import KakaoAdFit from "../components/KakaoAdFit";
 
 const Command = () => {
   // 각 항목의 카드가 열려 있는지 여부를 상태로 관리
   const [activeCard, setActiveCard] = useState(null);
+
+    // useEffect(() => {
+    //   const script = document.createElement('script');
+    //   script.type = 'text/javascript';
+    //   script.src = '//t1.daumcdn.net/kas/static/ba.min.js';
+    //   script.async = true;
+    //   document.body.appendChild(script);
+  
+    //   return () => {
+    //     // 컴포넌트 언마운트 시 스크립트를 제거
+    //     document.body.removeChild(script);
+    //   };
+    // }, []);
 
   const listLoaItems = [
     { id: 1, prefix: ".정보", img: require('../img/cmd/wjdqh.png') },
@@ -76,6 +90,16 @@ const Command = () => {
               </li>
             ))}
           </ul>
+          <div>
+            <KakaoAdFit unit="DAN-KjllsdstWjrHOWe6" width={250} height={250} disabled={true} />
+            {/* <ins
+                className="kakao_ad_area"
+                style={{display: 'none'}}
+                data-ad-unit="DAN-KjllsdstWjrHOWe6"
+                data-ad-width="250"
+                data-ad-height="250">
+            </ins> */}
+          </div>
         </div>
       </div>
     </div>

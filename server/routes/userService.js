@@ -257,19 +257,19 @@ exports.saveUserInfo = async (req, res, next) => {
             SELECT count(*) AS count 
             FROM CHARACTER_INFO
             WHERE NICKNAME = ?
-            AND USERNAME != ?
+            AND (USERNAME != ? AND USERNAME != 'UNKNOWN')
         `;
 
         const [rows] = await connection.execute(isCharacterSql, [nickName, email]);
         // rows는 배열이므로, rows[0].count를 사용해야 함
         if (rows[0].count > 0) {
-            return res.status(401).json({ message: '이미 등록되어있는 다른 유저의 캐릭터입니다.' });
+            return res.status(409).json({ message: '이미 등록되어있는 다른 유저의 캐릭터입니다.' });
         }
 
 
         // CHARACTER_INFO 유저의 기존 캐릭터 데이터 초기화 처리
         const resetUserCharacterSql = `
-            UPDATE CHARACTER_INFO SET USERNAME = null , IS_LINKED = 'N'
+            UPDATE CHARACTER_INFO SET USERNAME = 'UNKNOWN' , IS_LINKED = 'N'
             WHERE USERNAME = ?
         `;
         await connection.execute(resetUserCharacterSql, [email]);

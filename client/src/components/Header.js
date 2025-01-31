@@ -6,12 +6,6 @@ const Header = () => {
   return (
     <header className="header">
       <div className="logo"><Link to="/">LOAGAP</Link></div>
-      <div className="search-container">
-        <input type="text" className="search-box" placeholder="캐릭터를 입력하세요..." />
-        <button className="search-icon">
-          <i className="fa fa-search"></i>
-        </button>
-      </div>
       <nav className="nav">
         <ul>
           <li><Link to="/cmd">명령어</Link></li>

@@ -4,7 +4,7 @@ import '../App.css'; // CSS 파일 (위에서 작성한 스타일을 참조)
 import Island from '../components/Island';
 import '../css/Command.css'; // CSS 파일 (위에서 작성한 스타일을 참조)
 import { Link } from "react-router-dom";
-
+import KakaoAdFit from "../components/KakaoAdFit";
 
 const MainPages = () => {
   const [noticeData, setNoticeData] = useState(null);
@@ -12,18 +12,18 @@ const MainPages = () => {
   const [patchNoteData, setPatchNoteData] = useState(null);
 
 
-  useEffect(() => {
-    const script = document.createElement('script');
-    script.type = 'text/javascript';
-    script.src = '//t1.daumcdn.net/kas/static/ba.min.js';
-    script.async = true;
-    document.body.appendChild(script);
+  // useEffect(() => {
+  //   const script = document.createElement('script');
+  //   script.type = 'text/javascript';
+  //   script.src = '//t1.daumcdn.net/kas/static/ba.min.js';
+  //   script.async = true;
+  //   document.body.appendChild(script);
 
-    return () => {
-      // 컴포넌트 언마운트 시 스크립트를 제거
-      document.body.removeChild(script);
-    };
-  }, []);
+  //   return () => {
+  //     // 컴포넌트 언마운트 시 스크립트를 제거
+  //     document.body.removeChild(script);
+  //   };
+  // }, []);
 
   // 공지사항 API 데이터 호출
   useEffect(() => {
@@ -92,13 +92,14 @@ const MainPages = () => {
     <div>
       <Island />
       <div className="ad-content">
-        <ins
+        <KakaoAdFit unit="DAN-lOG6HPbp08gmb26g" width={728} height={90} disabled={true} />
+        {/* <ins
           className="kakao_ad_area"
           style={{ display: 'none' }}
           data-ad-unit="DAN-lOG6HPbp08gmb26g"
           data-ad-width="728"
           data-ad-height="90"
-        ></ins>
+        ></ins> */}
       </div>
       <div className="notice">
         <div className="content">

@@ -97,7 +97,7 @@ const MyPage = () => {
         } catch (error) {
             if (error.response) {
                 // 서버 응답이 있는 경우 (4xx, 5xx 상태 코드)
-                if (error.response.status === 401) {
+                if (error.response.status === 409) {
                     setError(error.response.data.message);
                 } else if (error.response.status === 403) {
                     setError('로그인기한이 만료되어 로그아웃 되었습니다.');
