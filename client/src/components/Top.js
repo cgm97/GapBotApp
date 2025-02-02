@@ -32,7 +32,8 @@ const Top = () => {
   return (
     <div className="top">
       <div className="container">
-        <span><a href="https://open.kakao.com/o/g6Abem1g" target="_blank" rel="noopener noreferrer">빈틈봇 소통방(분양)</a></span>
+        <span><a href="https://open.kakao.com/o/g6Abem1g" target="_blank" rel="noopener noreferrer">빈틈봇 소통방(분양)</a></span>&nbsp;&nbsp;
+        <span><Link to="/donate">후원안내</Link></span>
       </div>
 
       <div className="search-container">

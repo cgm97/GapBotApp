@@ -17,6 +17,7 @@ import { useUserContext } from "./context/UserContext";
 import api from './utils/api'; // 설정된 Axios 인스턴스
 import MyPage from "./dom/MyPage";
 import KakaoAdFit from "./components/KakaoAdFit";
+import Donate from "./dom/Donate";
 
 function App() {
     const { login } = useUserContext(); // Context에서 login 함수 가져오기
@@ -74,6 +75,7 @@ function App() {
           <Header />
           <Routes>
             <Route path="/" element={<MainPages />} />
+            <Route path="/donate" element={<Donate />} />
             <Route path="/login" element={<div className="centered"><Login /></div>} />
             <Route path="/register" element={<div className="centered"><Register /></div>} />
             <Route path="/cmd" element={<Command />} />
