@@ -87,18 +87,6 @@
     animation: fadeIn 0.3s ease-in-out;
 }
 
-/* 모달 등장 애니메이션 */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: scale(0.9);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
 /* 리스트 스타일 */
 .form-group ul {
     list-style-type: none;
