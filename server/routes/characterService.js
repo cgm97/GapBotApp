@@ -62,7 +62,8 @@ exports.getCharacterInfo = async (req, res, next) => {
                                 'STATS', CI.STATS,
                                 'SERVER', CI.SERVER,
                                 'SUBJOB', CI.SUBJOB,
-                                'TITLE', CI.TITLE
+                                'TITLE', CI.TITLE,
+                                'IS_DONATE', CI.IS_DONATE
                             ),
                             'equipItems', CE.EQUIPMENTS,
                             'accessoryItems', CE.ACCESSORY,
