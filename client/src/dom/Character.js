@@ -5,6 +5,7 @@ import '../css/Character.css';
 import elixirImg from '../img/elixir.png';
 import hyperImg from '../img/hyper.png';
 import guildImg from '../img/guild.png';
+import donatePng from '../img/donate/donation.png';
 import KakaoAdFit from "../components/KakaoAdFit";
 
 const Character = () => {
@@ -139,7 +140,7 @@ const Character = () => {
                     <button className="renew-button" onClick={handleRenew}>갱신하기</button>
                     <div className="character-info">
                         <p className="character-name">{profile.TITLE !== "없음" ? profile.TITLE : ""}</p>
-                        <p className="character-name">Lv.{profile.CHARACTER_LEVEL}&nbsp;{profile.NICKNAME}</p>
+                        <p className="character-name">Lv.{profile.CHARACTER_LEVEL}&nbsp;{profile.NICKNAME} {profile.IS_DONATE=="Y"?<img src={donatePng} alt={"후원"} className="arkPassive-image" />:""}</p>
                         <ul className="character-info-list">
                             <li className="character-info-item">
                                 <p className="character-info radius">직업</p>
