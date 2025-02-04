@@ -21,7 +21,7 @@ const Command = () => {
 
   const listLoaItems = [
     { id: 1, prefix: ".정보", img: require('../img/cmd/wjdqh.png') },
-    { id: 2, prefix: ".장비", img: require("../img/cmd/wkdql.png") },
+    // { id: 2, prefix: ".장비", img: require("../img/cmd/wkdql.png") },
     { id: 3, prefix: ".장신구(악세)", img: require("../img/cmd/wkdtlsrn.png") },
     { id: 4, prefix: ".팔찌", img: require("../img/cmd/vkfWl.png") },
     { id: 5, prefix: ".스킬", img: require("../img/cmd/skill.png") },
@@ -46,7 +46,7 @@ const Command = () => {
   const listUtilItems = [
     { id: 101, prefix: "이모티콘", img: null, description: "씨익콩,더줘콩,뿅콩,감사콩,꺼억콩,도망콩,머쓱해요,놀자에요,뭐라구요" },
     { id: 102, prefix: "/로또", img: require("../img/cmd/lotto.png"), description: "1 ~ 4 확정 로또번호 지원" },
-    { id: 103, prefix: "채팅레벨(중지)", img: null, description: "/레벨, /랭킹, /칭호" },
+    // { id: 103, prefix: "채팅레벨(중지)", img: null, description: "/레벨, /랭킹, /칭호" },
     { id: 104, prefix: "/재련", img: null, description: "/재련, /재련랭킹" }
   ];
   const toggleCard = (id) => {
