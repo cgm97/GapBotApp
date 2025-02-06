@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Helmet } from "react-helmet-async";
 import axios from 'axios';
 import '../App.css'; // CSS 파일 (위에서 작성한 스타일을 참조)
 import Island from '../components/Island';
@@ -90,6 +91,10 @@ const MainPages = () => {
 
   return (
     <div>
+      {/* SEO 메타 태그 */}
+              <Helmet>
+                  <title>LOAGAP</title>
+              </Helmet>
       <Island />
       <div className="ad-content">
         <KakaoAdFit unit="DAN-lOG6HPbp08gmb26g" width={728} height={90} disabled={true} />
