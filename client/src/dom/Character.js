@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import axios from 'axios';
 import '../css/Character.css';
 import elixirImg from '../img/elixir.png';
@@ -132,6 +133,43 @@ const Character = () => {
     };
 
     return (
+        <div className="character-container">
+        {/* SEO 메타 태그 */}
+        <Helmet>
+            <title>{nickName ? `${nickName} 캐릭터 정보 | LOAGAP` : "빈틈봇"}</title>
+            <meta name="description" content={`${nickName}님의 장비, 보석, 초월, 엘릭서 정보를 확인하세요.`} />
+            <meta name="keywords" content="로스트아크, 캐릭터 검색, 장비 정보, 초월, 엘릭서" />
+            <meta name="robots" content="index, follow" />
+
+            {/* OpenGraph */}
+            <meta property="og:title" content={`${nickName} 캐릭터 정보`} />
+            <meta property="og:description" content={`${nickName}님의 장비, 보석, 초월, 엘릭서 정보를 확인하세요.`} />
+            <meta property="og:image" content={profile.IMG_URL} />
+            <meta property="og:url" content={window.location.href} />
+
+            {/* Twitter Cards */}
+            <meta name="twitter:card" content="summary_large_image" />
+            <meta name="twitter:title" content={`${nickName} 캐릭터 정보`} />
+            <meta name="twitter:description" content={`${nickName}님의 장비, 보석, 초월, 엘릭서 정보를 확인하세요.`} />
+            <meta name="twitter:image" content={profile.IMG_URL} />
+
+            {/* JSON-LD 구조화 데이터 */}
+            <script type="application/ld+json">
+                {JSON.stringify({
+                    "@context": "https://schema.org",
+                    "@type": "VideoGameCharacter",
+                    "name": nickName,
+                    "url": window.location.href,
+                    "image": profile.IMG_URL,
+                    "description": `${nickName}님의 장비, 보석, 초월, 엘릭서 정보를 확인하세요.`,
+                    "game": {
+                        "@type": "VideoGame",
+                        "name": "Lost Ark"
+                    }
+                })}
+            </script>
+        </Helmet>
+
         <div className="group">
             {/* 캐릭터 정보 영역 */}
             <div className="group-info">
@@ -140,7 +178,7 @@ const Character = () => {
                     <button className="renew-button" onClick={handleRenew}>갱신하기</button>
                     <div className="character-info">
                         <p className="character-name">{profile.TITLE !== "없음" ? profile.TITLE : ""}</p>
-                        <p className="character-name">Lv.{profile.CHARACTER_LEVEL}&nbsp;{profile.NICKNAME} {profile.IS_DONATE==="Y"?<img src={donatePng} alt={"후원"} className="arkPassive-image" />:""}</p>
+                        <h1 className="character-name">Lv.{profile.CHARACTER_LEVEL}&nbsp;{profile.NICKNAME} {profile.IS_DONATE==="Y"?<img src={donatePng} alt={"후원"} className="arkPassive-image" />:""}</h1>
                         <ul className="character-info-list">
                             <li className="character-info-item">
                                 <p className="character-info radius">직업</p>
@@ -329,6 +367,7 @@ const Character = () => {
                     ))}
                 </div>
             </div>
+        </div>
         </div>
     );
 };

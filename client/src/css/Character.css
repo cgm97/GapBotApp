@@ -44,7 +44,9 @@
   background: #fff;
   color: #000;
 }
-
+.character-name{
+  font-size: 13px;
+}
 .renew-button:active {
   transform: scale(0.95);
 }

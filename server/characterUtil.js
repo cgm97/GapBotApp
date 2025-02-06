@@ -2,6 +2,7 @@ const pool = require('./db/connection');
 const logger = require('./logger');  // logger.js 임포트
 const spec = require('./calculator/specPoint');
 const url = 'characterUtil';
+const axios = require('axios');
 
 // 공식 API 활용하여 캐릭터 정보 값 파싱 및 조회
 const getCharacterProfile = async (nickName) => {
@@ -172,6 +173,46 @@ const insertCharacterInfo = async (equipItems, gemItems, accessoryItems, cardIte
             nickname, arkItems
         ]);
 
+        // 스킬
+        const kloaCharacter = `https://secapi.korlark.com/lostark/characters/${nickname}?force=true&blocking=true`;
+        const responseChar = await axios.get(kloaCharacter);
+        const kloaCharacterData = responseChar.data; // 응답 데이터 저장
+
+        // 캐틱터 스킬 SQL
+        const characteSkillSql = `
+        INSERT INTO CHARACTER_SKILL (
+            NICKNAME,
+            SKILL_POINT,
+            SKILLS
+        ) VALUES (?, ?, ?)
+        ON DUPLICATE KEY UPDATE
+            SKILL_POINT = VALUES(SKILL_POINT),
+            SKILLS = VALUES(SKILLS)
+        `;
+
+        const [insertSkill] = await connection.execute(characteSkillSql, [
+            nickname, kloaCharacterData.skillPoint, kloaCharacterData.skills
+        ]);
+
+        // 내실
+        const kloaCollectibles = `https://secapi.korlark.com/lostark/characters/${nickname}/collectibles`;
+        const responseCollect = await axios.get(kloaCollectibles);
+        const kloaCollectiblesData = responseCollect.data; // 응답 데이터 저장
+
+        // 캐틱터 스킬 SQL
+        const characterCollectSql = `
+        INSERT INTO CHARACTER_COLLECTION (
+            NICKNAME,
+            COLLECTIBLES
+        ) VALUES (?, ?)
+        ON DUPLICATE KEY UPDATE
+            COLLECTIBLES = VALUES(COLLECTIBLES)
+        `;
+
+        const [insertCollect] = await connection.execute(characterCollectSql, [
+            nickname, kloaCollectiblesData
+        ]);
+        
         // 트랜잭션 커밋
         await connection.commit();
 
