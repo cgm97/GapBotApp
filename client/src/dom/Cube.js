@@ -16,6 +16,7 @@ import solar4Icon from '../img/cube/solar4.png';
 import solar5Icon from '../img/cube/solar5.png';
 import stone3Icon from '../img/cube/stone3.png';
 import stone4Icon from '../img/cube/stone4.png';
+import { Helmet } from "react-helmet-async";
 
 const Cube = () => {
   const [characterInfo, setCharacterInfo] = useState(null);
@@ -182,8 +183,8 @@ const Cube = () => {
       console.log(character.CUBES);
       if (cubeIndex !== -1) {
         character.CUBES[cubeIndex].count = newValue;
-      } else{
-        character.CUBES[character.CUBES.length] = { name: tierName, count: newValue};
+      } else {
+        character.CUBES[character.CUBES.length] = { name: tierName, count: newValue };
       }
       if (sessionStorage.getItem("token")) {
         character.isSaveEnabled = false; // 수정 시 무조건 저장 버튼 활성화
@@ -403,7 +404,7 @@ const Cube = () => {
       ])
       setLoading(false); // 임시 데이터 로딩 완료 처리
     }
-  }, [navigate,logout]);
+  }, [navigate, logout]);
 
   if (loading) {
     return <div>로딩 중...</div>; // 로딩 상태 표시
@@ -415,6 +416,29 @@ const Cube = () => {
 
   return (
     <div>
+
+      {/* SEO 메타 태그 */}
+      <Helmet>
+        <title>큐브 계산기 | LOAGAP</title>
+        <meta name="description" content={`원정대 큐브 계산기.`} />
+        <meta name="keywords" content="빈틈봇, 큐브 계산기" />
+        <meta name="robots" content="index, follow" />
+
+        {/* JSON-LD 구조화 데이터 */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": "빈틈봇, 큐브 계산기",
+            "url": window.location.href,
+            "description": `빈틈봇에서 나의 원정대 큐브 정보를 확인하세요.`,
+            "game": {
+              "@type": "VideoGame",
+              "name": "Lost Ark"
+            }
+          })}
+        </script>
+      </Helmet>
       <div className="total-rewards">
         <h4>총 계산</h4>
         {characterInfo && Array.isArray(characterInfo) && (
@@ -557,7 +581,7 @@ const Cube = () => {
               <div className="tier-section">
                 <h3 className="tier-title">4티어</h3>
                 <ul className="tier-list">
-                  {["1해금", "2해금","3해금"].map((tierName, index) => {
+                  {["1해금", "2해금", "3해금"].map((tierName, index) => {
                     const cube = CUBES.find((c) => c.name === tierName) || { count: 0 };
                     return (
                       <li key={index}>

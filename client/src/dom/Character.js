@@ -138,7 +138,7 @@ const Character = () => {
         <Helmet>
             <title>{nickName ? `${nickName} 캐릭터 정보 | LOAGAP` : "빈틈봇"}</title>
             <meta name="description" content={`${nickName}님의 장비, 보석, 초월, 엘릭서 정보를 확인하세요.`} />
-            <meta name="keywords" content="로스트아크, 캐릭터 검색, 장비 정보, 초월, 엘릭서" />
+            <meta name="keywords" content="빈틈봇, 캐릭터 검색, 장비 정보, 초월, 엘릭서" />
             <meta name="robots" content="index, follow" />
 
             {/* OpenGraph */}
@@ -157,11 +157,22 @@ const Character = () => {
             <script type="application/ld+json">
                 {JSON.stringify({
                     "@context": "https://schema.org",
-                    "@type": "VideoGameCharacter",
+                    "@type": "ProfilePage",
+                    "mainContentOfPage": {
+                        "@type": "WebPageElement",
+                        "@id": window.location.href,
+                        "name": nickName
+                    },
+                    "mainEntity": {
+                        "@type": "Person",
+                        "name": nickName,
+                        "description": `${nickName}님의 장비, 보석, 초월, 엘릭서 정보`,
+                        "image": [profile.IMG_URL],
+                    },
                     "name": nickName,
                     "url": window.location.href,
-                    "image": profile.IMG_URL,
-                    "description": `${nickName}님의 장비, 보석, 초월, 엘릭서 정보를 확인하세요.`,
+                    "image": [profile.IMG_URL],
+                    "description": `${nickName}님의 장비, 보석, 초월, 엘릭서 정보`,
                     "game": {
                         "@type": "VideoGame",
                         "name": "Lost Ark"

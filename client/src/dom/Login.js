@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import axios from 'axios';
-import { Link , useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useUserContext } from "../context/UserContext";
 import '../css/Login.css'; // CSS 파일 (위에서 작성한 스타일을 참조)
+import { Helmet } from "react-helmet-async";
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -13,12 +14,12 @@ const Login = () => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-    
+
         const data = {
             email: email,
             password: password
         };
-    
+
         try {
             const response = await axios.post(process.env.REACT_APP_SERVER_URL + '/user/login', data, {
                 headers: {
@@ -26,18 +27,18 @@ const Login = () => {
                 },
                 withCredentials: true // 쿠키도 자동으로 포함되어 전송
             });
-        
+
             // 로그인 성공 시 처리
             if (response.status === 200) {
                 setError('');
                 // sessionStorage.setItem('token', response.data.token);
                 // sessionStorage.setItem('email', response.data.email);
                 const token = response.data.token; // 서버에서 반환된 JWT 토큰
-                const userData = response.data.email ; // 필요하면 서버에서 사용자 정보를 더 받아와서 추가
+                const userData = response.data.email; // 필요하면 서버에서 사용자 정보를 더 받아와서 추가
                 login(userData, token); // Context에 로그인 정보 저장
                 navigate("/"); // 로그인 후 메인 페이지로 이동
             }
-        
+
         } catch (error) {
             if (error.response) {
                 // 서버 응답이 있는 경우 (4xx, 5xx 상태 코드)
@@ -55,6 +56,28 @@ const Login = () => {
 
     return (
         <div className="login-container">
+            {/* SEO 메타 태그 */}
+            <Helmet>
+                <title>로그인 | LOAGAP</title>
+                <meta name="description" content={`LOAGAP 로그인.`} />
+                <meta name="keywords" content="빈틈봇, 로그인" />
+                <meta name="robots" content="index, follow" />
+
+                {/* JSON-LD 구조화 데이터 */}
+                <script type="application/ld+json">
+                    {JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "WebPage",
+                        "name": "빈틈봇, 로그인",
+                        "url": window.location.href,
+                        "description": `빈틈봇 로그인`,
+                        "game": {
+                            "@type": "VideoGame",
+                            "name": "Lost Ark"
+                        }
+                    })}
+                </script>
+            </Helmet>
             <h2>로그인</h2>
             <form onSubmit={handleSubmit}>
                 <div className="form-group">

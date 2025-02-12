@@ -1,23 +1,24 @@
 import React, { useState } from "react";
 import '../css/Command.css'; // CSS 파일 (위에서 작성한 스타일을 참조)
 import KakaoAdFit from "../components/KakaoAdFit";
+import { Helmet } from "react-helmet-async";
 
 const Command = () => {
   // 각 항목의 카드가 열려 있는지 여부를 상태로 관리
   const [activeCard, setActiveCard] = useState(null);
 
-    // useEffect(() => {
-    //   const script = document.createElement('script');
-    //   script.type = 'text/javascript';
-    //   script.src = '//t1.daumcdn.net/kas/static/ba.min.js';
-    //   script.async = true;
-    //   document.body.appendChild(script);
-  
-    //   return () => {
-    //     // 컴포넌트 언마운트 시 스크립트를 제거
-    //     document.body.removeChild(script);
-    //   };
-    // }, []);
+  // useEffect(() => {
+  //   const script = document.createElement('script');
+  //   script.type = 'text/javascript';
+  //   script.src = '//t1.daumcdn.net/kas/static/ba.min.js';
+  //   script.async = true;
+  //   document.body.appendChild(script);
+
+  //   return () => {
+  //     // 컴포넌트 언마운트 시 스크립트를 제거
+  //     document.body.removeChild(script);
+  //   };
+  // }, []);
 
   const listLoaItems = [
     { id: 1, prefix: ".정보", img: require('../img/cmd/wjdqh.png') },
@@ -38,8 +39,8 @@ const Command = () => {
     { id: 16, prefix: ".경매장", img: require("../img/cmd/rudaowkd.png"), description: "1~10겁작멸홍만 지원" },
     { id: 17, prefix: ".거래소", img: require("../img/cmd/rjfoth.png"), description: "각인서만 지원(인기 각인서는 약자 가능 ex:예둔)" },
     { id: 18, prefix: ".시세 (.시세 상 유물or고대 1~3)", img: require("../img/cmd/tkdwnd.png"), description: "상,상상,상중,상하,중,중중,중하,유각,전각,재료,식물,벌목,낚시,고고학,채광,수렵" },
-    { id: 19, prefix: ".사사게", img: null , description:".사사게 키워드"},
-    { id: 20, prefix: ".클골", img: null},
+    { id: 19, prefix: ".사사게", img: null, description: ".사사게 키워드" },
+    { id: 20, prefix: ".클골", img: null },
     { id: 21, prefix: ".큐브", img: require("../img/cmd/cube.png"), description: "LOAGAP 사이트와 연동이 되어야합니다." }
   ];
 
@@ -54,7 +55,30 @@ const Command = () => {
   };
 
   return (
+
     <div className="cmdContainer">
+      {/* SEO 메타 태그 */}
+      <Helmet>
+        <title>명령어 | LOAGAP</title>
+        <meta name="description" content={`빈틈봇 명령어 정보를 확인하세요.`} />
+        <meta name="keywords" content="빈틈봇, 명령어" />
+        <meta name="robots" content="index, follow" />
+
+        {/* JSON-LD 구조화 데이터 */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": "빈틈봇, 명령어",
+            "url": window.location.href,
+            "description": `빈틈봇 명령어 정보를 확인하세요.`,
+            "game": {
+              "@type": "VideoGame",
+              "name": "Lost Ark"
+            }
+          })}
+        </script>
+      </Helmet>
       <h2>빈틈봇 명령어</h2>
       <div className="prefix-container">
         <div className="prefix-section">
@@ -65,10 +89,10 @@ const Command = () => {
                 <span className="arrow">{activeCard === item.id ? "▼" : "▶"}</span>
                 {item.prefix}
                 {activeCard === item.id && (
-                <div className="card active"> {/* active 클래스 추가 */}
+                  <div className="card active"> {/* active 클래스 추가 */}
                     {item.description && <p>{item.description}</p>}
                     {item.img && <img src={item.img} alt={item.prefix} />}
-                </div>
+                  </div>
                 )}
               </li>
             ))}
@@ -82,10 +106,10 @@ const Command = () => {
                 <span className="arrow">{activeCard === item.id ? "▼" : "▶"}</span>
                 {item.prefix}
                 {activeCard === item.id && (
-                <div className="card active"> {/* active 클래스 추가 */}
+                  <div className="card active"> {/* active 클래스 추가 */}
                     {item.description && <p>{item.description}</p>}
                     {item.img && <img src={item.img} alt={item.prefix} />}
-                </div>
+                  </div>
                 )}
               </li>
             ))}
