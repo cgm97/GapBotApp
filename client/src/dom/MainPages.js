@@ -12,7 +12,6 @@ const MainPages = () => {
   const [eventData, setEventData] = useState(null);
   const [patchNoteData, setPatchNoteData] = useState(null);
 
-
   // useEffect(() => {
   //   const script = document.createElement('script');
   //   script.type = 'text/javascript';
@@ -92,9 +91,28 @@ const MainPages = () => {
   return (
     <div>
       {/* SEO 메타 태그 */}
-              <Helmet>
-                  <title>LOAGAP</title>
-              </Helmet>
+      {/* SEO 메타 태그 */}
+      <Helmet>
+        <title>LOAGAP</title>
+        <meta name="description" content={`LOAGAP 메인페이지.`} />
+        <meta name="keywords" content="빈틈봇, 메인페이지" />
+        <meta name="robots" content="index, follow" />
+
+        {/* JSON-LD 구조화 데이터 */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": "빈틈봇, 메인페이지",
+            "url": window.location.href,
+            "description": `빈틈봇 메인페이지`,
+            "game": {
+              "@type": "VideoGame",
+              "name": "Lost Ark"
+            }
+          })}
+        </script>
+      </Helmet>
       <Island />
       <div className="ad-content">
         <KakaoAdFit unit="DAN-lOG6HPbp08gmb26g" width={728} height={90} disabled={true} />

@@ -3,6 +3,8 @@ import '../css/Donate.css'; // CSS 파일 (위에서 작성한 스타일을 참�
 import donatePng from '../img/donate/donation.png';
 import webPng from '../img/donate/web.png';
 import mobilePng from '../img/donate/mobile.png';
+import { Helmet } from "react-helmet-async";
+
 export default function Donate() {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -17,6 +19,28 @@ export default function Donate() {
 
     return (
         <div className="login-container">
+            {/* SEO 메타 태그 */}
+            <Helmet>
+                <title>후원안내 | LOAGAP</title>
+                <meta name="description" content={`LOAGAP 후원안내.`} />
+                <meta name="keywords" content="빈틈봇, 후원안내" />
+                <meta name="robots" content="index, follow" />
+
+                {/* JSON-LD 구조화 데이터 */}
+                <script type="application/ld+json">
+                    {JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "WebPage",
+                        "name": "빈틈봇, 후원안내",
+                        "url": window.location.href,
+                        "description": `빈틈봇에 후원을 해주세요!, 개발 및 유지에 많은 도움이 됩니다.`,
+                        "game": {
+                            "@type": "VideoGame",
+                            "name": "Lost Ark"
+                        }
+                    })}
+                </script>
+            </Helmet>
             <h2>후원안내</h2>
             <form>
                 <div className="form-group">
@@ -28,7 +52,7 @@ export default function Donate() {
                     </ul>
                     <label>모바일 카카오페이 송금</label>
                     <a className="special" href="https://qr.kakaopay.com/FPzrlKoeT" target="_blank" rel="noopener noreferrer">클릭</a>
-                    
+
                 </div>
                 <div className="form-group">
                     <label>캐릭터명 후원</label>
@@ -48,8 +72,8 @@ export default function Donate() {
                         <p>후원자 캐릭터명에 표시될 아이콘은 아래와 같습니다.</p>
                         <p>[캐릭터명] <img src={donatePng} alt={"후원"} className="arkPassive-image" /></p>
                         <div className="image-container"> {/* 추가된 컨테이너 */}
-                        <img src={webPng} alt={"웹후원"} className="web-image" />
-                        <img src={mobilePng} alt={"모바일후원"} className="mobile-image" />
+                            <img src={webPng} alt={"웹후원"} className="web-image" />
+                            <img src={mobilePng} alt={"모바일후원"} className="mobile-image" />
                         </div>
                         <button onClick={handleModalClose} className="login-button">닫기</button>
                     </div>

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import '../css/Login.css'; // CSS 파일 (위에서 작성한 스타일을 참조)
+import { Helmet } from "react-helmet-async";
 
 const Register = () => {
     const [email, setEmail] = useState('');
@@ -72,6 +73,28 @@ const Register = () => {
 
     return (
         <div className="login-container">
+            {/* SEO 메타 태그 */}
+            <Helmet>
+                <title>회원가입 | LOAGAP</title>
+                <meta name="description" content={`LOAGAP 회원가입.`} />
+                <meta name="keywords" content="빈틈봇, 회원가입" />
+                <meta name="robots" content="index, follow" />
+
+                {/* JSON-LD 구조화 데이터 */}
+                <script type="application/ld+json">
+                    {JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "WebPage",
+                        "name": "빈틈봇, 회원가입",
+                        "url": window.location.href,
+                        "description": `빈틈봇 회원가입`,
+                        "game": {
+                            "@type": "VideoGame",
+                            "name": "Lost Ark"
+                        }
+                    })}
+                </script>
+            </Helmet>
             <h2>회원가입</h2>
             <form onSubmit={handleSubmit}>
                 <div className="form-group">
