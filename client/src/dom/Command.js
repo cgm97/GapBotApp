@@ -38,7 +38,7 @@ const Command = () => {
     { id: 15, prefix: ".크리스탈", img: require("../img/cmd/zmfltmxkf.png") },
     { id: 16, prefix: ".경매장", img: require("../img/cmd/rudaowkd.png"), description: "1~10겁작멸홍만 지원" },
     { id: 17, prefix: ".거래소", img: require("../img/cmd/rjfoth.png"), description: "각인서만 지원(인기 각인서는 약자 가능 ex:예둔)" },
-    { id: 18, prefix: ".시세 (.시세 상 유물or고대 1~3)", img: require("../img/cmd/tkdwnd.png"), description: "상,상상,상중,상하,중,중중,중하,유각,전각,재료,식물,벌목,낚시,고고학,채광,수렵" },
+    { id: 18, prefix: ".시세 (.시세 상 유물or고대 1~3)", img: require("../img/cmd/tkdwnd.png"), description: "상,상상,상중,상하,중,중중,중하,유각,전각,재료,식물,벌목,낚시,고고학,채광,수렵,보석" },
     { id: 19, prefix: ".사사게", img: null, description: ".사사게 키워드" },
     { id: 20, prefix: ".클골", img: null },
     { id: 21, prefix: ".큐브", img: require("../img/cmd/cube.png"), description: "LOAGAP 사이트와 연동이 되어야합니다." }

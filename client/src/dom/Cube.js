@@ -420,8 +420,8 @@ const Cube = () => {
       {/* SEO 메타 태그 */}
       <Helmet>
         <title>큐브 계산기 | LOAGAP</title>
-        <meta name="description" content={`원정대 큐브 계산기.`} />
-        <meta name="keywords" content="빈틈봇, 큐브 계산기" />
+        <meta name="description" content={`로스트아크 큐브 계산기입니다. 빈틈봇과 연동 할 수 있으며, 모든 원정대를 계산해줍니다.`} />
+        <meta name="keywords" content="빈틈봇, 큐브 계산기, 금제, 해금" />
         <meta name="robots" content="index, follow" />
 
         {/* JSON-LD 구조화 데이터 */}
@@ -431,7 +431,7 @@ const Cube = () => {
             "@type": "WebPage",
             "name": "빈틈봇, 큐브 계산기",
             "url": window.location.href,
-            "description": `빈틈봇에서 나의 원정대 큐브 정보를 확인하세요.`,
+            "description": `로스트아크 큐브 계산기입니다. 빈틈봇과 연동 할 수 있으며, 모든 원정대를 계산해줍니다.`,
             "game": {
               "@type": "VideoGame",
               "name": "Lost Ark"
