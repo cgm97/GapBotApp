@@ -6,4 +6,5 @@ const cronTestService = require('./cronTestService'); // 상대 경로로 apiSer
 router.get('/island', cronTestService.getIsland);
 router.get('/notice', cronTestService.getNotice);
 router.get('/event', cronTestService.getEvent);
+router.get('/jem', cronTestService.getJem);
 module.exports = router;

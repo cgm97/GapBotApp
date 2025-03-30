@@ -392,3 +392,135 @@ exports.getEvent = async (req, res, next) => {
     }
     return res.status(200).json({ msg:"success" }); // 유저 정보 반환
 };
+
+// 매주 수요일 10시 1분에 실행 - 이벤트 정보
+exports.getJem = async (req, res, next) => {
+    var method = '매일 0시 보석 데이터';
+    logger.info({
+        method: method,
+        url: '[CRON]',  // 요청 URL
+        message: '보석 저장 시작 START'
+    });
+
+        // 여기에 실제로 실행할 작업 코드 작성
+        const connection = await pool.getConnection();
+        const API_URL = "https://developer-lostark.game.onstove.com/auctions/items";
+    
+        try {
+    
+            // 트랜잭션 시작
+            await connection.beginTransaction();
+            
+            var jemArr = {};
+            for(var i = 7; i <=10; i++){
+                if (!jemArr[i]) jemArr[i] = [];  
+                const body = { 
+                    "CategoryCode": 210000,
+                    "Sort": "BUY_PRICE",
+                    "ItemTier": 4,
+                    "ItemName": i+"레벨 작열"
+                };
+    
+                // await 사용
+                const response = await axios.post(API_URL, body,{
+                    headers: {
+                        'accept': 'application/json',
+                        'Content-Type': 'application/json',  // JSON 데이터를 전송할 때 필요
+                        'authorization': `bearer ${process.env.LOA_API_KEY}`,
+                    },
+                });
+                
+                // response.data를 사용
+                const itemName = response.data.Items[0].Name;
+                const price = response.data.Items[0].AuctionInfo.BuyPrice;
+
+                // 데이터 저장
+                jemArr[i].push({
+                    name: itemName,
+                    price: price
+                });
+            }
+    
+            for(var i = 7; i <=10; i++){
+                if (!jemArr[i]) jemArr[i] = [];  
+                const body = { 
+                    "CategoryCode": 210000,
+                    "Sort": "BUY_PRICE",
+                    "ItemTier": 4,
+                    "ItemName": i+"레벨 겁화"
+                };
+    
+                // await 사용
+                const response = await axios.post(API_URL, body,{
+                    headers: {
+                        'accept': 'application/json',
+                        'Content-Type': 'application/json',  // JSON 데이터를 전송할 때 필요
+                        'authorization': `bearer ${process.env.LOA_API_KEY}`,
+                    },
+                });
+                
+                // response.data를 사용
+                const itemName = response.data.Items[0].Name;
+                const price = response.data.Items[0].AuctionInfo.BuyPrice;
+
+                // 데이터 저장
+                jemArr[i].push({
+                    name: itemName,
+                    price: price
+                });
+            }
+
+            console.log(jemArr);
+
+            logger.info({
+                method: method,
+                url: '[CRON]',  // 요청 URL
+                message: `데이터 불러오기 성공 ${Object.keys(jemArr).length} 건`,
+            });
+    
+            const today = new Date();
+
+            // 년, 월, 일 구하기
+            const year = today.getFullYear();  // 4자리 연도
+            const month = (today.getMonth() + 1).toString().padStart(2, '0');  // 월 (0부터 시작하므로 +1, 두 자릿수로 만들기)
+            const day = today.getDate().toString().padStart(2, '0');  // 일, 두 자릿수로 만들기
+
+            // 'YYYYMMDD' 형식으로 결합
+            const baseDate = `${year}${month}${day}`;
+
+            console.log(baseDate);  // 예: 20250330
+
+            // // 쿼리
+            const insertSql = `INSERT INTO JEWELS_LOG (
+                BASE_DATE,
+                JEWELS_DATA
+            ) VALUES (?, ?)`;
+
+            connection.execute(insertSql, [
+                baseDate,
+                jemArr
+            ]);
+
+            // 트랜잭션 커밋
+            await connection.commit();
+            logger.info({
+                method: method,
+                url: '[CRON]',  // 요청 URL
+                //message: `${JSON.stringify(arr, null, 2)} 모험섬 데이터 가공 종료`,
+                message: `보석 데이터 ${Object.keys(jemArr).length}건 적재 완료 END`
+            });
+        } catch (error) {
+            // 오류 발생 시 롤백
+            await connection.rollback();
+            // 에러 로깅
+            logger.error({
+                method: method,
+                url: '[CRON]',  // 요청 URL
+                message: error.stack
+            });
+        } finally {
+            // 연결 반환
+            connection.release();
+        }
+    return res.status(200).json({ msg:"success" }); // 유저 정보 반환
+};

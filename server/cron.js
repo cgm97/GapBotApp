@@ -59,13 +59,13 @@ cron.schedule('1 10 * * 3', async () => { // async로 변경
                 const groupedByDate = calender.StartTimes ? calender.StartTimes.reduce((acc, dateTime) => {
                     const date = dateTime.split('T')[0].replace(/-/g, ''); // 날짜만 추출 (2024-12-25 -> 20241225)
                     const time = dateTime.split('T')[1]; // 시간만 추출 (예: 19:00:00)
-                
+
                     if (!acc[date]) {
                         acc[date] = { times: [] }; // 날짜 키가 없으면 초기화
                     }
-                
+
                     acc[date].times.push(time);
-                
+
                     return acc;
                 }, {}) : {};  // StartTimes가 null이면 빈 객체 반환
 
@@ -222,7 +222,7 @@ cron.schedule('0 * * * *', async () => {
         const selectSql = `SELECT * FROM LOSTARK_NOTICE ORDER BY DATE DESC LIMIT 1`;
         const [retNotice] = await connection.execute(selectSql);
 
-        if(retNotice.length > 0 && data[0].Title == retNotice[0].TITLE){
+        if (retNotice.length > 0 && data[0].Title == retNotice[0].TITLE) {
             logger.info({
                 method: method,
                 url: url,  // 요청 URL
@@ -413,5 +413,137 @@ cron.schedule('1 10 * * 3', async () => { // async로 변경
         connection.release();
     }
 });
+
+// 매일 0시 _ 보석 조회
+cron.schedule('0 0 * * *', async () => { // async로 변경
+    var method = '매일 0시 보석 데이터';
+    logger.info({
+        method: method,
+        url: url,  // 요청 URL
+        message: '보석 저장 시작 START'
+    });
+
+    // 여기에 실제로 실행할 작업 코드 작성
+    const connection = await pool.getConnection();
+    const API_URL = "https://developer-lostark.game.onstove.com/auctions/items";
+
+    try {
+
+        // 트랜잭션 시작
+        await connection.beginTransaction();
+
+        var jemArr = {};
+        for (var i = 7; i <= 10; i++) {
+            if (!jemArr[i]) jemArr[i] = [];
+            const body = {
+                "CategoryCode": 210000,
+                "Sort": "BUY_PRICE",
+                "ItemTier": 4,
+                "ItemName": i + "레벨 작열"
+            };
+
+            // await 사용
+            const response = await axios.post(API_URL, body, {
+                headers: {
+                    'accept': 'application/json',
+                    'Content-Type': 'application/json',  // JSON 데이터를 전송할 때 필요
+                    'authorization': `bearer ${process.env.LOA_API_KEY}`,
+                },
+            });
+
+            // response.data를 사용
+            const itemName = response.data.Items[0].Name;
+            const price = response.data.Items[0].AuctionInfo.BuyPrice;
+
+            // 데이터 저장
+            jemArr[i].push({
+                name: itemName,
+                price: price
+            });
+        }
+
+        for (var i = 7; i <= 10; i++) {
+            if (!jemArr[i]) jemArr[i] = [];
+            const body = {
+                "CategoryCode": 210000,
+                "Sort": "BUY_PRICE",
+                "ItemTier": 4,
+                "ItemName": i + "레벨 겁화"
+            };
+
+            // await 사용
+            const response = await axios.post(API_URL, body, {
+                headers: {
+                    'accept': 'application/json',
+                    'Content-Type': 'application/json',  // JSON 데이터를 전송할 때 필요
+                    'authorization': `bearer ${process.env.LOA_API_KEY}`,
+                },
+            });
+
+            // response.data를 사용
+            const itemName = response.data.Items[0].Name;
+            const price = response.data.Items[0].AuctionInfo.BuyPrice;
+
+            // 데이터 저장
+            jemArr[i].push({
+                name: itemName,
+                price: price
+            });
+        }
+
+        console.log(jemArr);
+
+        logger.info({
+            method: method,
+            url: url,  // 요청 URL
+            message: `데이터 불러오기 성공 ${Object.keys(jemArr).length} 건`,
+        });
+
+        const today = new Date();
+
+        // 년, 월, 일 구하기
+        const year = today.getFullYear();  // 4자리 연도
+        const month = (today.getMonth() + 1).toString().padStart(2, '0');  // 월 (0부터 시작하므로 +1, 두 자릿수로 만들기)
+        const day = today.getDate().toString().padStart(2, '0');  // 일, 두 자릿수로 만들기
+
+        // 'YYYYMMDD' 형식으로 결합
+        const baseDate = `${year}${month}${day}`;
+
+        console.log(baseDate);  // 예: 20250330
+
+        // // 쿼리
+        const insertSql = `INSERT INTO JEWELS_LOG (
+                BASE_DATE,
+                JEWELS_DATA
+            ) VALUES (?, ?)`;
+
+        connection.execute(insertSql, [
+            baseDate,
+            jemArr
+        ]);
+
+        // 트랜잭션 커밋
+        await connection.commit();
+        logger.info({
+            method: method,
+            url: url,  // 요청 URL
+            //message: `${JSON.stringify(arr, null, 2)} 모험섬 데이터 가공 종료`,
+            message: `보석 데이터 ${Object.keys(jemArr).length}건 적재 완료 END`
+        });
+    } catch (error) {
+        // 오류 발생 시 롤백
+        await connection.rollback();
+        // 에러 로깅
+        logger.error({
+            method: method,
+            url: url,  // 요청 URL
+            message: error.stack
+        });
+    } finally {
+        // 연결 반환
+        connection.release();
+    }
+});
+
 
 module.exports = cron; // cron을 export하여 다른 파일에서 사용할 수 있게 함
