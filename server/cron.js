@@ -512,13 +512,15 @@ cron.schedule('0 0 * * *', async () => { // async로 변경
         console.log(baseDate);  // 예: 20250330
 
         // // 쿼리
-        const insertSql = `INSERT INTO JEWELS_LOG (
+        const insertSql = `INSERT INTO ITEM_PRICE_LOG (
                 BASE_DATE,
-                JEWELS_DATA
-            ) VALUES (?, ?)`;
+                ITEM_DVCD,
+                ITEM_DATA
+            ) VALUES (?, ?, ?)`;
 
         connection.execute(insertSql, [
             baseDate,
+            '01', // 보석 01
             jemArr
         ]);
 
