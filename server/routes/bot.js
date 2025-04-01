@@ -142,5 +142,6 @@ router.get('/cube', botService.getCharacterCube);
 router.get('/bangleOption', botService.getBangleOption);
 router.get('/accValue', botService.getAccValue);
 router.get('/jewelsLog', botService.getJewelsLog);
+router.get('/booksLog', botService.getBooksLog);
 
 module.exports = router;
