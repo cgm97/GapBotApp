@@ -526,3 +526,113 @@ exports.getJem = async (req, res, next) => {
         }
     return res.status(200).json({ msg:"success" }); // 유저 정보 반환
 };
+
+// 매일 0시 각인서데이터
+exports.getbook = async (req, res, next) => {
+    var method = '매일 0시 각인서 데이터';
+    logger.info({
+        method: method,
+        url: '[CRON]',  // 요청 URL
+        message: '각인서 저장 시작 START'
+    });
+
+        // 여기에 실제로 실행할 작업 코드 작성
+        const connection = await pool.getConnection();
+        const API_URL = "https://developer-lostark.game.onstove.com/markets/items";
+        try {
+    
+            // 트랜잭션 시작
+            await connection.beginTransaction();
+
+            var bookArr = [];
+            for(var i = 1; i <10; i++){
+                const body = { 
+                    "Sort": "CURRENT_MIN_PRICE",
+                    "CategoryCode": 40000,
+                    "ItemGrade": "유물",
+                    "PageNo": i,
+                    "SortCondition": "DESC"
+                };
+                
+                // await 사용
+                const response = await axios.post(API_URL, body,{
+                    headers: {
+                        'accept': 'application/json',
+                        'Content-Type': 'application/json',  // JSON 데이터를 전송할 때 필요
+                        'authorization': `bearer ${process.env.LOA_API_KEY}`,
+                    },
+                });
+                
+                if(response.data.Items.length == 0){
+                    break;
+                }
+                
+                // if (!bookArr[i]) bookArr[i] = [];  
+
+                response.data.Items.forEach(item => {
+                    const itemName = item.Name;
+                    const price = item.CurrentMinPrice;
+      
+                    // 데이터 저장
+                    bookArr.push({
+                        name: itemName,
+                        price: price
+                    });
+                });
+  
+            }
+    
+            console.log(bookArr);
+
+            logger.info({
+                method: method,
+                url: '[CRON]',  // 요청 URL
+                message: `데이터 불러오기 성공 ${Object.keys(bookArr).length} 건`,
+            });
+    
+            const today = new Date();
+
+            // 년, 월, 일 구하기
+            const year = today.getFullYear();  // 4자리 연도
+            const month = (today.getMonth() + 1).toString().padStart(2, '0');  // 월 (0부터 시작하므로 +1, 두 자릿수로 만들기)
+            const day = today.getDate().toString().padStart(2, '0');  // 일, 두 자릿수로 만들기
+
+            // 'YYYYMMDD' 형식으로 결합
+            const baseDate = `${year}${month}${day}`;
+
+            // // 쿼리
+            const insertSql = `INSERT INTO ITEM_PRICE_LOG (
+                BASE_DATE,
+                ITEM_DVCD,
+                ITEM_DATA
+            ) VALUES (?, ?, ?)`;
+
+            connection.execute(insertSql, [
+                baseDate,
+                '02', // 아이템구분코드 _ 보석 _ 01
+                bookArr
+            ]);
+
+            // 트랜잭션 커밋
+            await connection.commit();
+            logger.info({
+                method: method,
+                url: '[CRON]',  // 요청 URL
+                //message: `${JSON.stringify(arr, null, 2)} 모험섬 데이터 가공 종료`,
+                message: `보석 데이터 ${Object.keys(bookArr).length}건 적재 완료 END`
+            });
+        } catch (error) {
+            // 오류 발생 시 롤백
+            await connection.rollback();
+            // 에러 로깅
+            logger.error({
+                method: method,
+                url: '[CRON]',  // 요청 URL
+                message: error.stack
+            });
+        } finally {
+            // 연결 반환
+            connection.release();
+        }
+    return res.status(200).json({ msg:"success" }); // 유저 정보 반환
+};
