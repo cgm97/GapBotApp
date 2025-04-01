@@ -207,16 +207,22 @@ exports.getAccValue = async (req, res, next) => {
 exports.getJewelsLog = async (req, res, next) => {
   const connection = await pool.getConnection();
 
-  // 오늘 날짜 구하기
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = (today.getMonth() + 1).toString().padStart(2, '0');
-  const day = today.getDate().toString().padStart(2, '0');
-  const todayDate = `${year}${month}${day}`;  // 'YYYYMMDD' 형식
+  const { date } = req.query;
+
+  if (!date) {
+    res.status(400).send('날짜를 입력해주세요.');
+  }
+
+  const todayDate = date;
+
+  // 연, 월, 일 추출
+  const year = parseInt(date.substring(0, 4), 10);
+  const month = parseInt(date.substring(4, 6), 10) - 1; // JS의 월은 0부터 시작
+  const day = parseInt(date.substring(6, 8), 10);
 
   // 어제 날짜 구하기
-  const yesterday = new Date(today);
-  yesterday.setDate(today.getDate() - 1);  // 어제 날짜로 설정
+  const yesterday = new Date(year, month, day);
+  yesterday.setDate(yesterday.getDate() - 1);  // 어제 날짜로 설정
 
   const yearYesterday = yesterday.getFullYear();
   const monthYesterday = (yesterday.getMonth() + 1).toString().padStart(2, '0');
@@ -232,8 +238,8 @@ exports.getJewelsLog = async (req, res, next) => {
           WHERE BASE_DATE = ? AND ITEM_DVCD = ?
            `;
 
-    const [todayPrice] = await connection.execute(selectSql, [todayDate,'01']);
-    const [yesterdayPrice] = await connection.execute(selectSql, [yesterdayDate,'01']);
+    const [todayPrice] = await connection.execute(selectSql, [todayDate, '01']);
+    const [yesterdayPrice] = await connection.execute(selectSql, [yesterdayDate, '01']);
 
     logger.info({
       method: req.method,
@@ -244,38 +250,38 @@ exports.getJewelsLog = async (req, res, next) => {
     let retJson = {};
     let todayArr = [];
     let yesterdayArr = [];
-    
-    const todayKeys = Object.keys(todayPrice[0].JEWELS_DATA);
-    const yesterdayKeys = Object.keys(yesterdayPrice[0].JEWELS_DATA);
-    
+
+    const todayKeys = Object.keys(todayPrice[0]?.JEWELS_DATA || {});
+    const yesterdayKeys = Object.keys(yesterdayPrice[0]?.JEWELS_DATA || {});
+
     // 오늘 가격 배열 만들기
     for (let i = 0; i < todayKeys.length; i++) {
-        const key = todayKeys[i];
-        todayArr.push(...todayPrice[0].JEWELS_DATA[key]);
+      const key = todayKeys[i];
+      todayArr.push(...todayPrice[0].JEWELS_DATA[key]);
     }
-    
+
     // 어제 가격 배열 만들기
     for (let i = 0; i < yesterdayKeys.length; i++) {
-        const key = yesterdayKeys[i];
-        yesterdayArr.push(...yesterdayPrice[0].JEWELS_DATA[key]);
+      const key = yesterdayKeys[i];
+      yesterdayArr.push(...yesterdayPrice[0].JEWELS_DATA[key]);
     }
-    
+
     // 오늘 가격과 어제 가격 차이 계산
     todayArr.forEach(todayItem => {
-        // 같은 이름의 보석을 어제 배열에서 찾기
-        const yesterdayItem = yesterdayArr.find(yesterdayItem => yesterdayItem.name === todayItem.name);
-    
-        if (yesterdayItem) {
-            // 가격 차이 계산
-            const priceDifference = todayItem.price - yesterdayItem.price;
-    
-            // retJson에 추가
-            retJson[todayItem.name] = {
-                todayPrice: todayItem.price,
-                yesterdayPrice: yesterdayItem.price,
-                priceDifference: priceDifference
-            };
-        }
+      // 같은 이름의 보석을 어제 배열에서 찾기
+      const yesterdayItem = yesterdayArr.find(yesterdayItem => yesterdayItem.name === todayItem.name);
+
+      if (yesterdayItem) {
+        // 가격 차이 계산
+        const priceDifference = todayItem.price - yesterdayItem.price;
+
+        // retJson에 추가
+        retJson[todayItem.name] = {
+          todayPrice: todayItem.price,
+          yesterdayPrice: yesterdayItem.price,
+          priceDifference: priceDifference
+        };
+      }
     });
 
     res.status(200).send(retJson);
@@ -287,5 +293,41 @@ exports.getJewelsLog = async (req, res, next) => {
   } finally {
     // DB 연결 해제
     if (connection) connection.release();
+  }
+}
+
+exports.getBooksLog = async (req, res, next) => {
+  const connection = await pool.getConnection();
+
+  const { date } = req.query;
+
+  if (!date) {
+    res.status(400).send('날짜를 입력해주세요.');
+  }
+
+  try {
+    // 트랜잭션 시작
+    await connection.beginTransaction();
+    const selectSql = `SELECT 
+            ITEM_DATA AS BOOKS_DATA
+          FROM ITEM_PRICE_LOG 
+            WHERE BASE_DATE = ? AND ITEM_DVCD = ?
+             `;
+    const [yesterdayPrice] = await connection.execute(selectSql, [date, '02']);
+
+    logger.info({
+      method: req.method,
+      url: req.url,  // 요청 URL
+      message: `\nSql ${selectSql} \nParam ${[date]}`
+    });
+
+    let retJson = yesterdayPrice[0]?.BOOKS_DATA || [];
+
+
+    res.status(200).send(retJson);
+  } catch (err) {
+    // 오류 발생 시 롤백
+    await connection.rollback();
+    next(new Error(err));  // 
   }
 }
