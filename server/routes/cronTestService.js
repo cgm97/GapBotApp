@@ -393,7 +393,7 @@ exports.getEvent = async (req, res, next) => {
     return res.status(200).json({ msg:"success" }); // 유저 정보 반환
 };
 
-// 매주 수요일 10시 1분에 실행 - 이벤트 정보
+// 매일 0시 보석데이터
 exports.getJem = async (req, res, next) => {
     var method = '매일 0시 보석 데이터';
     logger.info({
@@ -491,13 +491,15 @@ exports.getJem = async (req, res, next) => {
             console.log(baseDate);  // 예: 20250330
 
             // // 쿼리
-            const insertSql = `INSERT INTO JEWELS_LOG (
+            const insertSql = `INSERT INTO ITEM_PRICE_LOG (
                 BASE_DATE,
-                JEWELS_DATA
-            ) VALUES (?, ?)`;
+                ITEM_DVCD,
+                ITEM_DATA
+            ) VALUES (?, ?, ?)`;
 
             connection.execute(insertSql, [
                 baseDate,
+                '01', // 아이템구분코드 _ 보석 _ 01
                 jemArr
             ]);
 

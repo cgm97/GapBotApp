@@ -227,14 +227,13 @@ exports.getJewelsLog = async (req, res, next) => {
     // 트랜잭션 시작
     await connection.beginTransaction();
     const selectSql = `SELECT 
-          JEWELS_DATA
-        FROM JEWELS_LOG
-         
-        WHERE BASE_DATE = ?
+          ITEM_DATA AS JEWELS_DATA
+        FROM ITEM_PRICE_LOG 
+          WHERE BASE_DATE = ? AND ITEM_DVCD = ?
            `;
 
-    const [todayPrice] = await connection.execute(selectSql, [todayDate]);
-    const [yesterdayPrice] = await connection.execute(selectSql, [yesterdayDate]);
+    const [todayPrice] = await connection.execute(selectSql, [todayDate,'01']);
+    const [yesterdayPrice] = await connection.execute(selectSql, [yesterdayDate,'01']);
 
     logger.info({
       method: req.method,
@@ -273,6 +272,7 @@ exports.getJewelsLog = async (req, res, next) => {
             // retJson에 추가
             retJson[todayItem.name] = {
                 todayPrice: todayItem.price,
+                yesterdayPrice: yesterdayItem.price,
                 priceDifference: priceDifference
             };
         }
