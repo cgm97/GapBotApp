@@ -547,8 +547,8 @@ cron.schedule('0 0 * * *', async () => { // async로 변경
     }
 });
 
-// 매일 0시 _ 각인서 조회
-cron.schedule('10 0 * * *', async () => { // async로 변경
+// 매일 0시 30분_ 각인서 조회
+cron.schedule('0-30/5 0 * * *', async () => { // async로 변경
     var method = '매일 0시 각인서 데이터';
     logger.info({
         method: method,
