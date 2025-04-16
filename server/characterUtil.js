@@ -173,8 +173,8 @@ const insertCharacterInfo = async (equipItems, gemItems, accessoryItems, cardIte
             nickname, arkItems
         ]);
 
-        // 스킬
-        const kloaCharacter = `https://secapi.korlark.com/lostark/characters/${nickname}?force=true&blocking=true`;
+        // 스킬 
+        const kloaCharacter = `https://api.korlark.com/lostark/characters/${nickname}?blocking=true`;
         const responseChar = await axios.get(kloaCharacter);
         const kloaCharacterData = responseChar.data; // 응답 데이터 저장
 
@@ -195,7 +195,7 @@ const insertCharacterInfo = async (equipItems, gemItems, accessoryItems, cardIte
         ]);
 
         // 내실
-        const kloaCollectibles = `https://secapi.korlark.com/lostark/characters/${nickname}/collectibles`;
+        const kloaCollectibles = `https://api.korlark.com/lostark/characters/${nickname}/collectibles`;
         const responseCollect = await axios.get(kloaCollectibles);
         const kloaCollectiblesData = responseCollect.data; // 응답 데이터 저장
 
