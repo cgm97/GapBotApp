@@ -1,97 +1,95 @@
-# GapBotWeb  
+# 📌 GapBotApp - 빈틈봇
 
-1.1 폴더 구조  
-GapBotApp/  
-├── client/                # React 프로젝트 (프론트엔드)  
-│   ├── build/             # React 빌드 결과물  
-│   ├── src/               # React 소스 코드  
-│   └── public/  
-├── server/                # Node.js 프로젝트 (백엔드)  
-│   ├── db/  
-│   │   └── connection.js  # db connection  
-│   ├─── server.js         # Node.js 서버 코드  
-│   └─── .env              # properties db정보  
-├── README.md              # 프로젝트 설명  
-└── package.json           # 루트 package.json
+GapBotApp은 GapBot(Kakaotalk 자동응답)을 연계하며 React 프론트엔드와 Node.js 백엔드로 구성된 풀스택 웹 애플리케이션입니다.
+
+---
+
+## 📸 주요 페이지 미리보기
+
+| 페이지       | 설명                        | 미리보기 |
+|--------------|-----------------------------|----------|
+| 메인페이지   | 로스트아크의 공지사항,이벤트,모험섬일정 표시 | ![메인페이지](https://github.com/user-attachments/assets/b026894f-98b3-4a09-81fe-554ba8a38646) |
+| 명령어       | 사용 가능한 명령어 목록 표시 | ![명령어](https://github.com/user-attachments/assets/5d01dae7-648f-4e8c-93d6-217bb2c0dabb) |
+| 로그인       | JWT 인증 로그인 | ![로그인](https://github.com/user-attachments/assets/7924d842-380e-4fc8-9cfd-9b5d015b0fd4) |
+| 내 정보      | 사용자의 대표캐릭터 설정, 빈틈봇과 연동 구현 | ![내정보](https://github.com/user-attachments/assets/c7f8800b-c1c0-4daf-84af-7501659e42f8) |
+| 큐브 계산기  | 사용자의 대표캐릭터의 원정대 캐릭터들의 큐브 계산기 | ![큐브](https://github.com/user-attachments/assets/658309ea-154f-4fe5-814c-5fd209b9512b) |
+| 캐릭터 조회  | 로스트아크 캐릭터 능력치 및 장비 정보 조회 | ![캐릭터조회](https://github.com/user-attachments/assets/626e0687-e3d4-47b6-826b-de4fd120c0e2) |
+
+---
 
 
-## 🚀 Node.js 설정
-1-1. server 폴더로 이동
+## 🗂️ 폴더 구조
 ```
+GapBotApp/
+├── client/                # React 프로젝트 (프론트엔드)
+│   ├── build/             # 빌드 결과물
+│   ├── src/               # 소스 코드
+│   └── public/
+├── server/                # Node.js 프로젝트 (백엔드)
+│   ├── db/
+│   │   └── connection.js  # DB 연결 설정
+│   ├── server.js          # 서버 실행 코드
+│   └── .env               # 환경 변수 (DB 정보 등)
+├── README.md              # 프로젝트 설명
+└── package.json           # 루트 package.json (동시 실행용)
+```
+
+---
+
+## 🚀 Node.js 서버 설정
+
+### 1. 패키지 설치
+```bash
 cd server
 npm init -y
-npm install express cors body-parser
+npm install express cors body-parser mysql2 dotenv winston axios node-cron
+npm install swagger-jsdoc swagger-ui-express bcryptjs jsonwebtoken nodemailer cookie-parser
 npm install --save-dev nodemon
-npm install mysql2
-npm install dotenv  
-npm install winston  
-npm install axios  
-npm install node-cron  
-npm install swagger-jsdoc swagger-ui-express express  
-npm install bcryptjs jsonwebtoken  
-npm install nodemailer  
-npm install cookie-parser  
 ```
-1-2. Nodemon 설정 (옵션)  
-package.json의 scripts 수정
-```
+
+### 2. `package.json` 스크립트 수정 (개발용)
+```json
 "scripts": {
   "start": "node server.js",
   "dev": "nodemon server.js"
 }
 ```
-1-3 Node.js 실행
-```
+
+### 3. 서버 실행
+```bash
 npm run dev
-http://localhost:5000 실행
+# 실행 주소: http://localhost:5000
 ```
-## 🚀 React 설정
-1-1. client 폴더로 이동
-```
+
+---
+
+## 🚀 React 프론트엔드 설정
+
+### 1. 프로젝트 초기화 및 패키지 설치
+```bash
 cd client
 npx create-react-app .
-npm install react react-dom
-npm install --save @toast-ui/calendar  
-npm install react-router-dom  
+npm install react react-dom react-router-dom axios @toast-ui/calendar
 ```
-1-2.React 실행
-```
+
+### 2. React 앱 실행
+```bash
 npm start
-http://localhost:3000
+# 실행 주소: http://localhost:3000
 ```
-1-3. Axios 설치 (API 요청)
-```
-npm install axios
-```
-## 🚀 React와 Node.js 통합 (빌드 후) _ 일단 생략
-1-1. React 앱 빌드
-```
-cd client
-npm run build
-```
-## 🚀 React와 Node.js 통합 서버 실행 (필수)
-```
-1. concurrently 설치
-서버(root 폴더)에서 concurrently 설치
-프로젝트 루트 디렉토리(GapBotApp)로 이동:
+
+---
+
+## ⚙️ React + Node.js 동시 실행 (개발용)
+
+### 1. 루트에서 `concurrently` 설치
+```bash
 cd GapBotApp
-
-concurrently 패키지 설치:
 npm install --save-dev concurrently
+```
 
-2. 프로젝트 구조 정리
-현재 프로젝트 구조가 아래와 같아야 합니다:
-react-nodejs-app/
-├── client/                # React 프로젝트
-│   ├── package.json
-├── server/                # Node.js 서버
-│   ├── server.js
-│   └── package.json
-├── package.json           # 루트 package.json
-3. 루트 package.json 설정
-루트 package.json 파일을 생성하거나 수정하여 다음과 같이 작성합니다:
-
-GapBotApp/package.json:
+### 2. 루트 `package.json` 설정
+```json
 {
   "name": "gapbotapp",
   "version": "1.0.0",
@@ -102,10 +100,11 @@ GapBotApp/package.json:
     "concurrently": "^9.1.0"
   }
 }
+```
 
-4. 실행
-루트 디렉토리에서 다음 명령어 실행:
+### 3. 동시 실행
+```bash
 npm start
-
-React 개발 서버(http://localhost:3000)와 Node.js 서버(http://localhost:5000)가 동시에 실행됩니다.
+# React: http://localhost:3000
+# Node.js: http://localhost:5000
 ```
