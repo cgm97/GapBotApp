@@ -16,7 +16,11 @@ GapBotApp은 GapBot(Kakaotalk 자동응답)을 연계하며 React 프론트엔�
 | 캐릭터 조회  | 로스트아크 캐릭터 능력치 및 장비 정보 조회 | ![캐릭터조회](https://github.com/user-attachments/assets/626e0687-e3d4-47b6-826b-de4fd120c0e2) |
 
 ---
+https://superb-antler-e73.notion.site/150c5e5dcbb180b7964ef1551a2fd565?v=150c5e5dcbb181e28b79000c5788c362
 
+[GapApp.pdf](https://github.com/user-attachments/files/20325691/GapApp.pdf)
+
+---
 
 ## 🗂️ 폴더 구조
 ```
