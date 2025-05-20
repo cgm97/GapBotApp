@@ -25,6 +25,7 @@ GapBotApp의 전체 기획, 기능 정의, 데이터 흐름 등을 정리한 문
 
 ### 🗂️ 데이터베이스 ERD  
 GapBotApp의 데이터베이스 구조를 시각화한 ERD입니다.
+🔗 [ERD 링크](https://github.com/cgm97/GapBotApp/issues/59)
 ![ERD](https://github.com/user-attachments/assets/f71a90c7-5a96-4ffa-a618-ea2721f4fc18)
 
 
