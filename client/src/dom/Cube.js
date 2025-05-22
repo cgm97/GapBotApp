@@ -440,6 +440,7 @@ const Cube = () => {
         </script>
       </Helmet>
       <div className="total-rewards">
+        <h2>큐브 계산기</h2>
         <h4>총 계산</h4>
         {characterInfo && Array.isArray(characterInfo) && (
           <div className="reward-summary">

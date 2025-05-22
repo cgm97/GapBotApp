@@ -12,6 +12,7 @@ import Register from './dom/Register';
 import PatchNote from './dom/PatchNote';
 import Cube from './dom/Cube';
 import Character from './dom/Character';
+import BookPrice from './dom/BookPrice';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useUserContext } from "./context/UserContext";
 import api from './utils/api'; // 설정된 Axios 인스턴스
@@ -79,6 +80,7 @@ function App() {
             <Route path="/login" element={<div className="centered"><Login /></div>} />
             <Route path="/register" element={<div className="centered"><Register /></div>} />
             <Route path="/cmd" element={<Command />} />
+            <Route path="/bookPrice" element={<BookPrice />} />
             <Route path="/character/:nickName" element={<Character />} />
             <Route path="/patchNote" element={<PatchNote />} />
             <Route path="/verifyEmail" element={<VerifyEmail />} />

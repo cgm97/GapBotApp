@@ -2,6 +2,7 @@ const cron = require('node-cron');
 const axios = require('axios');
 const logger = require('./logger');  // logger.js 임포트
 const pool = require('./db/connection');
+const utils = require('./characterUtil');
 require('dotenv').config(); // .env 파일에서 환경 변수 로드
 
 const url = 'CRON';
@@ -558,56 +559,13 @@ cron.schedule('30 0 * * *', async () => { // async로 변경
 
     // 여기에 실제로 실행할 작업 코드 작성
     const connection = await pool.getConnection();
-    const API_URL = "https://developer-lostark.game.onstove.com/markets/items";
     try {
-
+        
         // 트랜잭션 시작
         await connection.beginTransaction();
 
         var bookArr = [];
-        for (var i = 1; i < 10; i++) {
-            const body = {
-                "Sort": "CURRENT_MIN_PRICE",
-                "CategoryCode": 40000,
-                "ItemGrade": "유물",
-                "PageNo": i,
-                "SortCondition": "DESC"
-            };
-
-            // await 사용
-            const response = await axios.post(API_URL, body, {
-                headers: {
-                    'accept': 'application/json',
-                    'Content-Type': 'application/json',  // JSON 데이터를 전송할 때 필요
-                    'authorization': `bearer ${process.env.LOA_API_KEY}`,
-                },
-            });
-
-            if (response.data.Items.length == 0) {
-                break;
-            }
-
-            // if (!bookArr[i]) bookArr[i] = [];  
-
-            response.data.Items.forEach(item => {
-                const itemName = item.Name;
-                const price = item.CurrentMinPrice;
-
-                // 데이터 저장
-                bookArr.push({
-                    name: itemName,
-                    price: price,
-                    grade: "유물"
-                });
-            });
-
-        }
-
-        logger.info({
-            method: method,
-            url: url,  // 요청 URL
-            message: `데이터 불러오기 성공 ${Object.keys(bookArr).length} 건`,
-        });
+        bookArr = utils.getBookPrice();
 
         const today = new Date();
 
