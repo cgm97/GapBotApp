@@ -5,6 +5,7 @@ const logger = require('./logger');  // logger.js 임포트
 const lostarkAPI = require('./routes/api'); // 라우트 등록
 const user = require('./routes/user'); // 라우트 등록
 const cube = require('./routes/cube'); // 라우트 등록
+const price = require('./routes/price'); // 라우트 등록
 const bot = require('./routes/bot'); // 라우트 등록
 const character = require('./routes/character'); // 라우트 등록
 const cron = require('./cron'); // cron.js를 불러옵니다
@@ -110,6 +111,9 @@ app.use('/cube', cube);
 
 // character API 사용
 app.use('/character', character);
+
+// price 전용 API 사용
+app.use('/price', price);
 
 // bot 전용 API 사용
 app.use('/bot', bot);
