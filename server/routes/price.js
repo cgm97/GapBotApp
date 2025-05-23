@@ -45,4 +45,6 @@ const priceService = require('./priceService'); // 상대 경로로 apiService �
 router.get('/book', priceService.getBookPrice);
 router.get('/book/chart', priceService.getBookChartPrice);
 
+router.get('/jewel', priceService.getJewelPrice);
+router.get('/jewel/chart', priceService.getJewelChartPrice);
 module.exports = router;

@@ -1,6 +1,7 @@
 const axios = require('axios');
 const pool = require('../db/connection');
 const logger = require('../logger');  // logger.js 임포트
+const {getBookPrice, getJewelPrice} = require('../sessionUtil');
 require('dotenv').config(); // .env 파일에서 환경 변수 로드
 
 exports.getIsland = async (req, res, next) => {
@@ -404,73 +405,13 @@ exports.getJem = async (req, res, next) => {
 
         // 여기에 실제로 실행할 작업 코드 작성
         const connection = await pool.getConnection();
-        const API_URL = "https://developer-lostark.game.onstove.com/auctions/items";
-    
+
         try {
     
             // 트랜잭션 시작
             await connection.beginTransaction();
-            
-            var jemArr = {};
-            for(var i = 7; i <=10; i++){
-                if (!jemArr[i]) jemArr[i] = [];  
-                const body = { 
-                    "CategoryCode": 210000,
-                    "Sort": "BUY_PRICE",
-                    "ItemTier": 4,
-                    "ItemName": i+"레벨 작열"
-                };
-    
-                // await 사용
-                const response = await axios.post(API_URL, body,{
-                    headers: {
-                        'accept': 'application/json',
-                        'Content-Type': 'application/json',  // JSON 데이터를 전송할 때 필요
-                        'authorization': `bearer ${process.env.LOA_API_KEY}`,
-                    },
-                });
-                
-                // response.data를 사용
-                const itemName = response.data.Items[0].Name;
-                const price = response.data.Items[0].AuctionInfo.BuyPrice;
 
-                // 데이터 저장
-                jemArr[i].push({
-                    name: itemName,
-                    price: price
-                });
-            }
-    
-            for(var i = 7; i <=10; i++){
-                if (!jemArr[i]) jemArr[i] = [];  
-                const body = { 
-                    "CategoryCode": 210000,
-                    "Sort": "BUY_PRICE",
-                    "ItemTier": 4,
-                    "ItemName": i+"레벨 겁화"
-                };
-    
-                // await 사용
-                const response = await axios.post(API_URL, body,{
-                    headers: {
-                        'accept': 'application/json',
-                        'Content-Type': 'application/json',  // JSON 데이터를 전송할 때 필요
-                        'authorization': `bearer ${process.env.LOA_API_KEY}`,
-                    },
-                });
-                
-                // response.data를 사용
-                const itemName = response.data.Items[0].Name;
-                const price = response.data.Items[0].AuctionInfo.BuyPrice;
-
-                // 데이터 저장
-                jemArr[i].push({
-                    name: itemName,
-                    price: price
-                });
-            }
-
-            console.log(jemArr);
+            var jemArr = await getJewelPrice();
 
             logger.info({
                 method: method,
@@ -538,53 +479,15 @@ exports.getbook = async (req, res, next) => {
 
         // 여기에 실제로 실행할 작업 코드 작성
         const connection = await pool.getConnection();
-        const API_URL = "https://developer-lostark.game.onstove.com/markets/items";
+
         try {
     
             // 트랜잭션 시작
             await connection.beginTransaction();
 
-            var bookArr = [];
-            for(var i = 1; i <10; i++){
-                const body = { 
-                    "Sort": "CURRENT_MIN_PRICE",
-                    "CategoryCode": 40000,
-                    "ItemGrade": "유물",
-                    "PageNo": i,
-                    "SortCondition": "DESC"
-                };
-                
-                // await 사용
-                const response = await axios.post(API_URL, body,{
-                    headers: {
-                        'accept': 'application/json',
-                        'Content-Type': 'application/json',  // JSON 데이터를 전송할 때 필요
-                        'authorization': `bearer ${process.env.LOA_API_KEY}`,
-                    },
-                });
-                
-                if(response.data.Items.length == 0){
-                    break;
-                }
-                
-                // if (!bookArr[i]) bookArr[i] = [];  
+            var bookArr = await getBookPrice();
 
-                response.data.Items.forEach(item => {
-                    const itemName = item.Name;
-                    const price = item.CurrentMinPrice;
-      
-                    // 데이터 저장
-                    bookArr.push({
-                        name: itemName,
-                        price: price
-                    });
-                });
-  
-            }
-    
-            console.log(bookArr);
-
-            logger.info({
+            logger.info({   
                 method: method,
                 url: '[CRON]',  // 요청 URL
                 message: `데이터 불러오기 성공 ${Object.keys(bookArr).length} 건`,

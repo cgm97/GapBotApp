@@ -3,6 +3,7 @@ const pool = require('./db/connection');
 const logger = require('./logger');  // logger.js 임포트
 const axios = require('axios');
 let lastBookPriceUpdate = 0;
+let lastJewelPriceUpdate = 0;
 
 // 초기 데이터 설정 함수
 const initializeCache = async () => {
@@ -68,7 +69,7 @@ const getBookPrice = async () => {
     }
 
     const API_URL = "https://developer-lostark.game.onstove.com/markets/items";
-    const bookArr = [];
+    let bookArr = [];
 
     for (let i = 1; i < 10; i++) {
         const body = {
@@ -121,18 +122,100 @@ const getBookPrice = async () => {
     return bookArr;
 };
 
+// 보석 시세 조회
+const getJewelPrice = async () => {
+
+    const method = 'getJewelPrice';
+    const now = Date.now();
+
+    if (now - lastBookPriceUpdate < 60 * 1000) {
+        logger.info({
+            method,
+            url: "SessionUtil",
+            message: `getJewelPrice: 1분 이내 요청 → 캐시 사용`,
+        });
+        return sessionCache.get("jewelPrice");
+    }
+    
+    const API_URL = "https://developer-lostark.game.onstove.com/auctions/items";
+    let jemArr = {};
+    for (var i = 7; i <= 10; i++) {
+        if (!jemArr[i]) jemArr[i] = [];
+        const body = {
+            "CategoryCode": 210000,
+            "Sort": "BUY_PRICE",
+            "ItemTier": 4,
+            "ItemName": i + "레벨 작열"
+        };
+
+        // await 사용
+        const response = await axios.post(API_URL, body, {
+            headers: {
+                'accept': 'application/json',
+                'Content-Type': 'application/json',  // JSON 데이터를 전송할 때 필요
+                'authorization': `bearer ${process.env.LOA_API_KEY}`,
+            },
+        });
+
+        // response.data를 사용
+        const itemName = response.data.Items[0].Name;
+        const price = response.data.Items[0].AuctionInfo.BuyPrice;
+
+        // 데이터 저장
+        jemArr[i].push({
+            name: itemName,
+            price: price
+        });
+    }
+
+    for (var i = 7; i <= 10; i++) {
+        if (!jemArr[i]) jemArr[i] = [];
+        const body = {
+            "CategoryCode": 210000,
+            "Sort": "BUY_PRICE",
+            "ItemTier": 4,
+            "ItemName": i + "레벨 겁화"
+        };
+
+        // await 사용
+        const response = await axios.post(API_URL, body, {
+            headers: {
+                'accept': 'application/json',
+                'Content-Type': 'application/json',  // JSON 데이터를 전송할 때 필요
+                'authorization': `bearer ${process.env.LOA_API_KEY}`,
+            },
+        });
+
+        // response.data를 사용
+        const itemName = response.data.Items[0].Name;
+        const price = response.data.Items[0].AuctionInfo.BuyPrice;
+
+        // 데이터 저장
+        jemArr[i].push({
+            name: itemName,
+            price: price
+        });
+    }
+
+    sessionCache.set("jewelPrice", jemArr);
+    sessionCache.set("jewelPriceLastUpdate", getDateTime());
+
+    lastJewelPriceUpdate = now;
+    return jemArr;
+}
+
 // 현지날짜 시간 조회
 const getDateTime = (offsetDays = 0) => {
     const now = new Date();
     now.setDate(now.getDate() + offsetDays);
-  
+
     const yyyy = now.getFullYear();
     const MM = String(now.getMonth() + 1).padStart(2, "0");
     const dd = String(now.getDate()).padStart(2, "0");
     const HH = String(now.getHours()).padStart(2, "0");
     const mm = String(now.getMinutes()).padStart(2, "0");
     const ss = String(now.getSeconds()).padStart(2, "0");
-  
+
     return `${yyyy}-${MM}-${dd} ${HH}:${mm}:${ss}`;
 }
 
@@ -140,18 +223,19 @@ const getDateTime = (offsetDays = 0) => {
 const getDate = (offsetDays = 0) => {
     const now = new Date();
     now.setDate(now.getDate() + offsetDays);
-  
+
     const yyyy = now.getFullYear();
     const MM = String(now.getMonth() + 1).padStart(2, "0");
     const dd = String(now.getDate()).padStart(2, "0");
-  
+
     return `${yyyy}-${MM}-${dd}`;
-  };
+};
 
 module.exports = {
     sessionCache,
     initializeCache,
     getBookPrice,
+    getJewelPrice,
     getDateTime,
     getDate
 };
