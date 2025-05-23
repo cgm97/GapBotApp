@@ -144,8 +144,8 @@ const BookPrice = () => {
     <div className="container-patch">
       <Helmet>
         <title>유각시세 | LOAGAP</title>
-        <meta name="description" content="LOAGAP에서 로스트아크의 최신 유물 각인서 시세, 차트, 가격 변동, 랭킹 정보를 빠르게 확인해보세요."/>
-        <meta name="keywords" content="LOAGAP, 빈틈봇, 유각, 유각시세, 유각차트, 유각가격, 유각랭킹, 유각순위, 유물, 유물 각인서, 각인서, 전설, 전각, 로스트아크"/>
+        <meta name="description" content="LOAGAP에서 로스트아크의 최신 유물 각인서 시세, 차트, 가격 변동, 랭킹 정보를 빠르게 확인해보세요." />
+        <meta name="keywords" content="LOAGAP, 빈틈봇, 유각, 유각시세, 유각차트, 유각가격, 유각랭킹, 유각순위, 유물, 유물 각인서, 각인서, 전설, 전각, 로스트아크" />
         <meta name="robots" content="index, follow" />
       </Helmet>
 
@@ -200,10 +200,10 @@ const BookPrice = () => {
                 </h4>
                 <br />
                 <h5>기준일자 :{" "}
-                {new Date(new Date().setDate(new Date().getDate() - 1))
-                  .toISOString()
-                  .slice(0, 10)}</h5>
-               
+                  {new Date(new Date().setDate(new Date().getDate() - 1))
+                    .toISOString()
+                    .slice(0, 10)}</h5>
+
                 <h5>last update {bookLastUpdate}</h5>
               </div>
               <table className="price-table">
@@ -211,6 +211,7 @@ const BookPrice = () => {
                   <tr>
                     <th>각인서 이름</th>
                     <th>현재가격</th>
+                    <th>읽는가격</th>
                     <th>변동가격</th>
                     <th>차트선택</th>
                   </tr>
@@ -221,8 +222,19 @@ const BookPrice = () => {
                       const isSelected = selectedItems.includes(item.name);
                       return (
                         <tr key={item.name}>
-                          <td>{item.name}</td>
+                          <td><img src={item.icon} alt={item.name} className="icon" />{item.name}</td>
                           <td>{item.price.toLocaleString()}</td>
+                          <td>
+                            <details>
+                              <summary>펼치기</summary>
+                              <div>
+                                <p>5장:  {(item.price * 5).toLocaleString()}</p>
+                                <p>10장: {(item.price * 10).toLocaleString()}</p>
+                                <p>15장: {(item.price * 15).toLocaleString()}</p>
+                                <p>20장: {(item.price * 20).toLocaleString()}</p>
+                              </div>
+                            </details>
+                          </td>
                           <td
                             style={{
                               color:
@@ -277,10 +289,10 @@ const BookPrice = () => {
       )}
 
       {activeTab === "chart" && selectedItems.length > 0 && (
-        
+
         <div style={{ marginTop: "1rem" }}>
           <h5>
-              ※ 유물 각인서 시세를 차트로 확인할 수 있습니다. 
+            ※ 유물 각인서 시세를 차트로 확인할 수 있습니다.
           </h5>
           <Line
             data={{
