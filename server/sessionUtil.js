@@ -1,5 +1,8 @@
 const sessionCache = new Map(); // Map 객체 생성
 const pool = require('./db/connection');
+const logger = require('./logger');  // logger.js 임포트
+const axios = require('axios');
+let lastBookPriceUpdate = 0;
 
 // 초기 데이터 설정 함수
 const initializeCache = async () => {
@@ -50,7 +53,105 @@ const getCubeInfo = async () => {
     }
 };
 
+// 실시간 유각시세 갱신 (1분 내에는 캐시 사용)
+const getBookPrice = async () => {
+    const method = 'getBookPrice';
+    const now = Date.now();
+
+    if (now - lastBookPriceUpdate < 60 * 1000) {
+        logger.info({
+            method,
+            url: "SessionUtil",
+            message: `bookPrice: 1분 이내 요청 → 캐시 사용`,
+        });
+        return sessionCache.get("bookPrice");
+    }
+
+    const API_URL = "https://developer-lostark.game.onstove.com/markets/items";
+    const bookArr = [];
+
+    for (let i = 1; i < 10; i++) {
+        const body = {
+            "Sort": "CURRENT_MIN_PRICE",
+            "CategoryCode": 40000,
+            "ItemGrade": "유물",
+            "PageNo": i,
+            "SortCondition": "DESC"
+        };
+
+        try {
+            const response = await axios.post(API_URL, body, {
+                headers: {
+                    accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    authorization: `bearer ${process.env.LOA_API_KEY}`,
+                },
+            });
+
+            if (!response.data.Items || response.data.Items.length === 0) break;
+
+            response.data.Items.forEach(item => {
+                bookArr.push({
+                    name: item.Name,
+                    price: item.CurrentMinPrice,
+                    grade: "유물",
+                });
+            });
+        } catch (error) {
+            logger.error({
+                method,
+                url: "SessionUtil",
+                message: `bookPrice API 호출 실패`,
+                error,
+            });
+            throw error;
+        }
+    }
+
+    logger.info({
+        method,
+        url: "SessionUtil",
+        message: `bookPrice 갱신 완료 - ${bookArr.length}건`,
+    });
+
+    sessionCache.set("bookPrice", bookArr);
+    sessionCache.set("bookPriceLastUpdate", getDateTime());
+
+    lastBookPriceUpdate = now;
+    return bookArr;
+};
+
+// 현지날짜 시간 조회
+const getDateTime = (offsetDays = 0) => {
+    const now = new Date();
+    now.setDate(now.getDate() + offsetDays);
+  
+    const yyyy = now.getFullYear();
+    const MM = String(now.getMonth() + 1).padStart(2, "0");
+    const dd = String(now.getDate()).padStart(2, "0");
+    const HH = String(now.getHours()).padStart(2, "0");
+    const mm = String(now.getMinutes()).padStart(2, "0");
+    const ss = String(now.getSeconds()).padStart(2, "0");
+  
+    return `${yyyy}-${MM}-${dd} ${HH}:${mm}:${ss}`;
+}
+
+// 현재날짜 조회
+const getDate = (offsetDays = 0) => {
+    const now = new Date();
+    now.setDate(now.getDate() + offsetDays);
+  
+    const yyyy = now.getFullYear();
+    const MM = String(now.getMonth() + 1).padStart(2, "0");
+    const dd = String(now.getDate()).padStart(2, "0");
+  
+    return `${yyyy}-${MM}-${dd}`;
+  };
+
 module.exports = {
     sessionCache,
     initializeCache,
+    getBookPrice,
+    getDateTime,
+    getDate
 };
