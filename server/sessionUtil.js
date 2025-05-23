@@ -95,7 +95,8 @@ const getBookPrice = async () => {
                 bookArr.push({
                     name: item.Name,
                     price: item.CurrentMinPrice,
-                    grade: "유물",
+                    icon: item.Icon,
+                    grade: item.Grade,
                 });
             });
         } catch (error) {
@@ -128,7 +129,7 @@ const getJewelPrice = async () => {
     const method = 'getJewelPrice';
     const now = Date.now();
 
-    if (now - lastBookPriceUpdate < 60 * 1000) {
+    if (now - lastJewelPriceUpdate < 60 * 1000) {
         logger.info({
             method,
             url: "SessionUtil",
@@ -160,11 +161,13 @@ const getJewelPrice = async () => {
         // response.data를 사용
         const itemName = response.data.Items[0].Name;
         const price = response.data.Items[0].AuctionInfo.BuyPrice;
+        const icon = response.data.Items[0].Icon;
 
         // 데이터 저장
         jemArr[i].push({
             name: itemName,
-            price: price
+            price: price,
+            icon: icon
         });
     }
 
@@ -189,11 +192,13 @@ const getJewelPrice = async () => {
         // response.data를 사용
         const itemName = response.data.Items[0].Name;
         const price = response.data.Items[0].AuctionInfo.BuyPrice;
+        const icon = response.data.Items[0].Icon;
 
         // 데이터 저장
         jemArr[i].push({
             name: itemName,
-            price: price
+            price: price,
+            icon: icon
         });
     }
 

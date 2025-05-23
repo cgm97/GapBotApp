@@ -221,7 +221,7 @@ const JewelPrice = () => {
                       const isSelected = selectedItems.includes(item.name);
                       return (
                         <tr key={item.name}>
-                          <td>{item.name}</td>
+                          <td><img src={item.icon} alt={item.name} className="icon" />{item.name}</td>
                           <td>{item.price.toLocaleString()}</td>
                           <td
                             style={{

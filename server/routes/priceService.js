@@ -55,6 +55,7 @@ exports.getBookPrice = async (req, res, next) => {
                         name: todayBookPrice.name,
                         price: todayBookPrice.price,
                         diffPrice: diffPrice,
+                        icon: todayBookPrice.icon,
                         percent: percentChange
                     })
                 }
@@ -193,6 +194,7 @@ exports.getJewelPrice = async (req, res, next) => {
                         name: todayJewelPrice.name,
                         price: todayJewelPrice.price,
                         diffPrice: diffPrice,
+                        icon: todayJewelPrice.icon,
                         percent: percentChange
                     })
                 }
