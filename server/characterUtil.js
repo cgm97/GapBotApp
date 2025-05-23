@@ -233,62 +233,7 @@ const insertCharacterInfo = async (equipItems, gemItems, accessoryItems, cardIte
     }
 };
 
-// 유물각인서 가격 정보 조회
-const getBookPrice = async () => {
-
-    const method = 'getBookPrice';
-    const API_URL = "https://developer-lostark.game.onstove.com/markets/items";
-
-    var bookArr = [];
-    for (var i = 1; i < 10; i++) {
-        const body = {
-            "Sort": "CURRENT_MIN_PRICE",
-            "CategoryCode": 40000,
-            "ItemGrade": "유물",
-            "PageNo": i,
-            "SortCondition": "DESC"
-        };
-
-        // await 사용
-        const response = await axios.post(API_URL, body, {
-            headers: {
-                'accept': 'application/json',
-                'Content-Type': 'application/json',  // JSON 데이터를 전송할 때 필요
-                'authorization': `bearer ${process.env.LOA_API_KEY}`,
-            },
-        });
-
-        if (response.data.Items.length == 0) {
-            break;
-        }
-
-        // if (!bookArr[i]) bookArr[i] = [];  
-
-        response.data.Items.forEach(item => {
-            const itemName = item.Name;
-            const price = item.CurrentMinPrice;
-
-            // 데이터 저장
-            bookArr.push({
-                name: itemName,
-                price: price,
-                grade: "유물"
-            });
-        });
-
-    }
-
-    logger.info({
-        method: method,
-        url: url,  // 요청 URL
-        message: `데이터 불러오기 성공 ${Object.keys(bookArr).length} 건`,
-    });
-
-    return bookArr;
-}
-
 module.exports = {
     getCharacterProfile,
-    insertCharacterInfo,
-    getBookPrice
+    insertCharacterInfo
 };

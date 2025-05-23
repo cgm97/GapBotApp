@@ -1,29 +1,30 @@
 const pool = require('../db/connection');
 const logger = require('../logger');  // logger.js 임포트
-const utils = require('../characterUtil');
+const { sessionCache, getBookPrice, getDate } = require('../sessionUtil'); // 캐시 모듈 가져오기
 require('dotenv').config(); // .env 파일에서 환경 변수 로드
+
+function formatDateString(dateStr) {
+    if (!dateStr || dateStr.length !== 8) return dateStr; // 유효성 검사
+  
+    const yyyy = dateStr.slice(0, 4);
+    const mm = dateStr.slice(4, 6);
+    const dd = dateStr.slice(6, 8);
+  
+    return `${yyyy}-${mm}-${dd}`;
+  }
 
 // 유각 가격 조회
 exports.getBookPrice = async (req, res, next) => {
 
-    const today = new Date();                // 오늘 날짜
-    today.setDate(today.getDate() - 1);      // 하루 전으로 설정 (어제)
-
-    const year = today.getFullYear();        // 연도
-    const month = (today.getMonth() + 1).toString().padStart(2, '0'); // 월 (0부터 시작하므로 +1)
-    const day = today.getDate().toString().padStart(2, '0');          // 일
-
-    const yesterday = `${year}${month}${day}`; // 'YYYYMMDD' 형식
-
-
+    const yesterday = getDate(-1).replaceAll("-","");
+    
     // DB 연결
     const connection = await pool.getConnection();
     try {
 
         // 현재 각인서 가격 조회
-        const nowBookPrice = await utils.getBookPrice();
+        const nowBookPrice = await getBookPrice();
 
-        console.log(nowBookPrice);
         // 트랜잭션 시작
         await connection.beginTransaction();
         const selectSql = `SELECT 
@@ -36,7 +37,7 @@ exports.getBookPrice = async (req, res, next) => {
         logger.info({
             method: req.method,
             url: req.url,  // 요청 URL
-            message: `\nSql ${selectSql} \nParam ${[yesterday]}`
+            message: `\nSql ${selectSql} \nParam ${[yesterday, '02']}`
         });
 
         const preBookPrice = yesterdayPrice[0]?.BOOKS_DATA || [];
@@ -61,7 +62,8 @@ exports.getBookPrice = async (req, res, next) => {
 
         res.status(200).json({
             success: true,
-            booksPrice: retBooks
+            booksPrice: retBooks,
+            bookPriceLastUpdate: sessionCache.get("bookPriceLastUpdate")
         });
 
     } catch (error) {
@@ -99,12 +101,30 @@ exports.getBookChartPrice = async (req, res, next) => {
                             ) AS jt
                             WHERE jt.name = ?
                             AND ITEM_DVCD = ?`;
-        const [bookData] = await connection.execute(selectSql, [item, '02']);
+        let [bookData] = await connection.execute(selectSql, [item, '02']);
 
         logger.info({
             method: req.method,
             url: req.url,  // 요청 URL
             message: `\nSql ${selectSql} \nParam ${[item]}`
+        });
+
+        // 날자 포멧 변경
+        bookData = bookData.map(item => ({
+            ...item,
+            date: formatDateString(item.date),
+          }));
+
+        // 현재 각인서 가격 조회 - 오늘 시세가지 차트에 적용
+        const nowBookPrice = await getBookPrice();
+        nowBookPrice.forEach(book => {
+            if(book.name == item){
+                bookData.push({
+                    date: getDate(),
+                    name: book.name,
+                    price: book.price
+                })
+            }
         });
 
         res.status(200).json({

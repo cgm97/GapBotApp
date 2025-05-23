@@ -25,52 +25,32 @@ ChartJS.register(
 const BookPrice = () => {
   const [activeTab, setActiveTab] = useState("price");
   const [booksPrice, setBooksPrice] = useState({});
+  const [bookLastUpdate, setLastBooksPrice] = useState("");
   const [selectedItems, setSelectedItems] = useState([]); // 다중 선택
   const [chartData, setChartData] = useState({});
   const [alert, setAlert] = useState(null); // {message, type, position}
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
   const alertTimeoutRef = useRef(null);
 
-  // 세션 스토리지 캐시 관련
-  const CACHE_KEY = "booksPrice";
-  const CACHE_TIME_KEY = "booksPriceTime";
-  const CACHE_UPDATE_DATE = "booksPriceLastUpdate";
-  const CACHE_DURATION = 60 * 1000; // 1분
-
   const fetchBookData = async () => {
-    const cachedData = sessionStorage.getItem(CACHE_KEY);
-    const cachedTime = sessionStorage.getItem(CACHE_TIME_KEY);
-    const expire = Date.now();
-
-    if (cachedData && cachedTime && expire - Number(cachedTime) < CACHE_DURATION) {
-      setBooksPrice(JSON.parse(cachedData));
-      return;
-    }
-
+    setIsLoading(true);
+    setError(null);
     try {
       const response = await axios.get(
         `${process.env.REACT_APP_SERVER_URL}/price/book`
       );
       if (response.status === 200) {
         const data = response.data.booksPrice || {};
+        const bookLastUpdate = response.data.bookPriceLastUpdate;
         setBooksPrice(data);
-        sessionStorage.setItem(CACHE_KEY, JSON.stringify(data));
-        sessionStorage.setItem(CACHE_TIME_KEY, String(expire));
-
-        const now = new Date();
-        const yyyy = now.getFullYear();
-        const MM = String(now.getMonth() + 1).padStart(2, "0");
-        const dd = String(now.getDate()).padStart(2, "0");
-        const HH = String(now.getHours()).padStart(2, "0");
-        const mm = String(now.getMinutes()).padStart(2, "0");
-        const ss = String(now.getSeconds()).padStart(2, "0");
-
-        sessionStorage.setItem(
-          CACHE_UPDATE_DATE,
-          `${yyyy}-${MM}-${dd} ${HH}:${mm}:${ss}`
-        );
+        setLastBooksPrice(bookLastUpdate);
       }
     } catch (error) {
       console.error("Error fetching book data:", error);
+      setError("데이터를 불러오는 중 오류가 발생했습니다.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -164,8 +144,8 @@ const BookPrice = () => {
     <div className="container-patch">
       <Helmet>
         <title>유각시세 | LOAGAP</title>
-        <meta name="description" content="LOAGAP 유각시세, 유각차트" />
-        <meta name="keywords" content="빈틈봇, 유각시세, 유각차트" />
+        <meta name="description" content="LOAGAP에서 로스트아크의 최신 유물 각인서 시세, 차트, 가격 변동, 랭킹 정보를 빠르게 확인해보세요."/>
+        <meta name="keywords" content="LOAGAP, 빈틈봇, 유각, 유각시세, 유각차트, 유각가격, 유각랭킹, 유각순위, 유물, 유물 각인서, 각인서, 전설, 전각, 로스트아크"/>
         <meta name="robots" content="index, follow" />
       </Helmet>
 
@@ -198,91 +178,110 @@ const BookPrice = () => {
 
       {activeTab === "price" && (
         <div className="price-table-container">
-          <div
-            style={{ textAlign: "center", marginBottom: "1rem", color: "#555" }}
-          >
-            기준일자 :{" "}
-            {new Date(new Date().setDate(new Date().getDate() - 1))
-              .toISOString()
-              .slice(0, 10)}
-            <p>
-              ※ 변동가격은 기준일자 0시 기준으로 계산된 값이며,
-              차트에 추가하거나 제거할 수 있습니다.
-            </p>
-            <br />
-            <p>last update {sessionStorage.getItem(CACHE_UPDATE_DATE)}</p>
-          </div>
-          <table className="price-table">
-            <thead>
-              <tr>
-                <th>각인서 이름</th>
-                <th>현재가격</th>
-                <th>변동가격</th>
-                <th>차트선택</th>
-              </tr>
-            </thead>
-            <tbody>
-              {booksPrice && Object.keys(booksPrice).length > 0 ? (
-                Object.values(booksPrice).map((item) => {
-                  const isSelected = selectedItems.includes(item.name);
-                  return (
-                    <tr key={item.name}>
-                      <td>{item.name}</td>
-                      <td>{item.price.toLocaleString()}</td>
-                      <td
-                        style={{
-                          color:
-                            item.diffPrice > 0
-                              ? "green"
+          {isLoading ? (
+            <div style={{ textAlign: "center", marginTop: "2rem" }}>
+              🔄 시세를 불러오는 중입니다...
+            </div>
+          ) : error ? (
+            <div style={{ color: "red", textAlign: "center", marginTop: "2rem" }}>
+              ⚠️ {error}
+            </div>
+          ) : (
+            <>
+              <div
+                style={{ textAlign: "center", marginBottom: "1rem", color: "#555" }}
+              >
+                <h3>
+                  ※ 로스트아크 유물 각인서 실시간 시세를 조회 할 수 있습니다.
+                </h3>
+                <h4>
+                  변동가격은 기준일자 0시 기준으로 계산된 값이며,
+                  차트를 추가하거나 제거할 수 있습니다.
+                </h4>
+                <br />
+                <h5>기준일자 :{" "}
+                {new Date(new Date().setDate(new Date().getDate() - 1))
+                  .toISOString()
+                  .slice(0, 10)}</h5>
+               
+                <h5>last update {bookLastUpdate}</h5>
+              </div>
+              <table className="price-table">
+                <thead>
+                  <tr>
+                    <th>각인서 이름</th>
+                    <th>현재가격</th>
+                    <th>변동가격</th>
+                    <th>차트선택</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {booksPrice && Object.keys(booksPrice).length > 0 ? (
+                    Object.values(booksPrice).map((item) => {
+                      const isSelected = selectedItems.includes(item.name);
+                      return (
+                        <tr key={item.name}>
+                          <td>{item.name}</td>
+                          <td>{item.price.toLocaleString()}</td>
+                          <td
+                            style={{
+                              color:
+                                item.diffPrice > 0
+                                  ? "green"
+                                  : item.diffPrice < 0
+                                    ? "red"
+                                    : "gray",
+                            }}
+                          >
+                            {item.diffPrice > 0
+                              ? "▲"
                               : item.diffPrice < 0
-                              ? "red"
-                              : "gray",
-                        }}
-                      >
-                        {item.diffPrice > 0
-                          ? "▲"
-                          : item.diffPrice < 0
-                          ? "▼"
-                          : "—"}{" "}
-                        {Math.abs(item.diffPrice).toLocaleString()} ({item.percent}
-                        %)
-                      </td>
-                      <td>
-                        <button
-                          onClick={(e) => handleItemToggle(item.name, e)}
-                          style={{
-                            background: "none",
-                            border: "1px solid",
-                            borderColor: isSelected ? "green" : "gray",
-                            color: isSelected ? "green" : "gray",
-                            cursor: "pointer",
-                            padding: "4px 8px",
-                            borderRadius: "4px",
-                            userSelect: "none",
-                          }}
-                          aria-pressed={isSelected}
-                          aria-label={`${item.name} ${
-                            isSelected ? "제거" : "추가"
-                          } 버튼`}
-                        >
-                          {isSelected ? "−" : "+"}
-                        </button>
-                      </td>
+                                ? "▼"
+                                : "—"}{" "}
+                            {Math.abs(item.diffPrice).toLocaleString()} ({item.percent}
+                            %)
+                          </td>
+                          <td>
+                            <button
+                              onClick={(e) => handleItemToggle(item.name, e)}
+                              style={{
+                                background: "none",
+                                border: "1px solid",
+                                borderColor: isSelected ? "green" : "gray",
+                                color: isSelected ? "green" : "gray",
+                                cursor: "pointer",
+                                padding: "4px 8px",
+                                borderRadius: "4px",
+                                userSelect: "none",
+                              }}
+                              aria-pressed={isSelected}
+                              aria-label={`${item.name} ${isSelected ? "제거" : "추가"
+                                } 버튼`}
+                            >
+                              {isSelected ? "−" : "+"}
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  ) : (
+                    <tr>
+                      <td colSpan={4}>데이터가 없습니다.</td>
                     </tr>
-                  );
-                })
-              ) : (
-                <tr>
-                  <td colSpan={4}>데이터가 없습니다.</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                  )}
+                </tbody>
+              </table>
+            </>
+          )}
         </div>
       )}
 
       {activeTab === "chart" && selectedItems.length > 0 && (
+        
         <div style={{ marginTop: "1rem" }}>
+          <h5>
+              ※ 유물 각인서 시세를 차트로 확인할 수 있습니다. 
+          </h5>
           <Line
             data={{
               labels: allDates,
