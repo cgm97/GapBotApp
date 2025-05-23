@@ -10,6 +10,7 @@ const Header = () => {
         <ul>
           <li><Link to="/cmd">명령어</Link></li>
           <li><Link to="/bookPrice">유각시세</Link></li>
+          <li><Link to="/jewelPrice">보석시세</Link></li>
           {/* <li><Link to="/character">전투정보실</Link></li> */}
           {/* <li><Link to="/todo">TODO</Link></li> */}
           <li><Link to="/cube">큐브</Link></li>
