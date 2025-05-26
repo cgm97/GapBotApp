@@ -231,6 +231,66 @@ exports.getJewelChartPrice = async (req, res, next) => {
         const selectSql = `SELECT BASE_DATE as date, name, price FROM (
                             SELECT BASE_DATE, jt.name, jt.price
                             FROM ITEM_PRICE_LOG,
+                            JSON_TABLE(ITEM_DATA->'$."1"', '$[*]' COLUMNS (
+                                name VARCHAR(100) PATH '$.name',
+                                price INT PATH '$.price'
+                            )) AS jt
+                            WHERE ITEM_DVCD = '01'
+
+                            UNION ALL
+
+                            SELECT BASE_DATE, jt.name, jt.price
+                            FROM ITEM_PRICE_LOG,
+                            JSON_TABLE(ITEM_DATA->'$."2"', '$[*]' COLUMNS (
+                                name VARCHAR(100) PATH '$.name',
+                                price INT PATH '$.price'
+                            )) AS jt
+                            WHERE ITEM_DVCD = '01'
+
+                            UNION ALL
+
+                            SELECT BASE_DATE, jt.name, jt.price
+                            FROM ITEM_PRICE_LOG,
+                            JSON_TABLE(ITEM_DATA->'$."3"', '$[*]' COLUMNS (
+                                name VARCHAR(100) PATH '$.name',
+                                price INT PATH '$.price'
+                            )) AS jt
+                            WHERE ITEM_DVCD = '01'
+
+                            UNION ALL
+
+                            SELECT BASE_DATE, jt.name, jt.price
+                            FROM ITEM_PRICE_LOG,
+                            JSON_TABLE(ITEM_DATA->'$."4"', '$[*]' COLUMNS (
+                                name VARCHAR(100) PATH '$.name',
+                                price INT PATH '$.price'
+                            )) AS jt
+                            WHERE ITEM_DVCD = '01'
+
+                            UNION ALL
+
+                            SELECT BASE_DATE, jt.name, jt.price
+                            FROM ITEM_PRICE_LOG,
+                            JSON_TABLE(ITEM_DATA->'$."5"', '$[*]' COLUMNS (
+                                name VARCHAR(100) PATH '$.name',
+                                price INT PATH '$.price'
+                            )) AS jt
+                            WHERE ITEM_DVCD = '01'
+
+                            UNION ALL
+
+                            SELECT BASE_DATE, jt.name, jt.price
+                            FROM ITEM_PRICE_LOG,
+                            JSON_TABLE(ITEM_DATA->'$."6"', '$[*]' COLUMNS (
+                                name VARCHAR(100) PATH '$.name',
+                                price INT PATH '$.price'
+                            )) AS jt
+                            WHERE ITEM_DVCD = '01'
+
+                            UNION ALL
+
+                            SELECT BASE_DATE, jt.name, jt.price
+                            FROM ITEM_PRICE_LOG,
                             JSON_TABLE(ITEM_DATA->'$."7"', '$[*]' COLUMNS (
                                 name VARCHAR(100) PATH '$.name',
                                 price INT PATH '$.price'
@@ -267,7 +327,8 @@ exports.getJewelChartPrice = async (req, res, next) => {
                             )) AS jt
                             WHERE ITEM_DVCD = '01'
                             ) AS all_jewels
-                            WHERE name = ?`
+                            WHERE name = ?
+                            `
         let [jewelData] = await connection.execute(selectSql, [item]);
 
         logger.info({
