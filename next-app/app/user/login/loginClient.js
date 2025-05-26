@@ -79,7 +79,7 @@ export default function Login() {
           </button>
           <div className="register-link">
             <p>
-              Don't have an account?{" "}
+              Don&apos;t have an account?{" "}
               <a href="/register" style={{ color: "black" }}>
                 회원가입
               </a>

@@ -7,7 +7,7 @@ export const metadata = {
   openGraph: {
     title: '내정보 | LOAGAP',
     description: 'LOAGAP - Mypage(내정보), 빈틈봇과 연동하거나, 대표 캐릭터를 저장하여 원정대를 등록할 수 있습니다.',
-    url: 'https://loagap.com/user/myPage',
+    url: 'https://loagap.com/user/mypage',
     type: 'website',
   },
 };

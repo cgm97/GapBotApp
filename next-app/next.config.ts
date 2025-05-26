@@ -18,6 +18,16 @@ const nextConfig: NextConfig = {
         destination: "/user/mypage",
         permanent: true, // 301 리다이렉션 (SEO에 반영됨)
       },
+      {
+        source: "/register",
+        destination: "/user/register",
+        permanent: true, // 301 리다이렉션 (SEO에 반영됨)
+      },
+      {
+        source: "/verifyEmail",
+        destination: "/user/verifyEmail",
+        permanent: true, // 301 리다이렉션 (SEO에 반영됨)
+      }
     ];
   },
 };
