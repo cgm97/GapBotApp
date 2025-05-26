@@ -91,18 +91,20 @@ npm run dev
 
 ## 🚀 React 프론트엔드 설정
 
-### 1. 프로젝트 초기화 및 패키지 설치
+### 1. react
 ```bash
 cd client
 npx create-react-app .
 npm install react react-dom react-router-dom axios @toast-ui/calendar chart.js react-chartjs-2 
 ```
-
+### 1. next-js (마이그레이션)
 ```bash
 cd next-app  
 npx npx create-next-app .  
 npm install @toast-ui/calendar axios chart.js next@15.1.8 next-seo react-chartjs-2
 
+sudo systemctl restart nginx -- 재시작
+pm2 start npm --name "nextjs-app" -- start (pm2 nextJs start)
 ```
 
 ### 2. React 앱 실행
