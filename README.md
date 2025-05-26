@@ -95,7 +95,14 @@ npm run dev
 ```bash
 cd client
 npx create-react-app .
-npm install react react-dom react-router-dom axios @toast-ui/calendar chart.js react-chartjs-2
+npm install react react-dom react-router-dom axios @toast-ui/calendar chart.js react-chartjs-2 
+```
+
+```bash
+cd next-app  
+npx npx create-next-app .  
+npm install @toast-ui/calendar axios chart.js next@15.1.8 next-seo react-chartjs-2
+
 ```
 
 ### 2. React 앱 실행
