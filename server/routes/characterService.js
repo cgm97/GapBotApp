@@ -33,7 +33,8 @@ const updateItemLevelHistory = (origin, current) => {
 };
 
 exports.getCharacterInfo = async (req, res, next) => {
-    const { nickName } = req.query;
+    let { nickName } = req.query;
+    nickName = tryDecodeURIComponent(nickName);
     // 로깅
     const referer = req.headers.referer || req.headers.origin;
     logger.info({
@@ -195,3 +196,15 @@ exports.executeRenew = async (req, res, next) => {
     }
 }
 
+function tryDecodeURIComponent(value) {
+  try {
+    const decoded = decodeURIComponent(value);
+    // 디코딩했는데 다시 인코딩하면 같으면 → 이미 디코딩된 값
+    if (encodeURIComponent(decoded) === value) {
+      return decoded; // 원래 디코딩된 값이 맞음
+    }
+  } catch (e) {
+    // decodeURIComponent가 실패하면 원본 그대로 사용
+  }
+  return value;
+}
