@@ -32,9 +32,9 @@ const MyPage = () => {
                     }
                 );
                 setUserInfo(response.data); // 사용자 정보 저장
-                setRoomCode(response.data.roomCode);
-                setUserCode(response.data.userCode);
-                setNickName(response.data.nickName);
+                setRoomCode(response.data.roomCode?? '');
+                setUserCode(response.data.userCode?? '');
+                setNickName(response.data.nickName?? '');
             } catch (error) {
                 if (error.response.status === 403) {
                     setError('로그인기한이 만료되어 로그아웃 되었습니다.');
@@ -149,7 +149,7 @@ const MyPage = () => {
                     <div className="code-section">
                         {/* 설명 문구 */}
                         <p>
-                            카카오톡방에서 빈틈봇에게 <strong>'빈틈봇연동'</strong>을 입력하세요.
+                            카카오톡방에서 빈틈봇에게 <strong>&apos;빈틈봇연동&apos;</strong>을 입력하세요.
                         </p>
                         <p>
                             이후 빈틈봇이 발급한 <strong>채팅방CODE</strong>, <strong>유저CODE</strong>를 입력해주세요.
