@@ -1,0 +1,25 @@
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
+  async redirects() {
+    return [
+      {
+        source: "/cmd",
+        destination: "/command",
+        permanent: true, // 301 리다이렉션 (SEO에 반영됨)
+      },
+      {
+        source: "/login",
+        destination: "/user/login",
+        permanent: true, // 301 리다이렉션 (SEO에 반영됨)
+      },
+      {
+        source: "/mypage",
+        destination: "/user/mypage",
+        permanent: true, // 301 리다이렉션 (SEO에 반영됨)
+      },
+    ];
+  },
+};
+
+export default nextConfig;

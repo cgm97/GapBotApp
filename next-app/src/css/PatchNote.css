@@ -1,0 +1,36 @@
+.container-patch {
+    max-width: 800px;
+    margin: 0 auto;
+    flex: 1;
+}
+
+h2 {
+    font-size: 28px;
+    margin-bottom: 20px;
+}
+
+.release {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #fff;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+}
+
+.release h3 {
+    font-size: 20px;
+    margin-bottom: 10px;
+    color: #007BFF;
+}
+
+.release ul {
+    margin-left: 20px;
+    list-style: disc;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+}
