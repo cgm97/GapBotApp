@@ -140,7 +140,7 @@ const getJewelPrice = async () => {
     
     const API_URL = "https://developer-lostark.game.onstove.com/auctions/items";
     let jemArr = {};
-    for (var i = 7; i <= 10; i++) {
+    for (var i = 1; i <= 10; i++) {
         if (!jemArr[i]) jemArr[i] = [];
         const body = {
             "CategoryCode": 210000,
@@ -171,7 +171,7 @@ const getJewelPrice = async () => {
         });
     }
 
-    for (var i = 7; i <= 10; i++) {
+    for (var i = 1; i <= 10; i++) {
         if (!jemArr[i]) jemArr[i] = [];
         const body = {
             "CategoryCode": 210000,
