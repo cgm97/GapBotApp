@@ -4,6 +4,11 @@ import Top from '@/components/Top';
 import KakaoAdFit from '@/components/KakaoAdFit';
 import { UserProvider } from '@/context/UserContext';  // 경로 확인
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 0.5,
+};
+
 export default function RootLayout({
   children,
 }: {
