@@ -1,0 +1,12 @@
+export const goldIcon = "/img/cube/gold.png";
+export const jewellery3Icon = "/img/cube/jewellery3.png";
+export const jewellery4Icon = "/img/cube/jewellery4.png";
+export const silingIcon = "/img/cube/siling.png";
+export const cardIcon = "/img/cube/card.png";
+export const solar1Icon = "/img/cube/solar1.png";
+export const solar2Icon = "/img/cube/solar2.png";
+export const solar3Icon = "/img/cube/solar3.png";
+export const solar4Icon = "/img/cube/solar4.png";
+export const solar5Icon = "/img/cube/solar5.png";
+export const stone3Icon = "/img/cube/stone3.png";
+export const stone4Icon = "/img/cube/stone4.png";
