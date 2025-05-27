@@ -151,7 +151,8 @@ exports.getCharacterInfo = async (req, res, next) => {
 
 
 exports.executeRenew = async (req, res, next) => {
-    const { nickName } = req.query;
+    let { nickName } = req.query;
+    nickName = tryDecodeURIComponent(nickName);
 
     try {
         // 로깅
