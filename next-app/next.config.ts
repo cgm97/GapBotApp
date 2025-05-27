@@ -27,6 +27,16 @@ const nextConfig: NextConfig = {
         source: "/verifyEmail",
         destination: "/user/verifyEmail",
         permanent: true, // 301 리다이렉션 (SEO에 반영됨)
+      },
+      {
+        source: "/bookPrice",
+        destination: "/price/book",
+        permanent: true, // 301 리다이렉션 (SEO에 반영됨)
+      },
+      {
+        source: "/jewelPrice",
+        destination: "/price/jewel",
+        permanent: true, // 301 리다이렉션 (SEO에 반영됨)
       }
     ];
   },
