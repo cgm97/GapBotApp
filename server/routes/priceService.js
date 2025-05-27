@@ -83,6 +83,18 @@ exports.getBookChartPrice = async (req, res, next) => {
 
     const { item } = req.query;
 
+    // 로깅
+    const referer = req.headers.referer || req.headers.origin;
+    logger.info({
+        method: req.method,
+        url: req.url,
+        message: `요청 Host: ${referer} 유각조회: ${item}`,
+    });
+
+    if (!referer || (!referer.includes('loagap.com') && !referer.includes('localhost'))) {
+        return res.status(403).json({ message: 'Invalid host' });
+    }
+
     // DB 연결
     const connection = await pool.getConnection();
     try {
@@ -221,6 +233,18 @@ exports.getJewelPrice = async (req, res, next) => {
 exports.getJewelChartPrice = async (req, res, next) => {
 
     const { item } = req.query;
+
+    // 로깅
+    const referer = req.headers.referer || req.headers.origin;
+    logger.info({
+        method: req.method,
+        url: req.url,
+        message: `요청 Host: ${referer} 보석조회: ${item}`,
+    });
+
+    if (!referer || (!referer.includes('loagap.com') && !referer.includes('localhost'))) {
+        return res.status(403).json({ message: 'Invalid host' });
+    }
 
     // DB 연결
     const connection = await pool.getConnection();
