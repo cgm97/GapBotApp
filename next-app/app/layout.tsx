@@ -3,6 +3,7 @@ import Header from '@/components/Header';
 import Top from '@/components/Top';
 import KakaoAdFit from '@/components/KakaoAdFit';
 import { UserProvider } from '@/context/UserContext';  // 경로 확인
+import Script from 'next/script';
 
 export const viewport = {
   width: "device-width",
@@ -16,10 +17,33 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
-      <head><link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
-  /></head>
+      <head>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
+        {/* Google Analytics */}
+        <Script
+          strategy="afterInteractive"
+          src="https://www.googletagmanager.com/gtag/js?id=G-KMGNSECTNH"
+        />
+        <Script
+          id="gtag-init"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-KMGNSECTNH');
+            `,
+          }}
+        />
+        {/* Google AdSense */}
+        <Script
+          async
+          strategy="afterInteractive"
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3394263366814430"
+          crossOrigin="anonymous"
+        />
+      </head>
       <body>
         <UserProvider>
         <div className="wrapper">
