@@ -18,6 +18,12 @@ export const metadata = {
     description: '로스트아크의 실시간 유물 각인서 시세, 차트, 가격 변동, 랭킹 정보를 빠르게 확인해보세요.',
     url: 'https://loagap.com/price/book',
     type: 'website',
+    images: [
+        {
+          url: '/img/logo.png',
+          alt: `빈틈 이미지`
+        }
+      ]
   },
 };
 

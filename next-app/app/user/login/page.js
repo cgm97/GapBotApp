@@ -9,6 +9,12 @@ export const metadata = {
     description: 'LOAGAP - 빈틈봇 로그인',
     url: 'https://loagap.com/user/login',
     type: 'website',
+    images: [
+        {
+          url: '/img/logo.png',
+          alt: `빈틈 이미지`
+        }
+      ]
   },
 };
 

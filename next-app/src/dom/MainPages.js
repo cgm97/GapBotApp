@@ -84,7 +84,7 @@ const MainPages = () => {
           <ul>
             {patchNoteData?.slice(0, 20).map((patchNote) => (
               <li key={patchNote.SNO} className="truncate-text">
-                <Link href="/patchNote" className="link-style">
+                <Link href="/patchnote" className="link-style">
                   {patchNote.TITLE}
                 </Link>
               </li>
