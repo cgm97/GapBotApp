@@ -9,7 +9,7 @@ export const metadata = {
     type: 'website',
     images: [
         {
-          url: '/img/logo.png',
+          url: 'https://loagap.com/img/logo.png',
           alt: `빈틈 이미지`
         }
       ]
