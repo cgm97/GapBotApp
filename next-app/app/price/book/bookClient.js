@@ -6,22 +6,29 @@ import axios from "axios";
 import "@/css/BookPrice.css";
 import {
   Chart as ChartJS,
-  LineElement,
   CategoryScale,
   LinearScale,
   PointElement,
+  LineElement,
   Tooltip,
   Legend,
-} from "chart.js";
+  TimeScale
+} from 'chart.js';
+
+import annotationPlugin from 'chartjs-plugin-annotation';
 
 ChartJS.register(
-  LineElement,
   CategoryScale,
   LinearScale,
   PointElement,
+  LineElement,
   Tooltip,
-  Legend
+  Legend,
+  TimeScale,
+  annotationPlugin
 );
+
+ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip, Legend);
 
 export default function BookClient({ booksPrice, bookLastUpdate }) {
   const [activeTab, setActiveTab] = useState("price");
@@ -74,17 +81,42 @@ export default function BookClient({ booksPrice, bookLastUpdate }) {
     alertTimeoutRef.current = setTimeout(() => setAlert(null), 1800);
   };
 
-  const chartOptions = {
-    responsive: true,
-    plugins: {
-      legend: { position: "top" },
-      tooltip: { enabled: true },
-    },
-    scales: {
-      y: { beginAtZero: false },
-      x: { ticks: { autoSkip: false } },
+const annotationData = [
+  { date: '2025-04-30', label: 'Live 골두껍이 언급' }
+];
+
+const annotationLines = annotationData.reduce((acc, { date, label }, idx) => {
+  acc[`line${idx}`] = {
+    type: 'line',
+    scaleID: 'x',
+    value: date,
+    borderColor: 'black',
+    borderWidth: 1,
+    label: {
+      display: true,
+      content: label,
+      color: '#fff',
+      backgroundColor: 'rgba(0, 0, 0, 0.6)',
+      position: 'end'
     },
   };
+  return acc;
+}, {});
+
+  const chartOptions = {
+  responsive: true,
+  plugins: {
+    legend: { position: 'top' },
+    tooltip: { enabled: true },
+    annotation: {
+      annotations: annotationLines, // ✅ 여기!
+    },
+  },
+  scales: {
+    y: { beginAtZero: false },
+    x: { ticks: { autoSkip: false } }
+  }
+};
 
   const datasets = selectedItems.map((itemName, idx) => ({
     label: itemName,
@@ -214,13 +246,14 @@ export default function BookClient({ booksPrice, bookLastUpdate }) {
       )}
 
       {/* 차트 */}
-      {activeTab === "chart" && selectedItems.length > 0 && (
-        <div style={{ marginTop: "1rem" }}>
-          <h5>※ 유물 각인서 시세를 차트로 확인할 수 있습니다.</h5>
-          <Line data={{ labels: allDates, datasets }} options={chartOptions} />
-        </div>
-      )}
-
+      {activeTab === 'chart' && selectedItems.length > 0 && (
+  <div style={{ marginTop: '1rem' }}>
+    <h5>※ 유물 각인서 시세를 차트로 확인할 수 있습니다.</h5>
+    <Line
+      data={{ labels: allDates, datasets }}
+      options={chartOptions}
+    />
+  </div>)}
       {/* 알림 메시지 */}
       {alert && (
         <div
