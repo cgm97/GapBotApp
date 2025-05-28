@@ -1,10 +1,17 @@
 'use client';
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import '@/css/PatchNote.css'; // CSS 파일 (위에서 작성한 스타일을 참조)
 
 const PatchNote = () => {
-  const patchNote = JSON.parse(sessionStorage.getItem("patchNote"));
+  const [patchNote, setPatchNote] = useState([]);
+
+  useEffect(() => {
+    const data = sessionStorage.getItem("patchNote");
+    if (data) {
+      setPatchNote(JSON.parse(data));
+    }
+  }, []);
 
   return (
     <div className="container-patch">
