@@ -101,7 +101,7 @@ npm install react react-dom react-router-dom axios @toast-ui/calendar chart.js r
 ```bash
 cd next-app  
 npx npx create-next-app .  
-npm install @toast-ui/calendar axios chart.js next@15.1.8 next-seo react-chartjs-2
+npm install @toast-ui/calendar axios chart.js next@15.1.8 next-seo react-chartjs-2 npm install chartjs-plugin-annotation
 
 sudo systemctl restart nginx -- 재시작
 pm2 start npm --name "nextjs-app" -- start (pm2 nextJs start)
