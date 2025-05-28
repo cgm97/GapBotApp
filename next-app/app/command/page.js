@@ -7,6 +7,12 @@ export const metadata = {
     description: '빈틈봇 명령어 목록을 확인할 수 있습니다.',
     url: 'https://loagap.com/command',
     type: 'website',
+    images: [
+        {
+          url: '/img/logo.png',
+          alt: `빈틈 이미지`
+        }
+      ]
   },
 };
 

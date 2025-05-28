@@ -11,6 +11,12 @@ export const metadata = {
     description: '로스트아크 큐브 계산기입니다. 빈틈봇과 연동 할 수 있으며, 모든 원정대 큐브목록 수익을 계산합니다.',
     url: 'https://loagap.com/cube',
     type: 'website',
+    images: [
+        {
+          url: '/img/logo.png',
+          alt: `빈틈 이미지`
+        }
+      ]
   },
 };
 

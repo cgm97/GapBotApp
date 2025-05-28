@@ -7,6 +7,12 @@ export const metadata = {
     description: '빈틈봇에 후원을 해주세요!, 개발 및 유지에 많은 도움이 됩니다.',
     url: 'https://loagap.com/donate',
     type: 'website',
+    images: [
+        {
+          url: '/img/logo.png',
+          alt: `빈틈 이미지`
+        }
+      ]
   },
 };
 
