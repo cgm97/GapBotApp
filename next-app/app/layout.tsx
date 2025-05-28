@@ -18,7 +18,7 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <head>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
         {/* Google Analytics */}
         <Script
           strategy="afterInteractive"
@@ -36,6 +36,20 @@ export default function RootLayout({
             `,
           }}
         />
+        {/* 네이버 WCS 스크립트 삽입 */}
+        <Script
+          src="//wcs.naver.net/wcslog.js"
+          strategy="afterInteractive"
+        />
+        <Script id="naver-wcs" strategy="afterInteractive">
+          {`
+          if (!wcs_add) var wcs_add = {};
+          wcs_add["wa"] = "1200ae6f7282070";
+          if (window.wcs) {
+            wcs_do();
+          }
+        `}
+        </Script>
         {/* Google AdSense */}
         <Script
           async
@@ -46,22 +60,22 @@ export default function RootLayout({
       </head>
       <body>
         <UserProvider>
-        <div className="wrapper">
-          <div className="advertise left">
-            <KakaoAdFit unit="DAN-Qnq0ez9rvfuNOCVh" width={160} height={600} disabled={true} />
-          </div>
+          <div className="wrapper">
+            <div className="advertise left">
+              <KakaoAdFit unit="DAN-Qnq0ez9rvfuNOCVh" width={160} height={600} disabled={true} />
+            </div>
 
-          <div className="content">
-            <Top />
-            <Header />
-            {children} {/* 페이지 컴포넌트들이 여기에 렌더링됨 */}
-          </div>
+            <div className="content">
+              <Top />
+              <Header />
+              {children} {/* 페이지 컴포넌트들이 여기에 렌더링됨 */}
+            </div>
 
-          <div className="advertise right">
-            <KakaoAdFit unit="DAN-sj5267WiC2Xirn0q" width={160} height={600} disabled={true} />
+            <div className="advertise right">
+              <KakaoAdFit unit="DAN-sj5267WiC2Xirn0q" width={160} height={600} disabled={true} />
+            </div>
           </div>
-        </div>
-         </UserProvider>
+        </UserProvider>
       </body>
     </html>
   );
