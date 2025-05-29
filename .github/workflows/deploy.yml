@@ -29,7 +29,7 @@ jobs:
             REMOTE_HASH=$(git rev-parse origin/master)
 
             # 최초 배포 대비 - 원격 기준으로 저장
-            if [ ! -f .last_deploy_commit ]; then
+            if [ ! -s .last_deploy_commit ]; then
               echo "$REMOTE_HASH" > .last_deploy_commit
             fi
 
@@ -53,11 +53,15 @@ jobs:
                 npm run build
                 pm2 restart 2
                 cd ..
+              else
+                echo "No changes in next-app. Skipping build and restart PM2."
               fi
 
               if echo "$changed_files" | grep -q "^server/"; then
                 echo "Server changed: Restarting PM2..."
                 pm2 restart 0
+              else
+                echo "No changes in server. Skipping restart PM2."
               fi
 
               if echo "$changed_files" | grep -q "^next-app/"; then
