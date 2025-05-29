@@ -141,7 +141,12 @@ exports.getCharacterInfo = async (req, res, next) => {
                 res.status(200).json({ equipItems, gemItems, accessoryItems, cardItems, engravings, profile, guild, wisdom, arkItems });
             }
             else {
-                res.status(404).send('등록되지 않은 캐릭터입니다.');
+                if(referer.includes('loagap.com/meta')){
+                    // Meta 검색시에는 200 정상처리
+                    res.status(200).send('등록되지 않은 캐릭터입니다.');
+                } else{
+                    res.status(404).send('등록되지 않은 캐릭터입니다.');
+                }
             }
         }
     } catch (error) {
