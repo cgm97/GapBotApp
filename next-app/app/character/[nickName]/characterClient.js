@@ -9,8 +9,8 @@ const hyperImg = '/img/hyper.png';
 const guildImg = '/img/guild.png';
 const donatePng = '/img/donate/donation.png';
 
-const Character = (searchName) => {
-    const { nickName } = searchName;
+const Character = (nickName) => {
+    // const { nickName } = searchName;
     const [profile, setProfile] = useState({});
     const [guild, setGuild] = useState({});
     const [wisdom, setWisdom] = useState({});
