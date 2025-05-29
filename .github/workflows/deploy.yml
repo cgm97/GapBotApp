@@ -1,73 +1,67 @@
-name: Deploy to EC2
+name: Deploy to EC2 via Git Pull
 
 on:
   push:
     branches:
-      - master  # master 브랜치에 push될 때 배포
+      - master
 
 jobs:
-  build_and_deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. CI 환경 변수 설정
-      - name: Set CI environment variable to false
-        run: echo "CI=false" >> $GITHUB_ENV
-
-      # 2. Checkout
-      - name: Checkout code
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0  # 전체 Git 기록을 가져옵니다
-      # 3. 변경된 파일 확인
-      - name: Get changed files
-        id: changed_files
-        run: |
-          changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
-          echo "changed_files<<EOF" >> $GITHUB_ENV
-          echo "$changed_files" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
-
-          client_files=$(echo "$changed_files" | grep '^next-app/')
-          server_files=$(echo "$changed_files" | grep '^server/')
-
-          if [[ -n "$client_files" ]]; then echo "client_changed=true" >> $GITHUB_ENV; fi
-          if [[ -n "$server_files" ]]; then echo "server_changed=true" >> $GITHUB_ENV; fi
-
-      # 4. Next.js 빌드
-      - name: Build Next.js app if needed
-        if: ${{ env.client_changed == 'true' }}
-        working-directory: ./next-app
-        run: |
-          npm run build
-
-      # 5. SSH 키 저장
       - name: Save SSH Key
         run: |
           echo "${{ secrets.EC2_KEY }}" > key.pem
           chmod 600 key.pem
 
-      # 6. 클라이언트 전체 복사 (Next.js 프로젝트)
-      - name: Deploy Next.js app to EC2
-        if: ${{ env.client_changed == 'true' }}
-        run: |
-          rsync -avz --delete \
-            -e "ssh -o StrictHostKeyChecking=no -i key.pem" \
-            ./next-app/ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/GapBotApp/next-app/
-
-      # 7. 서버 코드 복사 (기존과 동일)
-      - name: Sync server files to EC2
-        if: ${{ env.server_changed == 'true' }}
-        run: |
-          rsync -avz --progress \
-            -e "ssh -o StrictHostKeyChecking=no -i key.pem" \
-            ./server/ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/GapBotApp/server/
-
-      # 8. PM2 서버 재시작 (Next.js 앱 + 기존 서버)
-      - name: Restart PM2 apps
+      - name: Deploy to EC2 (git pull & build)
         run: |
           ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-            cd /home/ubuntu/GapBotApp/server
-            pm2 restart GapBotAppServer
-            pm2 restart 2
+            set -e
+
+            cd /home/ubuntu/GapBotApp
+
+            echo "Pull latest master"
+            git pull origin master
+
+            LOCAL_HASH=$(git rev-parse HEAD)
+
+            if [ ! -f .last_deploy_commit ]; then
+              echo "$LOCAL_HASH" > .last_deploy_commit
+            fi
+
+            LAST_DEPLOY_COMMIT=$(cat .last_deploy_commit)
+
+            if [ "$LOCAL_HASH" != "$LAST_DEPLOY_COMMIT" ]; then
+              echo "Detecting changes since $LAST_DEPLOY_COMMIT"
+
+              changed_files=$(git diff --name-only "$LAST_DEPLOY_COMMIT" "$LOCAL_HASH")
+              echo "Changed files:"
+              echo "$changed_files"
+
+              if echo "$changed_files" | grep -q "^next-app/"; then
+                echo "Next-app changed: Building..."
+                cd next-app
+                npm install
+                npm run build
+                pm2 restart 2
+                cd ..
+              fi
+
+              if echo "$changed_files" | grep -q "^server/"; then
+                echo "Server changed: Restarting PM2..."
+                pm2 restart 0
+              fi
+
+              if echo "$changed_files" | grep -q "^next-app/"; then
+                echo "Restarting nginx..."
+                sudo systemctl restart nginx
+              fi
+
+              echo "$LOCAL_HASH" > .last_deploy_commit
+              echo "Deployment complete."
+            else
+              echo "No changes detected. Skipping build and restart."
+            fi
           EOF
