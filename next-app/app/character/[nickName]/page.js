@@ -40,10 +40,16 @@ export async function generateMetadata({ params }) {
           }
         ]
       }
+    }
+  } catch (err) {
+    return {
+      title: '캐릭터 정보를 불러올 수 없습니다 | LOAGAP',
+      description: '에러가 발생했습니다.',
     };
   }
+};
 
 export default async function Page({ params }) {
-    const { nickName } = await params;
-    return <CharacterPage nickName={nickName} />;
-  }
+  const { nickName } = await params;
+  return <CharacterPage nickName={nickName} />;
+}
