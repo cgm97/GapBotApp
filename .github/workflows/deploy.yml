@@ -17,7 +17,8 @@ jobs:
       # 2. Checkout
       - name: Checkout code
         uses: actions/checkout@v3
-
+        with:
+          fetch-depth: 0  # 전체 Git 기록을 가져옵니다
       # 3. 변경된 파일 확인
       - name: Get changed files
         id: changed_files
