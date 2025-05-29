@@ -12,86 +12,61 @@ jobs:
     steps:
       # 1. CI 환경 변수 설정
       - name: Set CI environment variable to false
-        run: echo "CI=false" >> $GITHUB_ENV  # CI 환경 변수 설정
+        run: echo "CI=false" >> $GITHUB_ENV
 
-      # 2. 코드 체크아웃
+      # 2. Checkout
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 4. 변경된 파일 확인
+      # 3. 변경된 파일 확인
       - name: Get changed files
         id: changed_files
         run: |
-          # 변경된 파일 목록 가져오기
           changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
-          echo "Changed files: $changed_files"
+          echo "changed_files<<EOF" >> $GITHUB_ENV
+          echo "$changed_files" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
 
-          # 변경된 파일을 GITHUB_ENV에 한 줄씩 저장
-          IFS=$'\n'  # newline 기준으로 파일 분리
-          for file in $changed_files; do
-            echo "changed_file=$file" >> $GITHUB_ENV
-          done
-
-          # client와 server 관련 파일을 필터링
-          client_files=$(echo "$changed_files" | grep '^client/')
+          client_files=$(echo "$changed_files" | grep '^next-app/')
           server_files=$(echo "$changed_files" | grep '^server/')
 
-          # client와 server 관련 파일을 GITHUB_ENV에 한 줄씩 저장
-          for client_file in $client_files; do
-            echo "client_file=$client_file" >> $GITHUB_ENV
-          done
-          for server_file in $server_files; do
-            echo "server_file=$server_file" >> $GITHUB_ENV
-          done
+          if [[ -n "$client_files" ]]; then echo "client_changed=true" >> $GITHUB_ENV; fi
+          if [[ -n "$server_files" ]]; then echo "server_changed=true" >> $GITHUB_ENV; fi
 
-      # 5. 클라이언트 빌드
-      - name: Build React app if needed
-        if: ${{ env.client_file }}
-        working-directory: ./client
+      # 4. Next.js 빌드
+      - name: Build Next.js app if needed
+        if: ${{ env.client_changed == 'true' }}
+        working-directory: ./next-app
         run: |
-          npm install
           npm run build
 
-      # 6. 클라이언트 파일 복사
-      - name: Copy client build files to production server
-        if: ${{ env.client_file }}
-        uses: appleboy/scp-action@v0.1.4
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_KEY }}
-          port: 22
-          source: "client/build/*"
-          target: "/var/www/loagap/"
-          strip_components: 2  # client/build 경로를 제거
-
-      # 7. SSH 키 저장
+      # 5. SSH 키 저장
       - name: Save SSH Key
         run: |
           echo "${{ secrets.EC2_KEY }}" > key.pem
           chmod 600 key.pem
 
-      # 8. 서버 파일 동기화
-      - name: Sync server files to production server
-        if: ${{ env.server_file }}
+      # 6. 클라이언트 전체 복사 (Next.js 프로젝트)
+      - name: Deploy Next.js app to EC2
+        if: ${{ env.client_changed == 'true' }}
+        run: |
+          rsync -avz --delete \
+            -e "ssh -o StrictHostKeyChecking=no -i key.pem" \
+            ./next-app/ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/GapBotApp/next-app/
+
+      # 7. 서버 코드 복사 (기존과 동일)
+      - name: Sync server files to EC2
+        if: ${{ env.server_changed == 'true' }}
         run: |
           rsync -avz --progress \
             -e "ssh -o StrictHostKeyChecking=no -i key.pem" \
             ./server/ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/GapBotApp/server/
 
-      # 9. PM2 서버 재시작
-      - name: Restart PM2 Server
-        if: ${{ env.server_file }}
+      # 8. PM2 서버 재시작 (Next.js 앱 + 기존 서버)
+      - name: Restart PM2 apps
         run: |
           ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             cd /home/ubuntu/GapBotApp/server
             pm2 restart GapBotAppServer
-          EOF
-
-      # 10. Nginx 재시작
-      - name: Restart Nginx
-        if: ${{ env.client_file }}
-        run: |
-          ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-            sudo systemctl restart nginx
+            pm2 restart 2
           EOF
