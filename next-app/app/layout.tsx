@@ -37,18 +37,14 @@ export default function RootLayout({
           }}
         />
         {/* 네이버 WCS 스크립트 삽입 */}
-        <Script
-          src="//wcs.naver.net/wcslog.js"
-          strategy="afterInteractive"
-        />
-        <Script id="naver-wcs" strategy="afterInteractive">
+        <Script src="//wcs.naver.net/wcslog.js" strategy="beforeInteractive"></Script>
+        <Script strategy="lazyOnload">
           {`
-          if (!wcs_add) var wcs_add = {};
-          wcs_add["wa"] = "1200ae6f7282070";
-          if (window.wcs) {
+            if(!wcs_add) var wcs_add = {};
+            wcs_add["wa"] = "1200ae6f7282070";
+            if(window.wcs) {
             wcs_do();
-          }
-        `}
+          }`}
         </Script>
         {/* Google AdSense */}
         <Script
