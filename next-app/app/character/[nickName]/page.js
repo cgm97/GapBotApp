@@ -50,6 +50,6 @@ export async function generateMetadata({ params }) {
 };
 
 export default async function Page({ params }) {
-  const { nickName } = await params;
+  const { nickName } = params;
   return <CharacterPage nickName={nickName} />;
 }
