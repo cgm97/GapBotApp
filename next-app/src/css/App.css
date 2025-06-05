@@ -65,6 +65,10 @@ body {
   align-items: center;
 }
 
+.top-right {
+  gap: 9px;
+}
+
 .top-left {
   justify-content: flex-start;
 }
