@@ -49,7 +49,6 @@ jobs:
               if echo "$changed_files" | grep -q "^next-app/"; then
                 echo "Next-app changed: Building and Restarting PM2..."
                 cd next-app
-                npm install
                 npm run build
                 pm2 restart 2
                 cd ..
