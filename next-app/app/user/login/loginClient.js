@@ -30,8 +30,9 @@ export default function Login() {
         setError("");
         const token = response.data.token;
         const userData = response.data.email;
-
-        login(userData, token);
+        const userCode = response.data.userCode;
+        const roomCode = response.data.roomCode;
+        login(userData, token, userCode, roomCode);
         router.push("/"); // Next.js 라우팅
       }
     } catch (err) {
