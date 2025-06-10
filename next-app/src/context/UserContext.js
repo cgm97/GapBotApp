@@ -21,10 +21,12 @@ export const UserProvider = ({ children }) => {
     }
   }, []);
 
-  const login = (userData, tokenData) => {
+  const login = (userData, tokenData, userCode, roomCode) => {
     setUser(userData);
     sessionStorage.setItem('user', userData);
     sessionStorage.setItem('token', tokenData);
+    sessionStorage.setItem('userCode', userCode);
+    sessionStorage.setItem('roomCode', roomCode);
   };
 
   const logout = async () => {
@@ -36,6 +38,8 @@ export const UserProvider = ({ children }) => {
       setUser(null);
       sessionStorage.removeItem('user');
       sessionStorage.removeItem('token');
+      sessionStorage.removeItem('userCode');
+      sessionStorage.removeItem('roomCode');
     }
   };
 

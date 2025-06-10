@@ -2,7 +2,52 @@ const axios = require('axios');
 const pool = require('../db/connection');
 const logger = require('../logger');  // logger.js 임포트
 const spec = require('../calculator/specPoint');
-const { sessionCache } = require('../sessionUtil'); // 세션 모듈 가져오기
+const { sessionCache, getDateTime } = require('../sessionUtil'); // 세션 모듈 가져오기
+
+// 재련강화확률표
+const ENHANCEMENTDATA = [
+  { step: 1, chance: 100, bonusChance: 100 },
+  { step: 2, chance: 100, bonusChance: 100 },
+  { step: 3, chance: 50, bonusChance: 27.91 },
+  { step: 4, chance: 50, bonusChance: 27.91 },
+  { step: 5, chance: 30, bonusChance: 18.60 },
+  { step: 6, chance: 30, bonusChance: 18.60 },
+  { step: 7, chance: 20, bonusChance: 13.95 },
+  { step: 8, chance: 20, bonusChance: 13.95 },
+  { step: 9, chance: 15, bonusChance: 11.63 },
+  { step: 10, chance: 15, bonusChance: 11.63 },
+  { step: 11, chance: 10, bonusChance: 9.30 },
+  { step: 12, chance: 10, bonusChance: 9.30 },
+  { step: 13, chance: 10, bonusChance: 9.30 },
+  { step: 14, chance: 5, bonusChance: 4.65 },
+  { step: 15, chance: 4, bonusChance: 1.86 },
+  { step: 16, chance: 4, bonusChance: 1.86 },
+  { step: 17, chance: 3, bonusChance: 1.40 },
+  { step: 18, chance: 3, bonusChance: 1.40 },
+  { step: 19, chance: 3, bonusChance: 1.40 },
+  { step: 20, chance: 1.5, bonusChance: 0.70 },
+  { step: 21, chance: 1.5, bonusChance: 0.70 },
+  { step: 22, chance: 1, bonusChance: 0.47 },
+  { step: 23, chance: 1, bonusChance: 0.47 },
+  { step: 24, chance: 0.5, bonusChance: 0.23 },
+  { step: 25, chance: 0.5, bonusChance: 0.23 }
+];
+
+// 시간계산
+function toDate(dateTimeStr) {
+  var parts = dateTimeStr.split(" "); // 날짜와 시간을 분리
+  var dateParts = parts[0].split("-"); // 날짜를 분리 (YYYY-MM-DD)
+  var timeParts = parts[1].split(":"); // 시간을 분리 (HH:mm:ss)
+
+  return new Date(
+    parseInt(dateParts[0]), // 년
+    parseInt(dateParts[1]) - 1, // 월 (0부터 시작하므로 -1 필요)
+    parseInt(dateParts[2]), // 일
+    parseInt(timeParts[0]), // 시
+    parseInt(timeParts[1]), // 분
+    parseInt(timeParts[2]) // 초
+  );
+}
 
 // 전체 큐브 보상아이템 합계 게산
 const calculateCubes = (cubes) => {
@@ -331,3 +376,243 @@ exports.getBooksLog = async (req, res, next) => {
     next(new Error(err));  // 
   }
 }
+
+// 재련강화
+exports.executeRefinement = async (req, res, next) => {
+
+  const { userId, userName, roomId, roomName } = req.body;
+
+  if (!userId || !userName || !roomId || !roomName) {
+    return res.status(400).json({
+      msg: "필수 파라미터가 누락되었습니다.",
+      missing: {
+        userId: userId,
+        userName: userName,
+        roomId: roomId,
+        roomName: roomName
+      }
+    });
+  }
+
+  const connection = await pool.getConnection();
+  try {
+    // 트랜잭션 시작
+    await connection.beginTransaction();
+
+    // USER_CODE
+    const selectSql = `
+      SELECT 
+        A.STEP, 
+        A.BONUS, 
+        CAST(DATE_FORMAT(A.ACHIEVE_DTTI, '%Y-%m-%d %H:%i:%s') AS CHAR) AS ACHIEVE_DTTI,
+        CAST(DATE_FORMAT(A.LST_DTTI, '%Y-%m-%d %H:%i:%s') AS CHAR) AS LST_DTTI,
+        B.NICKNAME 
+      FROM BOT_REFINEMENT_STATUS A
+      LEFT JOIN USER_INFO B
+        ON A.USER_ID = B.USER_CODE
+      AND A.ROOM_ID = B.ROOM_CODE
+      WHERE A.USER_ID = ?
+        AND A.ROOM_ID = ?
+    `;
+
+    const [selectReInfo] = await connection.execute(selectSql, [userId, roomId]);
+
+    logger.info({
+      method: req.method,
+      url: req.url,  // 요청 URL
+      message: `\nSql ${selectSql} \nParam ${[userId, roomId]}`
+    });
+    const userRefInfo = (Array.isArray(selectReInfo) && selectReInfo.length > 0)
+      ? selectReInfo[0]
+      : {};  // 결과가 없을 경우 초기값
+
+    // 유저 재련 정보
+    let currentDate = getDateTime();
+    let currentStep = userRefInfo.STEP || 0;
+    let nextStep = currentStep + 1;
+    let bonus = userRefInfo.BONUS || 0.00;
+    let bonusOrg = userRefInfo.BONUS || 0.00;
+    let achieveDtti = userRefInfo.ACHIEVE_DTTI || null;
+    let lstDtti = userRefInfo.LST_DTTI || null;
+    let nickName = userRefInfo.NICKNAME || "UNKNOWN";
+    let msg = "";
+
+    // 현재 단계의 강화데이터 조히
+    const nextData = ENHANCEMENTDATA.find(e => e.step === nextStep);
+
+    if (!nextData) {
+      msg = `🏆 ${userName}님은 이미 **최대 강화 단계(25)**에 도달했습니다!`;
+      return res.status(200).send(msg);
+    } else {
+
+      if (lstDtti != null) {
+        var baseTime = 1 * 60 * 1000; // 2분
+
+        var nowDate = toDate(currentDate);
+        var lastChatDate = toDate(lstDtti);
+
+        var checkTime = nowDate - lastChatDate;
+
+        if (checkTime < baseTime) {
+          var remainingTime = baseTime - checkTime;
+          var minutes = Math.floor(remainingTime / 60000);
+          var seconds = Math.floor((remainingTime % 60000) / 1000);
+
+          msg += `⏳ [쿨타임 대기 중]\n${userName}님\n`;
+          msg += `🕒 남은 시간: ${minutes > 0 ? minutes + "분 " : ""}${seconds}초`;
+
+          return res.status(200).send(msg);
+        }
+      }
+    }
+
+    // 강화 확률 계산
+    let successChance = nextData.chance;
+
+    let successChanceTxt = "";
+    if (bonus == 100) {
+      successChanceTxt = "🎯 성공 확률: 100% (장기백ㅊㅊ!)\n";
+    } else {
+      successChanceTxt = `🎯 성공 확률: ${successChance}%\n`;
+    }
+
+    // 강화 시도
+    const randomValue = Math.random() * 100; // 0~100 사이의 난수
+
+    if (randomValue < successChance || bonus == 100) {
+      // 강화 성공
+      msg += `🎉 [제련 성공]\n`;
+      msg += successChanceTxt;
+      msg += `📌 ${userName}님, 강화에 성공했습니다!\n`;
+      msg += `🔨 단계: ${currentStep} ➝ ${nextStep}\n`;
+      msg += `✨ 장인의 기운이 초기화`;
+      bonus = 0; // 장인의 기운 초기화
+      achieveDtti = currentDate;
+      currentStep = nextStep;
+
+    } else {
+      // 강화 실패
+      bonus = Number(bonus) + Number(nextData.bonusChance);
+      if (bonus > 100) bonus = 100;
+      msg += `💥 [제련 실패]\n`;
+      msg += successChanceTxt;
+      msg += `📌 ${userName}님, 강화에 실패했습니다.\n`;
+      msg += `🔨 단계 유지: ${currentStep}\n`;
+      msg += `✨ 장인의 기운 ${Number(bonusOrg).toFixed(2)}% ➝ ${Number(bonus).toFixed(2)}%`;
+    }
+
+    const refinmInsertSql = `
+            INSERT INTO BOT_REFINEMENT_STATUS (
+                USER_ID, ROOM_ID, USER_NAME, ROOM_NAME, STEP, BONUS, ACHIEVE_DTTI, LST_DTTI, USERNAME
+            ) VALUES (
+                ?, ?, ?, ?, ?, ?, ?, ?, ?
+            )
+            ON DUPLICATE KEY UPDATE
+                USER_NAME = VALUES(USER_NAME),
+                ROOM_NAME = VALUES(ROOM_NAME),
+                STEP = VALUES(STEP),
+                BONUS = VALUES(BONUS),
+                ACHIEVE_DTTI = VALUES(ACHIEVE_DTTI),
+                LST_DTTI = VALUES(LST_DTTI),
+                USERNAME = VALUES(USERNAME)
+        `;
+    connection.execute(refinmInsertSql, [userId, roomId, userName, roomName, currentStep, bonus, achieveDtti, currentDate, nickName]);
+
+    // logger.info({
+    //   method: req.method,
+    //   url: req.url,  // 요청 URL
+    //   message: `\nSql ${refinmInsertSql} \nParam ${[userId, roomId, userName, roomName, currentStep, bonus, achieveDtti, currentDate, nickName]}`
+    // });
+
+    // 트랜잭션 커밋
+    await connection.commit();
+
+    res.status(200).send(msg);
+  } catch (err) {
+    // 오류 발생 시 롤백
+    await connection.rollback();
+    next(new Error(err));  // 
+
+    res.status(400).send('잘못된 요청입니다.');
+  }
+}
+
+exports.getRefinementRank = async (req, res, next) => {
+  const connection = await pool.getConnection();
+
+  const { userId, roomId, page = 1, limit = 9999} = req.body;
+  const offset = (page - 1) * limit;
+
+  try {
+    await connection.beginTransaction();
+
+    /** 1) 전체 랭킹 조회 */
+    let rankingSql = `
+      WITH Ranked AS (
+        SELECT 
+          USER_ID,
+          STEP,
+          USER_NAME,
+          ROOM_NAME,
+          USERNAME AS NICKNAME,
+          RANK() OVER (ORDER BY STEP DESC, ACHIEVE_DTTI) AS RANKING,
+          CAST(DATE_FORMAT(ACHIEVE_DTTI, '%Y-%m-%d %H:%i:%s') AS CHAR) AS ACHIEVE_DTTI
+        FROM BOT_REFINEMENT_STATUS
+        WHERE DL_YN = 'N'
+        ${roomId ? ' AND ROOM_ID = ?' : ''}
+      )
+      SELECT *
+      FROM Ranked
+      ORDER BY RANKING
+      LIMIT ${Number(limit)} OFFSET ${Number(offset)}
+    `;
+
+    const queryParams = [];
+    if (roomId) queryParams.push(roomId);
+
+    const [rankings] = await connection.execute(rankingSql, queryParams);
+
+    logger.info({
+      method: req.method,
+      url: req.url,  // 요청 URL
+      message: `\nSql ${rankingSql} \nParam ${queryParams}`
+    });
+
+    /** 2) 내 랭킹 조회 */
+    let myRanking = null;
+    if (userId) {
+      let myRankingSql = `
+        SELECT *
+        FROM (
+          SELECT 
+            USER_ID,
+            STEP,
+            USER_NAME,
+            ROOM_NAME,
+            USERNAME AS NICKNAME,
+            RANK() OVER (ORDER BY STEP DESC, ACHIEVE_DTTI) AS RANKING,
+            CAST(DATE_FORMAT(ACHIEVE_DTTI, '%Y-%m-%d %H:%i:%s') AS CHAR) AS ACHIEVE_DTTI
+          FROM BOT_REFINEMENT_STATUS
+          WHERE DL_YN = 'N'
+          ${roomId ? ' AND ROOM_ID = ?' : ''}
+        ) AS Ranked
+        WHERE USER_ID = ?
+      `;
+      const myRankingParams = roomId ? [roomId, userId] : [userId];
+
+      const [myRankingRows] = await connection.execute(myRankingSql, myRankingParams);
+      myRanking = myRankingRows.length > 0 ? myRankingRows[0] : null;
+    }
+
+    res.json({
+      allRanking: rankings,
+      myRanking: myRanking
+    });
+
+  } catch (err) {
+    await connection.rollback();
+    next(new Error(err));
+  } finally {
+    connection.release();
+  }
+};

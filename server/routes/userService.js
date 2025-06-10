@@ -70,7 +70,7 @@ exports.executeLogin = async (req, res, next) => {
         });
 
         // 응답
-        return res.status(200).json({ token: accessToken, email: user.USERNAME });
+        return res.status(200).json({ token: accessToken, email: user.USERNAME, userCode: user.USER_CODE, roomCode: user.ROOM_CODE});
     } catch (error) {
         next(new Error(err));  // 에러 객체를 넘겨서 next 미들웨어로 전달
         return res.status(500).json({ message: '서버 오류가 발생했습니다.' });

@@ -144,4 +144,7 @@ router.get('/accValue', botService.getAccValue);
 router.get('/jewelsLog', botService.getJewelsLog);
 router.get('/booksLog', botService.getBooksLog);
 
+router.post('/refinement/try', botService.executeRefinement);
+router.post('/refinement/rank', botService.getRefinementRank);
+
 module.exports = router;
