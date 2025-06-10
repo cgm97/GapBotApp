@@ -123,9 +123,7 @@ const getBookPrice = async () => {
     return bookArr;
 };
 
-// 보석 시세 조회
 const getJewelPrice = async () => {
-
     const method = 'getJewelPrice';
     const now = Date.now();
 
@@ -137,77 +135,44 @@ const getJewelPrice = async () => {
         });
         return sessionCache.get("jewelPrice");
     }
-    
+
     const API_URL = "https://developer-lostark.game.onstove.com/auctions/items";
     let jemArr = {};
-    for (var i = 1; i <= 10; i++) {
-        if (!jemArr[i]) jemArr[i] = [];
-        const body = {
-            "CategoryCode": 210000,
-            "Sort": "BUY_PRICE",
-            "ItemTier": 4,
-            "ItemName": i + "레벨 작열"
-        };
 
-        // await 사용
-        const response = await axios.post(API_URL, body, {
-            headers: {
-                'accept': 'application/json',
-                'Content-Type': 'application/json',  // JSON 데이터를 전송할 때 필요
-                'authorization': `bearer ${process.env.LOA_API_KEY}`,
-            },
-        });
+    for (let i = 1; i <= 10; i++) {
+        jemArr[i] = [];
 
-        // response.data를 사용
-        const itemName = response.data.Items[0].Name;
-        const price = response.data.Items[0].AuctionInfo.BuyPrice;
-        const icon = response.data.Items[0].Icon;
+        const types = ["작열", "겁화"];
+        for (const type of types) {
+            const body = {
+                CategoryCode: 210000,
+                Sort: "BUY_PRICE",
+                ItemTier: 4,
+                ItemName: `${i}레벨 ${type}`
+            };
 
-        // 데이터 저장
-        jemArr[i].push({
-            name: itemName,
-            price: price,
-            icon: icon
-        });
+            const response = await axios.post(API_URL, body, {
+                headers: {
+                    'accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'authorization': `bearer ${process.env.LOA_API_KEY}`,
+                },
+            });
+
+            const item = response.data.Items[0];
+            jemArr[i].push({
+                name: item.Name,
+                price: item.AuctionInfo.BuyPrice,
+                icon: item.Icon,
+            });
+        }
     }
-
-    for (var i = 1; i <= 10; i++) {
-        if (!jemArr[i]) jemArr[i] = [];
-        const body = {
-            "CategoryCode": 210000,
-            "Sort": "BUY_PRICE",
-            "ItemTier": 4,
-            "ItemName": i + "레벨 겁화"
-        };
-
-        // await 사용
-        const response = await axios.post(API_URL, body, {
-            headers: {
-                'accept': 'application/json',
-                'Content-Type': 'application/json',  // JSON 데이터를 전송할 때 필요
-                'authorization': `bearer ${process.env.LOA_API_KEY}`,
-            },
-        });
-
-        // response.data를 사용
-        const itemName = response.data.Items[0].Name;
-        const price = response.data.Items[0].AuctionInfo.BuyPrice;
-        const icon = response.data.Items[0].Icon;
-
-        // 데이터 저장
-        jemArr[i].push({
-            name: itemName,
-            price: price,
-            icon: icon
-        });
-    }
-
     sessionCache.set("jewelPrice", jemArr);
     sessionCache.set("jewelPriceLastUpdate", getDateTime());
-
     lastJewelPriceUpdate = now;
+
     return jemArr;
-}
+};
 
 // 현지날짜 시간 조회
 const getDateTime = (offsetDays = 0) => {
