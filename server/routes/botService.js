@@ -446,7 +446,7 @@ exports.executeRefinement = async (req, res, next) => {
     } else {
 
       if (lstDtti != null) {
-        var baseTime = 1 * 60 * 1000; // 2분
+        var baseTime = 10 * 60 * 1000; // 10분
 
         var nowDate = toDate(currentDate);
         var lastChatDate = toDate(lstDtti);
@@ -458,7 +458,7 @@ exports.executeRefinement = async (req, res, next) => {
           var minutes = Math.floor(remainingTime / 60000);
           var seconds = Math.floor((remainingTime % 60000) / 1000);
 
-          msg += `⏳ [쿨타임 대기 중]\n${userName}님\n`;
+          msg += `⏳ [쿨타임 대기 중]\n\n${userName}님\n`;
           msg += `🕒 남은 시간: ${minutes > 0 ? minutes + "분 " : ""}${seconds}초`;
 
           return res.status(200).send(msg);
@@ -481,7 +481,7 @@ exports.executeRefinement = async (req, res, next) => {
 
     if (randomValue < successChance || bonus == 100) {
       // 강화 성공
-      msg += `🎉 [제련 성공]\n`;
+      msg += `🎉 [재련 성공]\n\n`;
       msg += successChanceTxt;
       msg += `📌 ${userName}님, 강화에 성공했습니다!\n`;
       msg += `🔨 단계: ${currentStep} ➝ ${nextStep}\n`;
@@ -494,7 +494,7 @@ exports.executeRefinement = async (req, res, next) => {
       // 강화 실패
       bonus = Number(bonus) + Number(nextData.bonusChance);
       if (bonus > 100) bonus = 100;
-      msg += `💥 [제련 실패]\n`;
+      msg += `💥 [재련 실패]\n\n`;
       msg += successChanceTxt;
       msg += `📌 ${userName}님, 강화에 실패했습니다.\n`;
       msg += `🔨 단계 유지: ${currentStep}\n`;
