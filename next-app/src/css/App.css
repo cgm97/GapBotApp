@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* 기본 스타일 */
 body {
   margin: 0;
@@ -273,6 +277,32 @@ li {
   vertical-align: middle;
 }
 
+.dropdown {
+  position: relative;
+  text-decoration: none;
+  color: white;
+  font-weight: bold;
+  transition: color 0.3s;
+}
+
+.dropdown > .dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  background-color: #3678cf;
+  padding: 8px 0;
+  box-shadow: 0 2px 8px rgba(11, 164, 224, 0.15);
+}
+
+.dropdown:hover > .dropdown-menu {
+  display: block;
+}
+
+.dropdown-menu li {
+  margin-right: 9px;
+  padding: 4px 16px;
+  white-space: nowrap;
+}
 /* 모바일 화면에서 100% 너비로 변경 (세로 1열로) */
 @media (max-width: 768px) {
   .notice .content {
