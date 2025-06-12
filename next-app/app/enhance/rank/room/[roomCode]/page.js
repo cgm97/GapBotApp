@@ -16,7 +16,7 @@ export const metadata = {
   },
 };
 
-import EnhanceClient from '../EnhanceClient';
+import EnhanceClient from '../enhanceClient';
 
 export default async function Page({ params }) {
   const {roomCode} = params;
