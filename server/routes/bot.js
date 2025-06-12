@@ -144,7 +144,10 @@ router.get('/accValue', botService.getAccValue);
 router.get('/jewelsLog', botService.getJewelsLog);
 router.get('/booksLog', botService.getBooksLog);
 
-router.post('/refinement/try', botService.executeRefinement);
-router.post('/refinement/rank', botService.getRefinementRank);
+router.post('/enhance/try', botService.executeEnhance);
+router.post('/enhance/rank', botService.getEnhanceRank);
+// 임시
+router.post('/refinement/try', botService.executeEnhance);
+router.post('/refinement/rank', botService.getEnhanceRank);
 
 module.exports = router;
