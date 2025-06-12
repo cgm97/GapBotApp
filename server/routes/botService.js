@@ -380,18 +380,22 @@ exports.getBooksLog = async (req, res, next) => {
 // 재련강화
 exports.executeEnhance = async (req, res, next) => {
 
-  const { userId, userName, roomId, roomName } = req.body;
+  let { userId, userName, roomId, roomName, site } = req.body;
 
-  if (!userId || !userName || !roomId || !roomName) {
-    return res.status(400).json({
-      msg: "필수 파라미터가 누락되었습니다.",
-      missing: {
-        userId: userId,
-        userName: userName,
-        roomId: roomId,
-        roomName: roomName
-      }
-    });
+  // LOAGAP 재련으로 들어왔을경우
+  if (site == "Y") {
+    if(!userId || !roomId){
+      return res.status(200).send(
+        "필수 파라미터가 누락되었습니다."
+      );
+    }
+  }
+  else {
+    if (!userId || !userName || !roomId || !roomName) {
+      return res.status(200).send(
+        "필수 파라미터가 누락되었습니다."
+      );
+    }
   }
 
   const connection = await pool.getConnection();
@@ -408,7 +412,9 @@ exports.executeEnhance = async (req, res, next) => {
         CAST(DATE_FORMAT(A.LST_DTTI, '%Y-%m-%d %H:%i:%s') AS CHAR) AS LST_DTTI,
         B.NICKNAME,
         A.SUCCESS_CNT,
-        A.FAIL_CNT
+        A.FAIL_CNT,
+        A.USER_NAME,
+        A.ROOM_NAME
       FROM BOT_ENHANCE_STATUS A
       LEFT JOIN USER_INFO B
         ON A.USER_ID = B.USER_CODE
@@ -424,10 +430,22 @@ exports.executeEnhance = async (req, res, next) => {
       url: req.url,  // 요청 URL
       message: `\nSql ${selectSql} \nParam ${[userId, roomId]}`
     });
+
     const userRefInfo = (Array.isArray(selectReInfo) && selectReInfo.length > 0)
       ? selectReInfo[0]
       : {};  // 결과가 없을 경우 초기값
 
+    // LOAGAP 사이트에선 초기 데이터 없을 경우 불가능
+    if (site === "Y") {
+      if (!userRefInfo || Object.keys(userRefInfo).length === 0) {
+        return res.status(200).send(
+          "재련 시뮬레이션은 본인의 채팅방에서 최초 1회 실행되어야 합니다.",
+        );
+      } else {
+        userName = userRefInfo.USER_NAME;
+        roomName = userRefInfo.ROOM_NAME;
+      }
+    }
     // 유저 재련 정보
     let currentDate = getDateTime();
     let currentStep = userRefInfo.STEP || 0;
@@ -641,11 +659,17 @@ exports.getMyNickName = async (req, res, next) => {
     nickName = rows[0]?.NICKNAME || "";
   }
   logger.info({
+      method: req.method,
+      url: req.url,  // 요청 URL
+      message: `\nSql ${selectNickName} \nParam ${[roomId, userId]}`
+    });
+
+  logger.info({
     method: req.method,
     url: req.url,
     message: `내정보(대표캐릭터): ${nickName}`,
   });
   res.json({
-    'NICKNAME':nickName
+    'NICKNAME': nickName
   });
 };
