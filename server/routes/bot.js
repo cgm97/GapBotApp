@@ -150,4 +150,6 @@ router.post('/enhance/rank', botService.getEnhanceRank);
 router.post('/refinement/try', botService.executeEnhance);
 router.post('/refinement/rank', botService.getEnhanceRank);
 
+router.post('/myNickName', botService.getMyNickName);
+
 module.exports = router;
