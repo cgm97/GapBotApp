@@ -1,6 +1,7 @@
 
 import Header from '@/components/Header';
 import Top from '@/components/Top';
+import Footer from '@/components/Footer';
 import KakaoAdFit from '@/components/KakaoAdFit';
 import { UserProvider } from '@/context/UserContext';  // 경로 확인
 import Script from 'next/script';
@@ -65,6 +66,7 @@ export default function RootLayout({
               <Top />
               <Header />
               {children} {/* 페이지 컴포넌트들이 여기에 렌더링됨 */}
+              <Footer /> 
             </div>
 
             <div className="advertise right">
