@@ -1,11 +1,9 @@
 'use client'
 
 import { useEffect, useState } from "react";
-import { useUserContext, } from "@/context/UserContext";
-// import axios from "axios";
-import api from '@/utils/api'; // 설정된 Axios 인스턴스
-import { useRouter } from "next/navigation"; // next/navigation의 useRouter
-import '@/css/MyPage.css';
+import { useUserContext } from "@/context/UserContext";
+import api from '@/utils/api';
+import { useRouter } from "next/navigation";
 
 const MyPage = () => {
     const [userInfo, setUserInfo] = useState(null);
@@ -14,7 +12,7 @@ const MyPage = () => {
     const [nickName, setNickName] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const { resetToken, logout } = useUserContext(); // Context에서 사용자 정보 가져오기
+    const { resetToken, logout } = useUserContext();
     const [isSuccess, setIsSuccess] = useState(false);
     const navigate = useRouter();
 
@@ -28,15 +26,15 @@ const MyPage = () => {
                         headers: {
                             Authorization: `Bearer ${sessionStorage.getItem("token")}`,
                         },
-                        withCredentials: true // 쿠키도 자동으로 포함되어 전송
+                        withCredentials: true
                     }
                 );
-                setUserInfo(response.data); // 사용자 정보 저장
-                setRoomCode(response.data.roomCode?? '');
-                setUserCode(response.data.userCode?? '');
-                setNickName(response.data.nickName?? '');
+                setUserInfo(response.data);
+                setRoomCode(response.data.roomCode ?? '');
+                setUserCode(response.data.userCode ?? '');
+                setNickName(response.data.nickName ?? '');
             } catch (error) {
-                if (error.response.status === 403) {
+                if (error.response?.status === 403) {
                     setError('로그인기한이 만료되어 로그아웃 되었습니다.');
                     logout();
                     navigate.push("/login");
@@ -51,63 +49,44 @@ const MyPage = () => {
         };
 
         if (sessionStorage.getItem("token")) {
-            fetchUserInfo(); // 함수 호출
+            fetchUserInfo();
         }
-    }, [navigate, logout]); // `fetchUserInfo` 제거
+    }, [navigate, logout]);
 
     if (loading) {
-        return <div>로딩 중...</div>;
+        return <div className="text-center text-lg py-8">로딩 중...</div>;
     }
 
     const handleSave = async (e) => {
-        e.preventDefault(); // 폼 기본 동작 방지
+        e.preventDefault();
         try {
-            setLoading(true); // 저장 중 상태
-            // const response = await axios.post(
-            //     process.env.REACT_APP_SERVER_URL + '/user/save',
-            //     {
-            //         email: userInfo.email,
-            //         nickName: nickName,
-            //         roomCode: roomCode,
-            //         userCode: userCode,
-            //     },
-            //     {
-            //         headers: {
-            //             Authorization: `Bearer ${sessionStorage.getItem("token")}`,
-            //         },
-            //         withCredentials: true // 쿠키도 자동으로 포함되어 전송
-            //     }
-            // );
+            setLoading(true);
             const response = await api.post(
                 '/user/save',
                 {
                     email: userInfo.email,
-                    nickName: nickName,
-                    roomCode: roomCode,
-                    userCode: userCode,
+                    nickName,
+                    roomCode,
+                    userCode,
                 },
                 {
                     headers: {
                         Authorization: `Bearer ${sessionStorage.getItem("token")}`,
                     },
-                    withCredentials: true // 쿠키도 자동으로 포함되어 전송
+                    withCredentials: true
                 }
             );
-            resetToken(response.data.token) // 내정보 수정시 토큰 재발급
-            setUserInfo(response.data.userInfo); // 최신 정보로 업데이트
+            resetToken(response.data.token);
+            setUserInfo(response.data.userInfo);
             setIsSuccess(true);
         } catch (error) {
-            if (error.response) {
-                // 서버 응답이 있는 경우 (4xx, 5xx 상태 코드)
-                if (error.response.status === 409) {
-                    setError(error.response.data.message);
-                } else if (error.response.status === 403) {
-                    setError('로그인기한이 만료되어 로그아웃 되었습니다.');
-                    logout();
-                    navigate.push("/login");
-                }
+            if (error.response?.status === 409) {
+                setError(error.response.data.message);
+            } else if (error.response?.status === 403) {
+                setError('로그인기한이 만료되어 로그아웃 되었습니다.');
+                logout();
+                navigate.push("/login");
             } else {
-                // 네트워크 오류 또는 서버에서 응답이 없는 경우
                 setError('네트워크 오류: ' + error.message);
             }
         } finally {
@@ -120,94 +99,102 @@ const MyPage = () => {
     };
 
     return (
-        <div className="user-profile-container">
-            <h2>내 정보</h2>
-            <form onSubmit={handleSave}>
-                <div className="user-info">
-                    <div className="form-group">
-                        <label htmlFor="email">Email</label>
-                        <input
-                            type="email"
-                            id="email"
-                            value={userInfo?.email || ''}
-                            readOnly
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="character">대표 캐릭터</label>
-                        <input
-                            type="text"
-                            id="character"
-                            value={nickName}
-                            onChange={(e) => setNickName(e.target.value)}
-                            placeholder="로스트아크 본인 대표 캐릭터 닉네임"
-                            required
-                        />
-                    </div>
+        <div className="max-w-xl mx-auto p-6 bg-white rounded-lg shadow-md text-gray-800">
+            <h2 className="text-2xl font-semibold mb-6 text-center">내 정보</h2>
 
-                    {/* CODE 그룹 섹션 시작 */}
-                    <div className="code-section">
-                        {/* 설명 문구 */}
-                        <p>
-                            카카오톡방에서 빈틈봇에게 <strong>&apos;빈틈봇연동&apos;</strong>을 입력하세요.
-                        </p>
-                        <p>
-                            이후 빈틈봇이 발급한 <strong>채팅방CODE</strong>, <strong>유저CODE</strong>를 입력해주세요.
-                        </p>
-                        <div className="form-group">
-                            <label htmlFor="roomCode">채팅방 CODE</label>
-                            <input
-                                type="text"
-                                id="roomCode"
-                                value={roomCode}
-                                onChange={(e) => setRoomCode(e.target.value)}
-                                placeholder="빈틈봇이 발급해준 CODE"
-                            />
-                        </div>
-                        <div className="form-group">
-                            <label htmlFor="userCode">유저 CODE</label>
-                            <input
-                                type="text"
-                                id="userCode"
-                                value={userCode}
-                                onChange={(e) => setUserCode(e.target.value)}
-                                placeholder="빈틈봇이 발급해준 CODE 또는 명"
-                            />
-                        </div>
+            <form onSubmit={handleSave} className="space-y-5">
+                <div>
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <div className="space-y-1 pr-6" >
+                    <input
+                        type="email"
+                        id="email"
+                        value={userInfo?.email || ''}
+                        readOnly
+                        className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-500 bg-gray-100"
+                    />
                     </div>
-                    {/* CODE 그룹 섹션 끝 */}
-
-                    <button type="submit" className="button">
-                        저장
-                    </button>
                 </div>
+
+                <div>
+                    <label htmlFor="character" className="block text-sm font-medium text-gray-700 mb-1">대표 캐릭터</label>
+                    <div className="space-y-1 pr-6" >
+                    <input
+                        type="text"
+                        id="character"
+                        value={nickName}
+                        onChange={(e) => setNickName(e.target.value)}
+                        placeholder="로스트아크 본인 대표 캐릭터 닉네임"
+                        required
+                        className="w-full border border-gray-300 rounded-md px-3 py-2"
+                    />
+                    </div>
+                </div>
+
+                <div className="space-y-2 text-sm text-gray-600 bg-gray-50 p-3 rounded-md">
+                    <p>카카오톡방에서 빈틈봇에게 <strong className="text-black">빈틈봇연동</strong> 입력</p>
+                    <p>빈틈봇이 발급한 <strong className="text-black">채팅방 CODE / 유저 CODE</strong>를 입력하세요.</p>
+                </div>
+
+                <div>
+                    <label htmlFor="roomCode" className="block text-sm font-medium text-gray-700 mb-1">채팅방 CODE</label>
+                    <div className="space-y-1 pr-6" >
+                    <input
+                        type="text"
+                        id="roomCode"
+                        value={roomCode}
+                        onChange={(e) => setRoomCode(e.target.value)}
+                        placeholder="빈틈봇이 발급해준 CODE"
+                        className="w-full border border-gray-300 rounded-md px-3 py-2"
+                    />
+                    </div>
+                </div>
+
+                <div>
+                    <label htmlFor="userCode" className="block text-sm font-medium text-gray-700 mb-1">유저 CODE</label>
+                    <div className="space-y-1 pr-6" >
+                    <input
+                        type="text"
+                        id="userCode"
+                        value={userCode}
+                        onChange={(e) => setUserCode(e.target.value)}
+                        placeholder="빈틈봇이 발급해준 CODE 또는 명"
+                        className="w-full border border-gray-300 rounded-md px-3 py-2"
+                    />
+                    </div>
+                </div>
+
+                <button
+                    type="submit"
+                    className="w-full py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+                >
+                    저장
+                </button>
             </form>
 
-            {/* 성공 메시지 모달 */}
+            {/* 성공 모달 */}
             {isSuccess && (
-                <div className="modal">
-                    <div className="modal-content">
-                        <h2>내정보 수정</h2>
-                        <p>성공적으로 완료되었습니다.</p>
-                        <button onClick={handleModalClose} className="login-button">확인</button>
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                    <div className="bg-white p-6 rounded-lg text-center max-w-sm w-full">
+                        <h2 className="text-xl font-semibold mb-2">내정보 수정</h2>
+                        <p className="mb-4">성공적으로 완료되었습니다.</p>
+                        <button onClick={handleModalClose} className="w-full py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">확인</button>
                     </div>
                 </div>
             )}
 
-            {/* 에러 메시지 모달 */}
+            {/* 에러 모달 */}
             {error && (
-                <div className="modal">
-                    <div className="modal-content error">
-                        <h2>내정보 수정</h2>
-                        <p>오류가 발생하였습니다.</p>
-                        <p>{error}</p>
-                        <button onClick={() => setError('')} className="login-button">닫기</button>
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                    <div className="bg-white p-6 rounded-lg text-center max-w-sm w-full">
+                        <h2 className="text-xl font-semibold mb-2 text-red-600">내정보 수정</h2>
+                        <p className="mb-4 text-gray-700">{error}</p>
+                        <button onClick={() => setError('')} className="w-full py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">닫기</button>
                     </div>
                 </div>
             )}
         </div>
     );
-
 };
 
 export default MyPage;
