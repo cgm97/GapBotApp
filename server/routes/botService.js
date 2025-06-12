@@ -406,7 +406,9 @@ exports.executeEnhance = async (req, res, next) => {
         A.BONUS, 
         CAST(DATE_FORMAT(A.ACHIEVE_DTTI, '%Y-%m-%d %H:%i:%s') AS CHAR) AS ACHIEVE_DTTI,
         CAST(DATE_FORMAT(A.LST_DTTI, '%Y-%m-%d %H:%i:%s') AS CHAR) AS LST_DTTI,
-        B.NICKNAME 
+        B.NICKNAME,
+        A.SUCCESS_CNT,
+        A.FAIL_CNT
       FROM BOT_ENHANCE_STATUS A
       LEFT JOIN USER_INFO B
         ON A.USER_ID = B.USER_CODE
@@ -435,6 +437,8 @@ exports.executeEnhance = async (req, res, next) => {
     let achieveDtti = userRefInfo.ACHIEVE_DTTI || null;
     let lstDtti = userRefInfo.LST_DTTI || null;
     let nickName = userRefInfo.NICKNAME || "UNKNOWN";
+    let successCnt = userRefInfo.SUCCESS_CNT || 0;
+    let failCnt = userRefInfo.FAIL_CNT || 0;
     let msg = "";
 
     // 현재 단계의 강화데이터 조히
@@ -489,7 +493,7 @@ exports.executeEnhance = async (req, res, next) => {
       bonus = 0; // 장인의 기운 초기화
       achieveDtti = currentDate;
       currentStep = nextStep;
-
+      successCnt++;
     } else {
       // 강화 실패
       bonus = Number(bonus) + Number(nextData.bonusChance);
@@ -499,13 +503,14 @@ exports.executeEnhance = async (req, res, next) => {
       msg += `📌 ${userName}님, 강화에 실패했습니다.\n`;
       msg += `🔨 단계 유지: ${currentStep}\n`;
       msg += `✨ 장인의 기운 ${Number(bonusOrg).toFixed(2)}% ➝ ${Number(bonus).toFixed(2)}%`;
+      failCnt++;
     }
 
     const refinmInsertSql = `
             INSERT INTO BOT_ENHANCE_STATUS (
-                USER_ID, ROOM_ID, USER_NAME, ROOM_NAME, STEP, BONUS, ACHIEVE_DTTI, LST_DTTI, USERNAME
+                USER_ID, ROOM_ID, USER_NAME, ROOM_NAME, STEP, BONUS, ACHIEVE_DTTI, LST_DTTI, USERNAME, SUCCESS_CNT, FAIL_CNT
             ) VALUES (
-                ?, ?, ?, ?, ?, ?, ?, ?, ?
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
             )
             ON DUPLICATE KEY UPDATE
                 USER_NAME = VALUES(USER_NAME),
@@ -514,7 +519,9 @@ exports.executeEnhance = async (req, res, next) => {
                 BONUS = VALUES(BONUS),
                 ACHIEVE_DTTI = VALUES(ACHIEVE_DTTI),
                 LST_DTTI = VALUES(LST_DTTI),
-                USERNAME = VALUES(USERNAME)
+                USERNAME = VALUES(USERNAME),
+                SUCCESS_CNT = VALUES(SUCCESS_CNT),
+                FAIL_CNT = VALUES(FAIL_CNT)
         `;
     connection.execute(refinmInsertSql, [userId, roomId, userName, roomName, currentStep, bonus, achieveDtti, currentDate, nickName]);
 
@@ -556,7 +563,9 @@ exports.getEnhanceRank = async (req, res, next) => {
           ROOM_NAME,
           USERNAME AS NICKNAME,
           RANK() OVER (ORDER BY STEP DESC, ACHIEVE_DTTI) AS RANKING,
-          CAST(DATE_FORMAT(ACHIEVE_DTTI, '%Y-%m-%d %H:%i:%s') AS CHAR) AS ACHIEVE_DTTI
+          CAST(DATE_FORMAT(ACHIEVE_DTTI, '%Y-%m-%d %H:%i:%s') AS CHAR) AS ACHIEVE_DTTI,
+          SUCCESS_CNT,
+          FAIL_CNT
         FROM BOT_ENHANCE_STATUS
         WHERE DL_YN = 'N'
         ${roomId ? ' AND ROOM_ID = ?' : ''}
@@ -591,7 +600,9 @@ exports.getEnhanceRank = async (req, res, next) => {
             ROOM_NAME,
             USERNAME AS NICKNAME,
             RANK() OVER (ORDER BY STEP DESC, ACHIEVE_DTTI) AS RANKING,
-            CAST(DATE_FORMAT(ACHIEVE_DTTI, '%Y-%m-%d %H:%i:%s') AS CHAR) AS ACHIEVE_DTTI
+            CAST(DATE_FORMAT(ACHIEVE_DTTI, '%Y-%m-%d %H:%i:%s') AS CHAR) AS ACHIEVE_DTTI,
+            SUCCESS_CNT,
+            FAIL_CNT
           FROM BOT_ENHANCE_STATUS
           WHERE DL_YN = 'N'
           ${roomId ? ' AND ROOM_ID = ?' : ''}
