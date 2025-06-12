@@ -159,7 +159,7 @@ const Rank = ({ roomId }) => {
                 <td className="text-center border p-2">
                   {user.NICKNAME && user.NICKNAME !== 'UNKNOWN' ? (
                     <Link
-                      href={`/user/${user.USER_ID}`}
+                      href={`/character/${user.NICKNAME}`}
                       className="text-blue-600 hover:underline"
                     >
                       {user.NICKNAME}
