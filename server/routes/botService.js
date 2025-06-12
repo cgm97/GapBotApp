@@ -523,7 +523,7 @@ exports.executeEnhance = async (req, res, next) => {
                 SUCCESS_CNT = VALUES(SUCCESS_CNT),
                 FAIL_CNT = VALUES(FAIL_CNT)
         `;
-    connection.execute(refinmInsertSql, [userId, roomId, userName, roomName, currentStep, bonus, achieveDtti, currentDate, nickName]);
+    connection.execute(refinmInsertSql, [userId, roomId, userName, roomName, currentStep, bonus, achieveDtti, currentDate, nickName, successCnt, failCnt]);
 
     // logger.info({
     //   method: req.method,
