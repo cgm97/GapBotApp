@@ -11,10 +11,8 @@ const Rank = ({ roomId }) => {
   const [hasMore, setHasMore] = useState(true);
   const loadingRef = useRef(false);
 
-
-
   const [userCode, setUserCode] = useState(null);
-  const [roomCode, setRoomCode] = useState(null);
+  const [roomCode, setRoomCode] = useState(roomId);
   useEffect(() => {
     if (typeof window !== "undefined") {
       const storedUserCode = sessionStorage.getItem("userCode") || null;
@@ -22,9 +20,8 @@ const Rank = ({ roomId }) => {
 
       const storedRoomCode = sessionStorage.getItem("roomCode") || roomId;
       setRoomCode(storedRoomCode);
-
     }
-  }, []);
+  }, [roomId]);
 
   const fetchRanking = async (pageNum = 1) => {
     if (loadingRef.current) return; // 중복 호출 방지
@@ -59,8 +56,10 @@ const Rank = ({ roomId }) => {
   };
 
   useEffect(() => {
-    fetchRanking(1);
-  }, []);
+    if (roomCode !== null) {
+      fetchRanking(1);
+    }
+  }, [roomCode]);
 
   // 스크롤 핸들러
   useEffect(() => {
@@ -83,7 +82,7 @@ const Rank = ({ roomId }) => {
 
   // page 변경시 데이터 추가로 불러오기
   useEffect(() => {
-    if (page === 1) return; // 첫 로딩은 위에서 이미 호출함
+    if (page === 1 ) return;
     fetchRanking(page);
   }, [page]);
 
