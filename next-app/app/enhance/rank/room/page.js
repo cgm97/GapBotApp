@@ -19,5 +19,5 @@ export const metadata = {
 import EnhanceClient from './enhanceClient';
 
 export default async function Page() {
-  return <EnhanceClient roomId={null} />;
+  return <EnhanceClient />;
 }
