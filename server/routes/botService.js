@@ -656,13 +656,14 @@ exports.getMyNickName = async (req, res, next) => {
 
     const [rows] = await pool.query(selectNickName, [roomId, userId]);
 
-    nickName = rows[0]?.NICKNAME || "";
-  }
-  logger.info({
+    logger.info({
       method: req.method,
       url: req.url,  // 요청 URL
       message: `\nSql ${selectNickName} \nParam ${[roomId, userId]}`
     });
+    
+    nickName = rows[0]?.NICKNAME || "";
+  }
 
   logger.info({
     method: req.method,
