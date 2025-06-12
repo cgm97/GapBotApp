@@ -630,8 +630,7 @@ exports.getEnhanceRank = async (req, res, next) => {
 
 // 대표캐릭터 조회 (빈틈봇)
 exports.getMyNickName = async (req, res, next) => {
-  const userId = req.headers['userid'] || "";
-  const roomId = req.headers['roomid'] || "";
+  const { userId, roomId } = req.body;
 
   let nickName = "";
   if (userId && roomId) {
