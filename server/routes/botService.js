@@ -547,7 +547,7 @@ exports.executeEnhance = async (req, res, next) => {
 exports.getEnhanceRank = async (req, res, next) => {
   const connection = await pool.getConnection();
 
-  const { userId, roomId, page = 1, limit = 9999} = req.body;
+  const { userId, roomId, page = 1, limit = 9999 } = req.body;
   const offset = (page - 1) * limit;
 
   try {
@@ -626,4 +626,27 @@ exports.getEnhanceRank = async (req, res, next) => {
   } finally {
     connection.release();
   }
+};
+
+// 대표캐릭터 조회 (빈틈봇)
+exports.getMyNickName = async (req, res, next) => {
+  const userId = req.headers['userid'] || "";
+  const roomId = req.headers['roomid'] || "";
+
+  let nickName = "";
+  if (userId && roomId) {
+    const selectNickName = `SELECT NICKNAME FROM USER_INFO WHERE ROOM_CODE = ? AND USER_CODE = ?`;
+
+    const [rows] = await pool.query(selectNickName, [roomId, userId]);
+
+    nickName = rows[0]?.NICKNAME || "";
+  }
+  logger.info({
+    method: req.method,
+    url: req.url,
+    message: `내정보(대표캐릭터): ${nickName}`,
+  });
+  res.json({
+    'NICKNAME':nickName
+  });
 };
