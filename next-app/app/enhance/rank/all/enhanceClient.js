@@ -24,7 +24,7 @@ const Rank = () => {
     loadingRef.current = true;
 
     try {
-      const res = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/bot/refinement/rank`, {
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/bot/enhance/rank`, {
         page: pageNum,
         limit: 20,
         userId: userCode
@@ -81,7 +81,7 @@ const Rank = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h2 className="text-2xl font-bold mb-2">🏆 빈틈봇 전체 재련 랭킹</h2>
+      <h2 className="text-2xl font-bold mb-2">🏆 빈틈봇 <span className="text-blue-600 font-medium">[전체]</span> 재련 랭킹</h2>
       <p className="text-gray-600 mb-2">최종 재련 달성 순으로 정렬된 전체 유저 랭킹입니다.</p>
 
       {myRank && (

@@ -378,7 +378,7 @@ exports.getBooksLog = async (req, res, next) => {
 }
 
 // 재련강화
-exports.executeRefinement = async (req, res, next) => {
+exports.executeEnhance = async (req, res, next) => {
 
   const { userId, userName, roomId, roomName } = req.body;
 
@@ -407,7 +407,7 @@ exports.executeRefinement = async (req, res, next) => {
         CAST(DATE_FORMAT(A.ACHIEVE_DTTI, '%Y-%m-%d %H:%i:%s') AS CHAR) AS ACHIEVE_DTTI,
         CAST(DATE_FORMAT(A.LST_DTTI, '%Y-%m-%d %H:%i:%s') AS CHAR) AS LST_DTTI,
         B.NICKNAME 
-      FROM BOT_REFINEMENT_STATUS A
+      FROM BOT_ENHANCE_STATUS A
       LEFT JOIN USER_INFO B
         ON A.USER_ID = B.USER_CODE
       AND A.ROOM_ID = B.ROOM_CODE
@@ -502,7 +502,7 @@ exports.executeRefinement = async (req, res, next) => {
     }
 
     const refinmInsertSql = `
-            INSERT INTO BOT_REFINEMENT_STATUS (
+            INSERT INTO BOT_ENHANCE_STATUS (
                 USER_ID, ROOM_ID, USER_NAME, ROOM_NAME, STEP, BONUS, ACHIEVE_DTTI, LST_DTTI, USERNAME
             ) VALUES (
                 ?, ?, ?, ?, ?, ?, ?, ?, ?
@@ -537,7 +537,7 @@ exports.executeRefinement = async (req, res, next) => {
   }
 }
 
-exports.getRefinementRank = async (req, res, next) => {
+exports.getEnhanceRank = async (req, res, next) => {
   const connection = await pool.getConnection();
 
   const { userId, roomId, page = 1, limit = 9999} = req.body;
@@ -557,7 +557,7 @@ exports.getRefinementRank = async (req, res, next) => {
           USERNAME AS NICKNAME,
           RANK() OVER (ORDER BY STEP DESC, ACHIEVE_DTTI) AS RANKING,
           CAST(DATE_FORMAT(ACHIEVE_DTTI, '%Y-%m-%d %H:%i:%s') AS CHAR) AS ACHIEVE_DTTI
-        FROM BOT_REFINEMENT_STATUS
+        FROM BOT_ENHANCE_STATUS
         WHERE DL_YN = 'N'
         ${roomId ? ' AND ROOM_ID = ?' : ''}
       )
@@ -592,7 +592,7 @@ exports.getRefinementRank = async (req, res, next) => {
             USERNAME AS NICKNAME,
             RANK() OVER (ORDER BY STEP DESC, ACHIEVE_DTTI) AS RANKING,
             CAST(DATE_FORMAT(ACHIEVE_DTTI, '%Y-%m-%d %H:%i:%s') AS CHAR) AS ACHIEVE_DTTI
-          FROM BOT_REFINEMENT_STATUS
+          FROM BOT_ENHANCE_STATUS
           WHERE DL_YN = 'N'
           ${roomId ? ' AND ROOM_ID = ?' : ''}
         ) AS Ranked
