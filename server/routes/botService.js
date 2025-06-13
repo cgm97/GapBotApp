@@ -374,6 +374,9 @@ exports.getBooksLog = async (req, res, next) => {
     // 오류 발생 시 롤백
     await connection.rollback();
     next(new Error(err));  // 
+  } finally {
+    // DB 연결 해제
+    if (connection) connection.release();
   }
 }
 
@@ -559,6 +562,9 @@ exports.executeEnhance = async (req, res, next) => {
     next(new Error(err));  // 
 
     res.status(400).send('잘못된 요청입니다.');
+  } finally {
+    // DB 연결 해제
+    if (connection) connection.release();
   }
 }
 
@@ -642,7 +648,8 @@ exports.getEnhanceRank = async (req, res, next) => {
     await connection.rollback();
     next(new Error(err));
   } finally {
-    connection.release();
+    // DB 연결 해제
+    if (connection) connection.release();
   }
 };
 

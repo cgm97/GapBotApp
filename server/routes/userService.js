@@ -136,7 +136,10 @@ exports.executeRefresh = async (req, res, next) => {
     } catch (error) {
         console.error(error);
         return res.status(403).json({ message: 'RefreshToken이 만료되었습니다.' });
-    }
+    } finally {
+    // DB 연결 해제
+    if (connection) connection.release();
+  }
 };
 
 
