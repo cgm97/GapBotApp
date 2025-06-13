@@ -146,9 +146,7 @@ router.get('/booksLog', botService.getBooksLog);
 
 router.post('/enhance/try', botService.executeEnhance);
 router.post('/enhance/rank', botService.getEnhanceRank);
-// 임시
-router.post('/refinement/try', botService.executeEnhance);
-router.post('/refinement/rank', botService.getEnhanceRank);
+router.get('/enhance/rates', botService.getEnhanceRates);
 
 router.post('/myNickName', botService.getMyNickName);
 

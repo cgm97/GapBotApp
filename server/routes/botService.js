@@ -674,3 +674,8 @@ exports.getMyNickName = async (req, res, next) => {
     'NICKNAME': nickName
   });
 };
+
+// 대표캐릭터 조회 (빈틈봇)
+exports.getEnhanceRates = async (req, res, next) => {
+  return res.send(ENHANCEMENTDATA);
+};
