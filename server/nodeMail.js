@@ -23,11 +23,12 @@ const sendVerificationEmail = async (userEmail, verificationToken) => {
     text: `아래 링크를 클릭하여 이메일 인증을 완료해주세요:\n\n
     https://loagap.com/verifyEmail?token=${verificationToken}`, // 인증 토큰 포함
   };
-
   try {
     await transporter.sendMail(mailOptions);
   } catch (error) {
     console.error('이메일 발송 오류:', error);
+  } finally {
+    transporter.close();
   }
 };
 

@@ -682,7 +682,7 @@ exports.getMyNickName = async (req, res, next) => {
   });
 };
 
-// 대표캐릭터 조회 (빈틈봇)
+// 재련 강화 확률표 조회
 exports.getEnhanceRates = async (req, res, next) => {
   return res.send(ENHANCEMENTDATA);
 };
