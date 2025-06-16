@@ -106,11 +106,11 @@ exports.executeRefresh = async (req, res, next) => {
         return res.status(403).json({ message: '로그인이 필요합니다.' });
     }
 
+    const connection = await pool.getConnection();
     try {
         // Refresh Token 검증
         const user = jwt.verify(refreshToken, process.env.JWT_SECRET_REFRESH);
 
-        const connection = await pool.getConnection();
 
         const selectSql = `SELECT USERNAME, NICKNAME, ROOM_CODE, USER_CODE FROM USER_INFO WHERE USERNAME =?`;
         const [userInfo] = await connection.execute(selectSql, [user.USERNAME]);
