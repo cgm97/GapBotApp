@@ -6,7 +6,7 @@ const apiService = require('./apiService'); // 상대 경로로 apiService 불�
  * @swagger
  * tags:
  *   - name: LostArk API
- *     description: 로스트아크 관련 API 목록 (메인화면)
+ *     description: 메인화면 API 목록
  */
 
 /**
@@ -14,7 +14,8 @@ const apiService = require('./apiService'); // 상대 경로로 apiService 불�
  * /api/island:
  *   get:
  *     summary: 모험섬 정보를 가져옵니다.
- *     tags: [LostArk API]
+ *     tags: 
+ *      - LostArk API
  *     responses:
  *       200:
  *         description: 모험섬 데이터 목록.
@@ -90,7 +91,8 @@ router.get('/island', apiService.getIsland);
  * /api/notice:
  *   get:
  *     summary: 공지사항 목록을 가져옵니다.
- *     tags: [LostArk API]
+ *     tags: 
+ *      - LostArk API
  *     responses:
  *       200:
  *         description: 공지사항 데이터 목록.
@@ -125,7 +127,8 @@ router.get('/notice', apiService.getNotice);
  * /api/event:
  *   get:
  *     summary: 이벤트 목록을 가져옵니다.
- *     tags: [LostArk API]
+ *     tags: 
+ *      - LostArk API
  *     responses:
  *       200:
  *         description: 이벤트 데이터 목록.
@@ -160,7 +163,8 @@ router.get('/event', apiService.getEvent);
  * /api/patchNote:
  *   get:
  *     summary: 빈틈봇 패치노트를 가져옵니다.
- *     tags: [LostArk API]
+ *     tags: 
+ *      - LostArk API
  *     responses:
  *       200:
  *         description: 빈틈봇 패치노트 데이터 목록.

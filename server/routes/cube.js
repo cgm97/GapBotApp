@@ -5,7 +5,7 @@ const cubeService = require('./cubeService'); // 상대 경로로 apiService 불
 /**
  * @swagger
  * tags:
- *   - name: CUBE
+ *   - name: CUBE API
  *     description: 큐브 관련 API 목록
  */
 
@@ -14,7 +14,7 @@ const cubeService = require('./cubeService'); // 상대 경로로 apiService 불
  * /cube/:
  *   post:
  *     summary: 캐릭터의 큐브 정보를 조회합니다.
- *     tags: [CUBE]
+ *     tags: [CUBE API]
  *     requestBody:
  *       required: true
  *       content:
@@ -119,7 +119,7 @@ router.post('/', cubeService.getCharacterCubeInfo);
  * /cube/save:
  *   post:
  *     summary: 캐릭터의 큐브 정보를 저장합니다.
- *     tags: [CUBE]
+ *     tags: [CUBE API]
  *     requestBody:
  *       required: true
  *       content:

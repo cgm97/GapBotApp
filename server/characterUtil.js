@@ -15,7 +15,7 @@ const insertCharacterInfo = async (equipItems, gemItems, accessoryItems, cardIte
 
     const method = 'insertCharacterInfo';
 
-    let connection = await pool.getConnection()
+    const connection = await pool.getConnection()
     try {
         if (!profile) {
             throw new Error("profile.NICKNAME이 존재하지 않습니다.");

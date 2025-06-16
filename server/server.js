@@ -20,6 +20,7 @@ require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const isProduction = process.env.NODE_ENV === 'PROD'; // 배포 여부 판단
 
 // 서버 시작 시 캐시 초기화
 initializeCache();
@@ -43,20 +44,23 @@ app.use(cookieParser());
 const swaggerDefinition = {
   openapi: '3.0.0', // OpenAPI 3.0 규격을 사용
   info: {
-    title: 'LOAGAP API', // API 제목
+    title: 'LOAGAP - 빈틈봇', // API 제목
     version: '1.0.0', // API 버전
-    description: 'LOAGAP API Description', // API 설명
+    description: 'LOAGAP 로스트아크 카카오톡 빈틈봇 API 서버 ', // API 설명
   },
-  servers: [
-    {
-      url: `http://localhost:${PORT}`, // 서버 URL
-      description: 'Development Server', // 서버 설명
-    },
-    {
-      url: 'https://api.loagap.com', // 운영 서버 URL
-      description: 'Production Server', // 서버 설명
-    },
-  ],
+  servers: isProduction
+    ? [
+        {
+          url: 'https://api.loagap.com',
+          description: 'LOAGAP Server',
+        },
+      ]
+    : [
+        {
+          url: `http://localhost:${PORT}`,
+          description: 'Local Server',
+        },
+      ],
 };
 
 // Swagger 옵션 설정
@@ -69,7 +73,13 @@ const options = {
 const swaggerSpec = swaggerJSDoc(options);
 
 // Swagger UI 설정
-app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  swaggerOptions:{
+    docExpansion: 'none',
+    defaultModelsExpandDepth: -1,
+    displayRequestDuration: true
+  }
+}));
 
 // 미들웨어: 모든 요청에 대해 자동으로 로그 기록
 app.use((req, res, next) => {
