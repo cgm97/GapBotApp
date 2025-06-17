@@ -539,3 +539,76 @@ exports.getbook = async (req, res, next) => {
         }
     return res.status(200).json({ msg:"success" }); // 유저 정보 반환
 };
+
+exports.getaccessory = async (req, res, next) => {
+ var method = '매일 0시 악세서리 데이터';
+    logger.info({
+        method: method,
+        url: '[CRON]',  // 요청 URL
+        message: '악세서리 저장 시작 START'
+    });
+
+    // 여기에 실제로 실행할 작업 코드 작성
+    const connection = await pool.getConnection();
+    
+    try {
+        
+        // 트랜잭션 시작
+        await connection.beginTransaction();
+
+        var accessArr = [];
+        accessArr = await getAccessoriesPrice();
+
+        logger.info({
+            method: method,
+            url: '[CRON]',  // 요청 URL
+            message: `데이터 불러오기 성공 ${Object.keys(accessArr).length} 건`,
+        });
+
+        const today = new Date();
+
+        // 년, 월, 일 구하기
+        const year = today.getFullYear();  // 4자리 연도
+        const month = (today.getMonth() + 1).toString().padStart(2, '0');  // 월 (0부터 시작하므로 +1, 두 자릿수로 만들기)
+        const day = today.getDate().toString().padStart(2, '0');  // 일, 두 자릿수로 만들기
+
+        // 'YYYYMMDD' 형식으로 결합
+        const baseDate = `${year}${month}${day}`;
+
+        console.log(baseDate);  // 예: 20250330
+
+        // // 쿼리
+        const insertSql = `INSERT INTO ITEM_PRICE_LOG (
+                BASE_DATE,
+                ITEM_DVCD,
+                ITEM_DATA
+            ) VALUES (?, ?, ?)`;
+
+        connection.execute(insertSql, [
+            baseDate,
+            '03', // 악세서리 03
+            accessArr
+        ]);
+
+        // 트랜잭션 커밋
+        await connection.commit();
+        logger.info({
+            method: method,
+            url: '[CRON]',  // 요청 URL
+            //message: `${JSON.stringify(arr, null, 2)} 모험섬 데이터 가공 종료`,
+            message: `악세서리 데이터 ${Object.keys(accessArr).length}건 적재 완료 END`
+        });
+    } catch (error) {
+        // 오류 발생 시 롤백
+        await connection.rollback();
+        // 에러 로깅
+        logger.error({
+            method: method,
+            url: '[CRON]',  // 요청 URL
+            message: error.stack
+        });
+    } finally {
+        // 연결 반환
+        connection.release();
+    }
+}
