@@ -9,10 +9,8 @@ const KakaoAdFit = ({ unit, width, height, disabled }) => {
   const location = usePathname(); // 현재 위치를 추적
 
   useEffect(() => {
-    console.log("useEffect 실행됨"); // useEffect가 실행되었는지 확인
 
     if (!disabled) {
-      console.log("광고 비활성화됨");
       return; // 광고 비활성화 시 return
     }
 
@@ -37,7 +35,7 @@ const KakaoAdFit = ({ unit, width, height, disabled }) => {
       };
 
       script.onerror = () => {
-        console.error("카카오 애드핏 스크립트 로드 실패");
+        // console.error("카카오 애드핏 스크립트 로드 실패");
       };
 
       document.body.appendChild(script); // <body>에 스크립트 추가
@@ -47,7 +45,7 @@ const KakaoAdFit = ({ unit, width, height, disabled }) => {
       if (window.kakao && window.kakao.adfit) {
         window.kakao.adfit.push({});
       } else {
-        console.log("window.kakao.adfit이 존재하지 않음");
+        // console.log("window.kakao.adfit이 존재하지 않음");
       }
   
 
