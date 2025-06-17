@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from 'axios';
 import KakaoAdFit from "@/components/KakaoAdFit";
+import AdSense from '@/components/AdSense';
 import '@/css/Character.css';
 const elixirImg = '/img/elixir.png';
 const hyperImg = '/img/hyper.png';
@@ -188,7 +189,8 @@ const Character = ({nickName}) => {
 
                 {/* 광고 영역 */}
                 <div className="engraving">
-                    <KakaoAdFit unit="DAN-KjllsdstWjrHOWe6" width={250} height={250} disabled={true} />
+                    {/* <KakaoAdFit unit="DAN-KjllsdstWjrHOWe6" width={250} height={250} disabled={true} /> */}
+                     <AdSense adSlot="1985041601" />  {/* 사각형 광고 */}
                 </div>
             </div>
 
