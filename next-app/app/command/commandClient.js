@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import KakaoAdFit from '@/components/KakaoAdFit';
-import AdSense from '@/components/AdSense';
+import AdSense from '@/components/Adsense';
 
 const CommandPage = () => {
   const [activeCard, setActiveCard] = useState(null);
