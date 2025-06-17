@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from 'axios';
 import KakaoAdFit from "@/components/KakaoAdFit";
-import AdSense from '@/components/AdSense';
+import AdSense from '@/components/Adsense';
 import '@/css/Character.css';
 const elixirImg = '/img/elixir.png';
 const hyperImg = '/img/hyper.png';

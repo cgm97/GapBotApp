@@ -5,7 +5,7 @@ import axios from 'axios';
 import Link from 'next/link';
 import Island from '@/components/Island';
 import KakaoAdFit from '@/components/KakaoAdFit';
-import AdSense from '@/components/AdSense';
+import AdSense from '@/components/Adsense';
 
 const MainPages = () => {
   const [noticeData, setNoticeData] = useState([]);
