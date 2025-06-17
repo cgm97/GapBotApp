@@ -1,7 +1,7 @@
 const axios = require('axios');
 const pool = require('../db/connection');
 const logger = require('../logger');  // logger.js 임포트
-const {getBookPrice, getJewelPrice} = require('../sessionUtil');
+const {getBookPrice, getJewelPrice, getAccessoriesPrice} = require('../sessionUtil');
 require('dotenv').config(); // .env 파일에서 환경 변수 로드
 
 exports.getIsland = async (req, res, next) => {
