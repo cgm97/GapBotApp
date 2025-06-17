@@ -2,7 +2,7 @@ const cron = require('node-cron');
 const axios = require('axios');
 const logger = require('./logger');  // logger.js 임포트
 const pool = require('./db/connection');
-const {getBookPrice, getJewelPrice} = require('./sessionUtil');
+const {getBookPrice, getJewelPrice, getAccessoriesPrice} = require('./sessionUtil');
 require('dotenv').config(); // .env 파일에서 환경 변수 로드
 
 const url = 'CRON';
@@ -491,7 +491,7 @@ cron.schedule('0 0 * * *', async () => { // async로 변경
 
 // 매일 0시 30분_ 각인서 조회
 cron.schedule('30 0 * * *', async () => { // async로 변경
-    var method = '매일 0시 3분 각인서 데이터';
+    var method = '매일 0시 30분 각인서 데이터';
     logger.info({
         method: method,
         url: url,  // 요청 URL
@@ -554,4 +554,77 @@ cron.schedule('30 0 * * *', async () => { // async로 변경
     }
 });
 
+// 매일 0시 _ 악세서리 조회
+cron.schedule('0 0 * * *', async () => { // async로 변경
+    var method = '매일 0시 악세서리 데이터';
+    logger.info({
+        method: method,
+        url: url,  // 요청 URL
+        message: '악세서리 저장 시작 START'
+    });
+
+    // 여기에 실제로 실행할 작업 코드 작성
+    const connection = await pool.getConnection();
+    
+    try {
+        
+        // 트랜잭션 시작
+        await connection.beginTransaction();
+
+        var accessArr = [];
+        accessArr = await getAccessoriesPrice();
+
+        logger.info({
+            method: method,
+            url: url,  // 요청 URL
+            message: `데이터 불러오기 성공 ${Object.keys(accessArr).length} 건`,
+        });
+
+        const today = new Date();
+
+        // 년, 월, 일 구하기
+        const year = today.getFullYear();  // 4자리 연도
+        const month = (today.getMonth() + 1).toString().padStart(2, '0');  // 월 (0부터 시작하므로 +1, 두 자릿수로 만들기)
+        const day = today.getDate().toString().padStart(2, '0');  // 일, 두 자릿수로 만들기
+
+        // 'YYYYMMDD' 형식으로 결합
+        const baseDate = `${year}${month}${day}`;
+
+        console.log(baseDate);  // 예: 20250330
+
+        // // 쿼리
+        const insertSql = `INSERT INTO ITEM_PRICE_LOG (
+                BASE_DATE,
+                ITEM_DVCD,
+                ITEM_DATA
+            ) VALUES (?, ?, ?)`;
+
+        connection.execute(insertSql, [
+            baseDate,
+            '03', // 악세서리 03
+            accessArr
+        ]);
+
+        // 트랜잭션 커밋
+        await connection.commit();
+        logger.info({
+            method: method,
+            url: url,  // 요청 URL
+            //message: `${JSON.stringify(arr, null, 2)} 모험섬 데이터 가공 종료`,
+            message: `악세서리 데이터 ${Object.keys(accessArr).length}건 적재 완료 END`
+        });
+    } catch (error) {
+        // 오류 발생 시 롤백
+        await connection.rollback();
+        // 에러 로깅
+        logger.error({
+            method: method,
+            url: url,  // 요청 URL
+            message: error.stack
+        });
+    } finally {
+        // 연결 반환
+        connection.release();
+    }
+});
 module.exports = cron; // cron을 export하여 다른 파일에서 사용할 수 있게 함
