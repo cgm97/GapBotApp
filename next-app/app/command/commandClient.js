@@ -129,8 +129,8 @@ const CommandPage = () => {
           </ul>
 
           <div className="mt-6 flex justify-center">
-            {/* <KakaoAdFit unit="DAN-KjllsdstWjrHOWe6" width={250} height={250} disabled={true} /> */}
-            <AdSense adSlot="1985041601" />  {/* 사각형 광고 */}
+            <KakaoAdFit unit="DAN-KjllsdstWjrHOWe6" width={250} height={250} disabled={true} />
+            {/* <AdSense adSlot="1985041601" />  사각형 광고 */}
           </div>
         </div>
       </div>
