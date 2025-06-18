@@ -189,8 +189,8 @@ const Character = ({nickName}) => {
 
                 {/* 광고 영역 */}
                 <div className="engraving">
-                    <KakaoAdFit unit="DAN-KjllsdstWjrHOWe6" width={250} height={250} disabled={true} />
-                     {/* <AdSense adSlot="1985041601" />  사각형 광고 */}
+                    {/* <KakaoAdFit unit="DAN-KjllsdstWjrHOWe6" width={250} height={250} disabled={true} /> */}
+                     <AdSense adSlot="1488834693" />
                 </div>
             </div>
 

@@ -5,13 +5,20 @@ import { useEffect } from 'react';
 export default function AdSense({ adSlot }) {
 
   useEffect(() => {
-    (window.adsbygoogle = window.adsbygoogle || []).push({});
+        try {
+          window.adsbygoogle = window.adsbygoogle || [];
+          window.adsbygoogle.push({});
+        }
+        catch(e){
+        }
   }, []);
 
   return (
     <ins
       className="adsbygoogle"
-      style={{ display: 'block'}}
+      style={{ display: 'block',
+               width: '100%'
+            }}
       data-ad-client="ca-pub-3394263366814430"
       data-ad-slot={adSlot}
       data-ad-format="auto"
