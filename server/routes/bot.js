@@ -522,4 +522,87 @@ router.get('/enhance/rates', botService.getEnhanceRates);
  */
 router.post('/myNickName', botService.getMyNickName);
 
+router.get('/lopec', botService.getLopecPoint);
+
+/**
+ * @swagger
+ * /bot/accessory:
+ *   get:
+ *     summary: 액세서리 가격 정보 조회
+ *     tags: [BOT API]
+ *     description: grade, title, enhance 쿼리 파라미터를 받아 해당 조건에 맞는 액세서리 가격 데이터를 반환합니다.
+ *     parameters:
+ *       - in: query
+ *         name: grade
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: "액세서리 등급 (예: 고대)"
+ *         example: 고대
+ *       - in: query
+ *         name: title
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: "가격 등급 타이틀 (예: 상, 중, 하)"
+ *         example: 상
+ *       - in: query
+ *         name: enhance
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: "연마 수치 (예: 1, 2, 3)"
+ *         example: "1"
+ *     responses:
+ *       200:
+ *         description: 액세서리 가격 데이터 조회 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 grade:
+ *                   type: string
+ *                   example: 고대
+ *                 title:
+ *                   type: string
+ *                   example: 상
+ *                 enhance:
+ *                   type: string
+ *                   example: "1"
+ *                 items:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       name:
+ *                         type: string
+ *                         example: 목걸이
+ *                       items:
+ *                         type: array
+ *                         items:
+ *                           type: object
+ *                           properties:
+ *                             option:
+ *                               type: array
+ *                               items:
+ *                                 type: string
+ *                               example: ["적에게 주는 피해%"]
+ *                             price:
+ *                               type: integer
+ *                               example: 58000
+ *                             priceDiff:
+ *                               type: integer
+ *                               example: -1000
+ *                             percentDiff:
+ *                               type: number
+ *                               format: float
+ *                               example: -1.69
+ *       400:
+ *         description: 필수 쿼리 파라미터 누락 또는 잘못된 요청
+ *       500:
+ *         description: 서버 내부 오류
+ */
+router.get('/accessory', botService.getAccessory);
+
 module.exports = router;

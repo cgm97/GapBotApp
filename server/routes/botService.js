@@ -2,7 +2,8 @@ const axios = require('axios');
 const pool = require('../db/connection');
 const logger = require('../logger');  // logger.js 임포트
 const spec = require('../calculator/specPoint');
-const { sessionCache, getDateTime } = require('../sessionUtil'); // 세션 모듈 가져오기
+const accessoryFillter = require('../accessoryFillter');
+const { sessionCache, getDateTime, getDate } = require('../sessionUtil'); // 세션 모듈 가져오기
 
 // 재련강화확률표
 const ENHANCEMENTDATA = [
@@ -387,7 +388,7 @@ exports.executeEnhance = async (req, res, next) => {
 
   // LOAGAP 재련으로 들어왔을경우
   if (site == "Y") {
-    if(!userId || !roomId){
+    if (!userId || !roomId) {
       return res.status(200).send(
         "필수 파라미터가 누락되었습니다."
       );
@@ -668,7 +669,7 @@ exports.getMyNickName = async (req, res, next) => {
       url: req.url,  // 요청 URL
       message: `\nSql ${selectNickName} \nParam ${[roomId, userId]}`
     });
-    
+
     nickName = rows[0]?.NICKNAME || "";
   }
 
@@ -682,7 +683,276 @@ exports.getMyNickName = async (req, res, next) => {
   });
 };
 
+// LOPEC 점수 조회
+exports.getLopecPoint = async (req, res, next) => {
+  const { nickName } = req.query;
+
+  logger.info({
+    method: req.method,
+    url: req.url,
+    message: `로펙조회: ${nickName}`,
+  });
+
+  const API_URL = "https://api.lopec.kr/api/character/stats";
+
+  let param = {
+    "nickname": nickName,
+    "characterClass": "",
+    "totalStatus": "",
+    "statusSpecial": "",
+    "statusHaste": ""
+  }
+
+  try {
+    const response = await axios.post(API_URL, param, {
+      headers: {
+        accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    });
+
+    // {
+    //     "nickname": "곰주제",
+    //     "characterClass": "야성 환수사",
+    //     "evoKarma": 21,
+    //     "totalStatus": 2378,
+    //     "statusSpecial": null,
+    //     "statusHaste": null,
+    //     "totalSum": 3715.199998305726,
+    //     "achieveDate": "20250614044140"
+    // }
+    param = response.data;
+  } catch (error) {
+    logger.error({
+      method: req.method,
+      url: req.url,
+      message: `로펙 API 호출 실패`,
+      error,
+    });
+    throw error;
+  }
+
+  let = msg = `📢 ${nickName}님의 LOPEC\n\n`;
+  if (param?.totalSum != null) {
+    msg += `스펙 포인트: ${(param.totalSum).toFixed(0)}\n`
+    msg += `클래스: ${param.characterClass}\n\n`
+    msg += `LOPEC 상세보기\n`
+    msg += `https://lopec.kr/search/search.html?headerCharacterName=${nickName}`
+  } else {
+    msg += "캐릭터 정보가 없습니다."
+  }
+
+  res.send(msg);
+
+};
+
+// 악세 시세 조회
+// http://localhost:5000/bot/accessory?title=%EC%83%81%ED%95%98&enhance=2&type=%EA%B3%A0%EB%8C%80
+exports.getAccessory = async (req, res, next) => {
+  const { grade, title, enhance } = req.query;
+
+  const accessory = accessoryFillter.ACCESSORY;
+  const CategoryCode = accessoryFillter.CATEGORYCODE;
+  const categortKeys = Object.keys(CategoryCode); // necklace earring ring
+  const gradeFillter = accessoryFillter.GRADE;
+  const functionSingle = accessoryFillter.getEtcOptionsSingle;
+  const functionDouble = accessoryFillter.getEtcOptionsDouble;
+
+  // 현재 시세
+  let retAccessory = [];
+  for (const categortKey of categortKeys) {
+    const acsryOption = accessory[title][categortKey];
+
+    for (const acsry of acsryOption) {
+      const name = acsry.name;
+      const params = acsry.params;
+      const pointAdjust = acsry.pointAdjust || 0;
+      const option = acsry.option;
+      let etcOptions = null;
+
+      // 증첩 (상상 ... 중하)
+      if (accessory[title].useGetEtcOptionDouble) {
+        if (enhance == 1) {
+          continue; // 연마 횟수가 1은 중첩 불가 -> 단일만 조회
+        }
+        etcOptions = functionDouble(params[0], params[1], params[2], params[3], params[4], (gradeFillter[grade].point[enhance] + pointAdjust));
+      }
+      // 딘일(상 중)
+      else {
+        etcOptions = functionSingle(params[0], params[1], params[2], (gradeFillter[grade].point[enhance] + pointAdjust));
+      }
+
+      const body = {
+        "ItemLevelMin": gradeFillter[grade].level,
+        "ItemLevelMax": gradeFillter[grade].level,
+        "ItemUpgradeLevel": enhance,
+        "CategoryCode": CategoryCode[categortKey],
+        "ItemGradeQuality": 67, // 깨포 최대치
+        "SkillOptions": [],
+        "EtcOptions": etcOptions,
+        "Sort": "BUY_PRICE",
+        "PageNo": 1,
+        "SortCondition": "ASC"
+      }
+
+      const response = await axios.post("https://developer-lostark.game.onstove.com/auctions/items", body, {
+        headers: {
+          'accept': 'application/json',
+          'Content-Type': 'application/json',
+          'authorization': `bearer ${process.env.LOA_API_KEY}`,
+        },
+      });
+
+      const item = (response.data.Items && response.data.Items.length > 0)
+        ? response.data.Items[0]
+        : null;
+
+      // 1️⃣ title 그룹 찾기
+      let titleGroup = retAccessory.find(t => t.title === title);
+      if (!titleGroup) {
+        titleGroup = { title, enhances: [] };
+        retAccessory.push(titleGroup);
+      }
+
+      // 2️⃣ enhance 그룹 찾기
+      let enhanceGroup = titleGroup.enhances.find(e => e.enhance === enhance);
+      if (!enhanceGroup) {
+        enhanceGroup = { enhance, items: [] };
+        titleGroup.enhances.push(enhanceGroup);
+      }
+
+      // 3️⃣ 해당 enhance 안에 item 추가
+      enhanceGroup.items.push({
+        name: name,
+        option: option,
+        price: item?.AuctionInfo?.BuyPrice ?? 0
+      });
+    }
+  };
+
+  // 전일자 DB
+  const yesterday = getDate(-1).replaceAll("-", "");
+
+  const selectSql = `SELECT 
+                ITEM_DATA AS ACCESSORYS_DATA
+              FROM ITEM_PRICE_LOG 
+                WHERE BASE_DATE = ? AND ITEM_DVCD = ?
+                 `;
+
+  const [rows] = await pool.query(selectSql, [yesterday, '03']);
+
+  const accessoryData = rows[0]?.ACCESSORYS_DATA;
+  const titleGroup = accessoryData.find(t => t.title === title);
+
+  if (!titleGroup) {
+    return res.status(404).json({ message: '해당 title 없음' });
+  }
+
+  const enhanceGroup = titleGroup.enhances.find(e => e.enhance == enhance);
+
+  if (!enhanceGroup) {
+    return res.status(404).json({ message: '해당 enhance 없음' });
+  }
+
+  // "title": "상",
+  // "enhances": [
+  //     {
+  //         "enhance": "1",
+  //         "items": [
+  //             {
+  //                 "name": "목걸이",
+  //                 "option": [
+  //                     "적에게 주는 피해%"
+  //                 ],
+  //                 "price": 52999
+
+
+  logger.info({
+    method: req.method,
+    url: req.url,  // 요청 URL
+    message: `\nSql ${selectSql} \nParam ${[yesterday, '03']}`
+  });
+
+  logger.info({
+    method: req.method,
+    url: req.url,
+    message: `악세서리 시세`,
+  });
+
+  let items = null;
+  if (grade == "고대") {
+    items = groupByNameArray(calculatePriceDiff(enhanceGroup.items, retAccessory[0].enhances[0].items));
+  } else {
+    items = groupByNameArray(retAccessory[0].enhances[0].items);
+  }
+
+  return res.json({
+    grade: grade,
+    title: title,
+    enhance: enhanceGroup.enhance,
+    // yesterdayItems: enhanceGroup.items,
+    items: items
+  });
+}
 // 재련 강화 확률표 조회
 exports.getEnhanceRates = async (req, res, next) => {
   return res.send(ENHANCEMENTDATA);
 };
+
+// 악세 전일자대비 구하기
+function makeStrictKey(item) {
+  return `${item.name}|${item.option.join(',')}`;
+}
+
+function calculatePriceDiff(yesterdayItems, todayItems) {
+  const yesterdayMap = new Map();
+
+  for (const item of yesterdayItems) {
+    const key = makeStrictKey(item);
+    if (!yesterdayMap.has(key)) {
+      yesterdayMap.set(key, item.price);
+    } else {
+      const prev = yesterdayMap.get(key);
+      yesterdayMap.set(key, Math.min(prev, item.price)); // 최저가 기준
+    }
+  }
+
+  return todayItems.map(item => {
+    const key = makeStrictKey(item);
+    const yesterdayPrice = yesterdayMap.get(key);
+
+    let priceDiff = 0;
+    let percentDiff = 0;
+
+    if (typeof yesterdayPrice === 'number' && yesterdayPrice > 0) {
+      priceDiff = item.price - yesterdayPrice;
+      percentDiff = (priceDiff / yesterdayPrice) * 100;
+      // 소수점 둘째 자리까지 반올림
+      percentDiff = Math.round(percentDiff * 100) / 100;
+    }
+
+    return {
+      ...item,
+      priceDiff,
+      percentDiff
+    };
+  });
+}
+
+// name별로 배열로 묶기
+function groupByNameArray(items) {
+  const map = new Map();
+
+  items.forEach(item => {
+    if (!map.has(item.name)) {
+      map.set(item.name, []);
+    }
+    map.get(item.name).push(item);
+  });
+
+  // 그룹핑 후, 각 그룹 내 아이템에서 name 삭제
+  return Array.from(map, ([name, items]) => ({
+    name,
+    items: items.map(({ name, ...rest }) => rest), // name 제거 후 나머지만 반환
+  }));
+}
