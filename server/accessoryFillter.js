@@ -38,7 +38,7 @@ const ACCESSORY = {
     "title": "상중",
     "necklace": [
       { "name": "목걸이", "option": ["적에게 주는 피해%", "추가 피해%"], "params": [7, 42, 41, 200, 160] },
-      { "name": "목걸이", "option": ["추가 피해%", "적에게 주는 피해%"], "params": [7, 41, 42, 200, 120] },
+      { "name": "목걸이", "option": ["추가 피해%", "적에게 주는 피해%"], "params": [7, 41, 42, 260, 120] },
       { "name": "목걸이", "option": ["낙인력%", "세레나데"], "params": [7, 44, 43, 800, 360] }
     ],
     "earring": [
@@ -47,9 +47,9 @@ const ACCESSORY = {
       { "name": "귀걸이", "option": ["무기 공격력%", "무기 공격력+"], "params": [7, 46, 54, 300, 480], "pointAdjust": -1 }
     ],
     "ring": [
-      { "name": "반지", "option": ["치명타 피해%", "치명타 적중률%"], "params": [7, 50, 49, 400, 155], "pointAdjust": -1 },
+      { "name": "반지", "option": ["치명타 피해%", "치명타 적중률%"], "params": [7, 50, 49, 400, 95], "pointAdjust": -1 },
       { "name": "반지", "option": ["치명타 적중률%", "치명타 피해%"], "params": [7, 49, 50, 155, 240], "pointAdjust": -1 },
-      { "name": "반지", "option": ["아군 피해 강화%", "아군 공격력 강화%"], "params": [7, 52, 51, 750, 500], "pointAdjust": -1 },
+      { "name": "반지", "option": ["아군 피해 강화%", "아군 공격력 강화%"], "params": [7, 52, 51, 750, 300], "pointAdjust": -1 },
       { "name": "반지", "option": ["아군 공격력 강화%", "아군 피해 강화%"], "params": [7, 51, 52, 500, 450], "pointAdjust": -1 }
     ],
     "useGetEtcOptionDouble": true
