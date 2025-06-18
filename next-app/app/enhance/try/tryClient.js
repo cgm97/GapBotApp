@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import AdSense from '@/components/Adsense';
 
 const EnhanceTry = () => {
   const [userId, setUserId] = useState('');
@@ -63,34 +64,34 @@ const EnhanceTry = () => {
         </div>
       </div>
 
-<div className="mb-4 pr-6">
-  <label className="block text-sm font-medium mb-1">
-    User Code
-  </label>
-  <input
-    type="text"
-    value={userId || ""}
-    onChange={(e) => setUserId(e.target.value)}
-    className="w-full border rounded px-3 py-2 text-sm"
-    placeholder="빈틈봇이 발급한 유저 코드 (예: test)"
-  />
-</div>
+      <div className="mb-4 pr-6">
+        <label className="block text-sm font-medium mb-1">
+          User Code
+        </label>
+        <input
+          type="text"
+          value={userId || ""}
+          onChange={(e) => setUserId(e.target.value)}
+          className="w-full border rounded px-3 py-2 text-sm"
+          placeholder="빈틈봇이 발급한 유저 코드 (예: test)"
+        />
+      </div>
 
-<div className="mb-4 pr-6">
-  <label className="block text-sm font-medium mb-1">
-    Room Code
-  </label>
-  <input
-    type="text"
-    value={roomId || ""}
-    onChange={(e) => setRoomId(e.target.value)}
-    className="w-full border rounded px-3 py-2 text-sm"
-    placeholder="빈틈봇이 발급한 채팅방 코드 (예: test)"
-  />
-</div>
-<p className="text-xs text-gray-500 mt-1">
-  테스트용으로 <b>test / test</b> 코드를 사용할 수 있습니다.
-</p>
+      <div className="mb-4 pr-6">
+        <label className="block text-sm font-medium mb-1">
+          Room Code
+        </label>
+        <input
+          type="text"
+          value={roomId || ""}
+          onChange={(e) => setRoomId(e.target.value)}
+          className="w-full border rounded px-3 py-2 text-sm"
+          placeholder="빈틈봇이 발급한 채팅방 코드 (예: test)"
+        />
+      </div>
+      <p className="text-xs text-gray-500 mt-1">
+        테스트용으로 <b>test / test</b> 코드를 사용할 수 있습니다.
+      </p>
 
       <button
         onClick={handleEnhance}
@@ -121,6 +122,9 @@ const EnhanceTry = () => {
         <p className="mt-3 text-xs text-gray-500">
           * 위 확률은 빈틈봇 전용이며 실제 게임 내 확률과 다를 수 있습니다.
         </p>
+      </div>
+      <div >
+        <AdSense adSlot="1488834693" />
       </div>
     </div>
 

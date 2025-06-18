@@ -63,8 +63,8 @@ const MainPages = () => {
       <Island />
 
       <div className="ad-content">
-        <KakaoAdFit unit="DAN-lOG6HPbp08gmb26g" width={728} height={90} disabled={true} />
-        {/* <AdSense adSlot="1488834693" />  수평형 광고 */}
+        {/* <KakaoAdFit unit="DAN-lOG6HPbp08gmb26g" width={728} height={90} disabled={true} /> */}
+        <AdSense adSlot="1488834693" />
       </div>
 
       <div className="notice">

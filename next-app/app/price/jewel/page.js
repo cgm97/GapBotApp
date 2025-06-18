@@ -1,5 +1,6 @@
 
 import JewelPage from './jewelClient';
+import AdSense from '@/components/Adsense';
 
 async function getJewelsPriceData() {
   const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/price/jewel`, {
@@ -20,11 +21,11 @@ export const metadata = {
     url: 'https://loagap.com/price/jewel',
     type: 'website',
     images: [
-        {
-          url: 'https://loagap.com/img/logo.png',
-          alt: `빈틈 이미지`
-        }
-      ]
+      {
+        url: 'https://loagap.com/img/logo.png',
+        alt: `빈틈 이미지`
+      }
+    ]
   },
 };
 
@@ -34,6 +35,9 @@ export default async function Page() {
   return (
     <div className="container-patch">
       <h2>보석시세 / 보석차트</h2>
+      <div>
+        <AdSense adSlot="1488834693" />
+      </div>
       <JewelPage jewelsPrice={jewelsPrice} jewelPriceLastUpdate={jewelPriceLastUpdate} />
     </div>
   );

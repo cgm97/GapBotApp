@@ -1,4 +1,5 @@
 import BookPage from './bookClient';
+import AdSense from '@/components/Adsense';
 
 async function getBooksPriceData() {
   const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/price/book`, {
@@ -33,6 +34,9 @@ export default async function Page() {
   return (
     <div className="container-patch">
       <h2>유각시세 / 유각차트</h2>
+      <div>
+        <AdSense adSlot="1488834693" />
+      </div>
       <BookPage booksPrice={booksPrice} bookLastUpdate={bookPriceLastUpdate} />
     </div>
   );
