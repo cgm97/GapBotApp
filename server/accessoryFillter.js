@@ -29,7 +29,7 @@ const ACCESSORY = {
       { "name": "귀걸이", "option": ["무기 공격력%", "무기 공격력+"], "params": [7, 46, 54, 300, 960], "pointAdjust": -1 }
     ],
     "ring": [
-      { "name": "반지", "option": ["치명타 피해% ", "무기 치명타 적중률%"], "params": [7, 50, 49, 400, 155], "pointAdjust": -1 },
+      { "name": "반지", "option": ["치명타 피해% ", "치명타 적중률%"], "params": [7, 50, 49, 400, 155], "pointAdjust": -1 },
       { "name": "반지", "option": ["아군 피해 강화% ", "아군 공격력 강화%"], "params": [7, 52, 51, 750, 500], "pointAdjust": -1 }
     ],
     "useGetEtcOptionDouble": true
