@@ -291,7 +291,7 @@ const getAccessoriesPrice = async () => {
                             enhanceGroup.items.push({
                                 name: name,
                                 option: option,
-                                price: item ? item.AuctionInfo.BuyPrice : '검색결과 없음'
+                                price: item?.AuctionInfo?.BuyPrice ?? 0
                             });
                             cnt++;
                                    
