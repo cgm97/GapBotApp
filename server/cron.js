@@ -629,7 +629,7 @@ cron.schedule('0 0 * * *', async () => { // async로 변경
 });
 
 // 매일 30분마다 _ 악세서리 조회 (재갱신)
-cron.schedule('*/10 * * * *', async () => { // async로 변경
+cron.schedule('*/30 * * * *', async () => { // async로 변경
     var method = '매 30분 악세서리 데이터';
     logger.info({
         method: method,
@@ -655,7 +655,7 @@ cron.schedule('*/10 * * * *', async () => { // async로 변경
     logger.info({
         method: method,
         url: url,  // 요청 URL
-        message: `데이터 불러오기 성공 ${Object.keys(reload).length} 건`,
+        message: `악세서리 데이터 불러오기 성공 ${Object.keys(reload).length} 건`,
     });
 
 });
