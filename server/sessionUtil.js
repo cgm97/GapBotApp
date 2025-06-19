@@ -294,7 +294,12 @@ const getAccessoriesPrice = async () => {
                             });
                             cnt++;
 
-                            await new Promise(resolve => setTimeout(resolve, 600));
+                            logger.info({
+                                method,
+                                url: "SessionUtil",
+                                message: `${cnt}번째 조회중.. ${authorization}`,
+                            });
+                            await new Promise(resolve => setTimeout(resolve, 1000));
                                    
             // "title": "상",
             // "enhances": [
