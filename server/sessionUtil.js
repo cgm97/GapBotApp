@@ -187,12 +187,11 @@ const getAccessoriesPrice = async () => {
     const functionDouble = fillter.getEtcOptionsDouble;
 
     // if (now - accessoryPriceLastUpdate < 60 * 60 * 1000) { // 1시간
-    //     logger.info({
-    //         method,
-    //         url: "SessionUtil",
-    //         message: `${method}: 1시간 이내 요청 → 캐시 사용`,
-    //     });
-    //     return sessionCache.get("accessoryPrice");
+    logger.info({
+        method,
+        url: "SessionUtil",
+        message: `${method}`,
+    });
     // }
 
     const accessoryKeys = Object.keys(accessory); // 상 상상 상중 ... 중하
@@ -254,7 +253,7 @@ const getAccessoriesPrice = async () => {
 
                             // LOA API 세팅 분당 100회 제한
                             let authorization = LOA_API1;
-                            if (cnt > 80) {
+                            if (cnt > 95) {
                                 authorization = LOA_API2;
                             }
                             
@@ -294,6 +293,8 @@ const getAccessoriesPrice = async () => {
                                 price: item?.AuctionInfo?.BuyPrice ?? 0
                             });
                             cnt++;
+
+                            await sleep(600);
                                    
             // "title": "상",
             // "enhances": [
