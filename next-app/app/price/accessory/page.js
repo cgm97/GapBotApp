@@ -2,12 +2,24 @@
 import AccessoryPage from './accessoryClient';
 import AdSense from '@/components/Adsense';
 
-  async function getAccessoryPriceData() {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/price/accessory`);
-    if (!res.ok) throw new Error("Failed to fetch");
+async function getAccessoryPriceData() {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/price/accessory`, {
+      next: { revalidate: 1800 },
+    });
+
+    if (!res.ok) throw new Error('Response not OK');
+
     const data = await res.json();
     return data;
+  } catch (err) {
+    console.error('악세서리 시세 불러오기 실패:', err);
+    return {
+      accessorysPrice: [],
+      accessoryPriceLastUpdate: null,
+    };
   }
+}
 
 export const metadata = {
   title: '악세시세 · 악세차트 | LOAGAP',
