@@ -1,11 +1,12 @@
 
 import AccessoryPage from './accessoryClient';
 import AdSense from '@/components/Adsense';
+import sampleData from './data.json';
 
 async function getAccessoryPriceData() {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/price/accessory`, {
-      next: { revalidate: 1800 },
+      next: { revalidate: 60 },
     });
 
     if (!res.ok) throw new Error('Response not OK');
@@ -14,10 +15,7 @@ async function getAccessoryPriceData() {
     return data;
   } catch (err) {
     console.error('악세서리 시세 불러오기 실패:', err);
-    return {
-      accessorysPrice: [],
-      accessoryPriceLastUpdate: null,
-    };
+    return sampleData;
   }
 }
 
