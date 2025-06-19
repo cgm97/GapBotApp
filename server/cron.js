@@ -630,7 +630,7 @@ cron.schedule('0 0 * * *', async () => { // async로 변경
 
 // 매일 30분마다 _ 악세서리 조회 (재갱신)
 cron.schedule('*/30 * * * *', async () => { // async로 변경
-    var method = '매일 0시 악세서리 데이터';
+    var method = '매 30분 악세서리 데이터';
     logger.info({
         method: method,
         url: url,  // 요청 URL
