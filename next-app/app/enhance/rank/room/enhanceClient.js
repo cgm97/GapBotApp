@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import Link from 'next/link';
+import AdSense from '@/components/Adsense';
 
 const Rank = ({ roomId }) => {
   const [rankingList, setRankingList] = useState([]);
@@ -95,6 +96,7 @@ const Rank = ({ roomId }) => {
           <span className="text-blue-600 font-medium">[톡방]</span>
         )} 재련 랭킹
       </h2>
+        <AdSense adSlot="1488834693" />
       <p className="text-gray-600 mb-2">최종 재련 달성 순으로 정렬된 전체 유저 랭킹입니다.</p>
       {!roomCode && (
         <div>
@@ -122,6 +124,7 @@ const Rank = ({ roomId }) => {
               <th className="p-2 border w-[80px]">재련</th>
               <th className="p-2 border w-[250px]">닉네임</th>
               <th className="p-2 border w-[250px]">대표 캐릭터</th>
+              <th className="p-2 border w-[150px]">직업</th>
               <th className="p-2 border w-[250px]">최종 달성 일시</th>
             </tr>
           </thead>
@@ -165,6 +168,15 @@ const Rank = ({ roomId }) => {
                     </Link>
                   ) : (
                     user.NICKNAME
+                  )}
+                </td>
+                <td className="text-center">
+                  {user.NICKNAME && user.NICKNAME !== 'UNKNOWN' ? (
+                    <>
+                      {user.JOB} {user.SUBJOB}<br />{user.ITEM_LEVEL.toFixed(2)}
+                    </>
+                  ) : (
+                    ''
                   )}
                 </td>
                 <td className="text-center border p-2">{user.ACHIEVE_DTTI}</td>
