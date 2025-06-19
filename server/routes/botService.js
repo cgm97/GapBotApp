@@ -3,7 +3,7 @@ const pool = require('../db/connection');
 const logger = require('../logger');  // logger.js 임포트
 const spec = require('../calculator/specPoint');
 const accessoryFillter = require('../accessoryFillter');
-const { sessionCache, getDateTime, getDate } = require('../sessionUtil'); // 세션 모듈 가져오기
+const { sessionCache, getDateTime, getDate, calculatePriceDiff } = require('../sessionUtil'); // 세션 모듈 가져오기
 
 // 재련강화확률표
 const ENHANCEMENTDATA = [
@@ -580,20 +580,26 @@ exports.getEnhanceRank = async (req, res, next) => {
 
     /** 1) 전체 랭킹 조회 */
     let rankingSql = `
-      WITH Ranked AS (
+        WITH Ranked AS (
         SELECT 
-          USER_ID,
-          STEP,
-          USER_NAME,
-          ROOM_NAME,
-          USERNAME AS NICKNAME,
-          RANK() OVER (ORDER BY STEP DESC, ACHIEVE_DTTI) AS RANKING,
-          CAST(DATE_FORMAT(ACHIEVE_DTTI, '%Y-%m-%d %H:%i:%s') AS CHAR) AS ACHIEVE_DTTI,
-          SUCCESS_CNT,
-          FAIL_CNT
-        FROM BOT_ENHANCE_STATUS
-        WHERE DL_YN = 'N'
-        ${roomId ? ' AND ROOM_ID = ?' : ''}
+          A.USER_ID,
+          A.STEP,
+          A.USER_NAME,
+          A.ROOM_NAME,
+          A.USERNAME AS NICKNAME,
+          B.ITEM_LEVEL,
+          B.JOB,
+          B.SUBJOB,
+          RANK() OVER (ORDER BY A.STEP DESC, A.ACHIEVE_DTTI) AS RANKING,
+          CAST(DATE_FORMAT(A.ACHIEVE_DTTI, '%Y-%m-%d %H:%i:%s') AS CHAR) AS ACHIEVE_DTTI,
+          A.SUCCESS_CNT,
+          A.FAIL_CNT
+        FROM BOT_ENHANCE_STATUS A
+        LEFT JOIN CHARACTER_INFO B
+          ON A.USERNAME = B.NICKNAME
+        WHERE A.DL_YN = 'N' 
+          AND (B.DL_YN = 'N' OR B.DL_YN IS NULL)
+          ${roomId ? ' AND A.ROOM_ID = ?' : ''}
       )
       SELECT *
       FROM Ranked
@@ -898,46 +904,6 @@ exports.getAccessory = async (req, res, next) => {
 exports.getEnhanceRates = async (req, res, next) => {
   return res.send(ENHANCEMENTDATA);
 };
-
-// 악세 전일자대비 구하기
-function makeStrictKey(item) {
-  return `${item.name}|${item.option.join(',')}`;
-}
-
-function calculatePriceDiff(yesterdayItems, todayItems) {
-  const yesterdayMap = new Map();
-
-  for (const item of yesterdayItems) {
-    const key = makeStrictKey(item);
-    if (!yesterdayMap.has(key)) {
-      yesterdayMap.set(key, item.price);
-    } else {
-      const prev = yesterdayMap.get(key);
-      yesterdayMap.set(key, Math.min(prev, item.price)); // 최저가 기준
-    }
-  }
-
-  return todayItems.map(item => {
-    const key = makeStrictKey(item);
-    const yesterdayPrice = yesterdayMap.get(key);
-
-    let priceDiff = 0;
-    let percentDiff = 0;
-
-    if (typeof yesterdayPrice === 'number' && yesterdayPrice > 0) {
-      priceDiff = item.price - yesterdayPrice;
-      percentDiff = (priceDiff / yesterdayPrice) * 100;
-      // 소수점 둘째 자리까지 반올림
-      percentDiff = Math.round(percentDiff * 100) / 100;
-    }
-
-    return {
-      ...item,
-      priceDiff,
-      percentDiff
-    };
-  });
-}
 
 // name별로 배열로 묶기
 function groupByNameArray(items) {

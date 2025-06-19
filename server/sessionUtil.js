@@ -186,11 +186,11 @@ const getAccessoriesPrice = async () => {
     const functionSingle = fillter.getEtcOptionsSingle;
     const functionDouble = fillter.getEtcOptionsDouble;
 
-    if (now - lastJewelPriceUpdate < 60 * 1000) {
+    if (now - accessoryPriceLastUpdate < 60 * 60 * 1000) { // 1시간
         logger.info({
             method,
             url: "SessionUtil",
-            message: `${method}: 1분 이내 요청 → 캐시 사용`,
+            message: `${method}: 1시간 이내 요청 → 캐시 사용`,
         });
         return sessionCache.get("accessoryPrice");
     }
@@ -357,6 +357,47 @@ const getDate = (offsetDays = 0) => {
     return `${yyyy}-${MM}-${dd}`;
 };
 
+// 악세 가격 차이 계산
+const calculatePriceDiff = (yesterdayItems, todayItems) => {
+  const yesterdayMap = new Map();
+
+  for (const item of yesterdayItems) {
+    const key = makeStrictKey(item);
+    if (!yesterdayMap.has(key)) {
+      yesterdayMap.set(key, item.price);
+    } else {
+      const prev = yesterdayMap.get(key);
+      yesterdayMap.set(key, Math.min(prev, item.price)); // 최저가 기준
+    }
+  }
+
+  return todayItems.map(item => {
+    const key = makeStrictKey(item);
+    const yesterdayPrice = yesterdayMap.get(key);
+
+    let priceDiff = 0;
+    let percentDiff = 0;
+
+    if (typeof yesterdayPrice === 'number' && yesterdayPrice > 0) {
+      priceDiff = item.price - yesterdayPrice;
+      percentDiff = (priceDiff / yesterdayPrice) * 100;
+      // 소수점 둘째 자리까지 반올림
+      percentDiff = Math.round(percentDiff * 100) / 100;
+    }
+
+    return {
+      ...item,
+      priceDiff,
+      percentDiff
+    };
+  });
+}
+
+// 악세 전일자대비 구하기
+const makeStrictKey = (item) => {
+  return `${item.name}|${item.option.join(',')}`;
+}
+
 module.exports = {
     sessionCache,
     initializeCache,
@@ -364,5 +405,6 @@ module.exports = {
     getJewelPrice,
     getAccessoriesPrice,
     getDateTime,
-    getDate
+    getDate,
+    calculatePriceDiff
 };

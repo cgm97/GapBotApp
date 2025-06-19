@@ -328,7 +328,7 @@ router.get('/booksLog', botService.getBooksLog);
 
 /**
  * @swagger
- * bot/enhance/try:
+ * /bot/enhance/try:
  *   post:
  *     summary: 재련 시뮬레이션 실행
  *     tags: [BOT API]
@@ -378,7 +378,7 @@ router.post('/enhance/try', botService.executeEnhance);
 
 /**
  * @swagger
- * bot/enhance/rank:
+ * /bot/enhance/rank:
  *   post:
  *     summary: 재련 랭킹 조회
  *     tags: [BOT API]

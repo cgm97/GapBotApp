@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import Link from 'next/link';
+import AdSense from '@/components/Adsense';
 
 const Rank = () => {
   const [rankingList, setRankingList] = useState([]);
@@ -82,8 +83,11 @@ const Rank = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <h2 className="text-2xl font-bold mb-2">🏆 빈틈봇 <span className="text-blue-600 font-medium">[전체]</span> 재련 랭킹</h2>
-      <p className="text-gray-600 mb-2">최종 재련 달성 순으로 정렬된 전체 유저 랭킹입니다.</p>
-
+      <AdSense adSlot="1488834693" />
+      <p className="text-gray-600 mb-2">최종 재련 달성 순으로 정렬된 전체 유저 랭킹입니다.
+        <span className="text-gray-600 mb-2"> ※빈틈봇연동시 대표캐릭터가 표시됩니다.</span>
+      </p>
+      
       {myRank && (
         <div className="overflow-x-auto pr-4">
           <div className="mb-2 p-2 bg-blue-50 border rounded-xl shadow-sm">
@@ -104,6 +108,7 @@ const Rank = () => {
               <th className="p-2 border w-[80px]">재련</th>
               <th className="p-2 border w-[250px]">닉네임</th>
               <th className="p-2 border w-[250px]">대표 캐릭터</th>
+              <th className="p-2 border w-[150px]">직업</th>
               <th className="p-2 border w-[250px]">최종 달성 일시</th>
             </tr>
           </thead>
@@ -146,7 +151,16 @@ const Rank = () => {
                       {user.NICKNAME}
                     </Link>
                   ) : (
-                    user.NICKNAME
+                    '미연동'
+                  )}
+                </td>
+                <td className="text-center">
+                  {user.NICKNAME && user.NICKNAME !== 'UNKNOWN' ? (
+                    <>
+                      {user.JOB} {user.SUBJOB}<br />{user.ITEM_LEVEL.toFixed(2)}
+                    </>
+                  ) : (
+                    ''
                   )}
                 </td>
                 <td className="text-center border p-2">{user.ACHIEVE_DTTI}</td>
