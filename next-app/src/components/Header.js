@@ -45,6 +45,7 @@ const Header = () => {
             </li>
             <li><Link href="/price/book">유각시세</Link></li>
             <li><Link href="/price/jewel">보석시세</Link></li>
+            <li><Link href="/price/accessory">악세시세</Link></li>
             <li><Link href="/cube">큐브</Link></li>
           </ul>
         </nav>

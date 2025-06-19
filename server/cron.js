@@ -2,7 +2,7 @@ const cron = require('node-cron');
 const axios = require('axios');
 const logger = require('./logger');  // logger.js 임포트
 const pool = require('./db/connection');
-const {getBookPrice, getJewelPrice, getAccessoriesPrice} = require('./sessionUtil');
+const { getBookPrice, getJewelPrice, getAccessoriesPrice } = require('./sessionUtil');
 require('dotenv').config(); // .env 파일에서 환경 변수 로드
 
 const url = 'CRON';
@@ -426,9 +426,9 @@ cron.schedule('0 0 * * *', async () => { // async로 변경
 
     // 여기에 실제로 실행할 작업 코드 작성
     const connection = await pool.getConnection();
-    
+
     try {
-        
+
         // 트랜잭션 시작
         await connection.beginTransaction();
 
@@ -501,7 +501,7 @@ cron.schedule('30 0 * * *', async () => { // async로 변경
     // 여기에 실제로 실행할 작업 코드 작성
     const connection = await pool.getConnection();
     try {
-        
+
         // 트랜잭션 시작
         await connection.beginTransaction();
 
@@ -565,9 +565,9 @@ cron.schedule('0 0 * * *', async () => { // async로 변경
 
     // 여기에 실제로 실행할 작업 코드 작성
     const connection = await pool.getConnection();
-    
+
     try {
-        
+
         // 트랜잭션 시작
         await connection.beginTransaction();
 
@@ -626,5 +626,37 @@ cron.schedule('0 0 * * *', async () => { // async로 변경
         // 연결 반환
         connection.release();
     }
+});
+
+// 매일 30분마다 _ 악세서리 조회 (재갱신)
+cron.schedule('*/30 * * * *', async () => { // async로 변경
+    var method = '매일 0시 악세서리 데이터';
+    logger.info({
+        method: method,
+        url: url,  // 요청 URL
+        message: '악세서리 조회 시작 START'
+    });
+
+    const now = new Date();
+    const hours = now.getHours();
+
+    if (hours === 0) {
+        // 00시일 때는 실행하지 않음
+        logger.info({
+        method: method,
+        url: url,  // 요청 URL
+        message: '악세서리 조회 시작 END 0시 Pass'
+    });
+        return;
+    }
+
+    const reload = await getAccessoriesPrice();
+
+    logger.info({
+        method: method,
+        url: url,  // 요청 URL
+        message: `데이터 불러오기 성공 ${Object.keys(reload).length} 건`,
+    });
+
 });
 module.exports = cron; // cron을 export하여 다른 파일에서 사용할 수 있게 함
