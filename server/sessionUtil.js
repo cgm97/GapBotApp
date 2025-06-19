@@ -294,7 +294,7 @@ const getAccessoriesPrice = async () => {
                             });
                             cnt++;
 
-                            await sleep(600);
+                            await new Promise(resolve => setTimeout(resolve, 600));
                                    
             // "title": "상",
             // "enhances": [
