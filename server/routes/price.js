@@ -210,4 +210,79 @@ router.get('/jewel', priceService.getJewelPrice);
  *                   example: Internal Server Error
  */
 router.get('/jewel/chart', priceService.getJewelChartPrice);
+
+/**
+ * @swagger
+ * /price/accessory:
+ *   get:
+ *     summary: 악세서리 가격 조회
+ *     tags: [PRICE API]
+ *     description: 전일 대비 악세서리 가격과 변화율을 조회합니다.
+ *     responses:
+ *       200:
+ *         description: 악세서리 가격 데이터
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 accessorysPrice:
+ *                   type: array
+ *                   description: 악세서리 등급별 현재 가격과 전일 대비 차이
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       title:
+ *                         type: string
+ *                         description: 악세서리 등급 (ex. 상, 중상, 중중 등)
+ *                         example: "상"
+ *                       enhances:
+ *                         type: array
+ *                         description: 연마 단계별 데이터
+ *                         items:
+ *                           type: object
+ *                           properties:
+ *                             enhance:
+ *                               type: string
+ *                               description: 연마 단계
+ *                               example: "1"
+ *                             items:
+ *                               type: array
+ *                               description: 악세서리 옵션별 가격 정보
+ *                               items:
+ *                                 type: object
+ *                                 properties:
+ *                                   name:
+ *                                     type: string
+ *                                     description: 악세서리 종류 (목걸이, 귀걸이, 반지)
+ *                                     example: "목걸이"
+ *                                   option:
+ *                                     type: array
+ *                                     description: 옵션 배열
+ *                                     items:
+ *                                       type: string
+ *                                     example: ["적에게 주는 피해%"]
+ *                                   price:
+ *                                     type: integer
+ *                                     description: 현재 가격
+ *                                     example: 49000
+ *                                   priceDiff:
+ *                                     type: number
+ *                                     description: 전일 대비 가격 변화량
+ *                                     example: -10000
+ *                                   percentDiff:
+ *                                     type: number
+ *                                     description: 전일 대비 변화율(%), 소수점 둘째 자리
+ *                                     example: -16.95
+ *                 accessoryPriceLastUpdate:
+ *                   type: string
+ *                   description: 마지막 가격 업데이트 시각
+ *                   example: "2025-06-18 15:00"
+ *       500:
+ *         description: 서버 오류
+ */
+router.get('/accessory', priceService.getAccessoryPrice);
 module.exports = router;

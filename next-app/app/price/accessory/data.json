@@ -1,0 +1,1447 @@
+{
+  "success": true,
+  "accessorysPrice": [
+    {
+      "title": "상",
+      "enhances": [
+        {
+          "enhance": "1",
+          "items": [
+            {
+              "name": "목걸이",
+              "option": [
+                "적에게 주는 피해%"
+              ],
+              "price": 48999,
+              "priceDiff": -10001,
+              "percentDiff": -16.95
+            },
+            {
+              "name": "목걸이",
+              "option": [
+                "추가 피해%"
+              ],
+              "price": 42000,
+              "priceDiff": -1000,
+              "percentDiff": -2.33
+            },
+            {
+              "name": "목걸이",
+              "option": [
+                "낙인력%"
+              ],
+              "price": 40000,
+              "priceDiff": 15000,
+              "percentDiff": 60
+            },
+            {
+              "name": "귀걸이",
+              "option": [
+                "공격력%"
+              ],
+              "price": 50000,
+              "priceDiff": -8000,
+              "percentDiff": -13.79
+            },
+            {
+              "name": "귀걸이",
+              "option": [
+                "무기 공격력%"
+              ],
+              "price": 37000,
+              "priceDiff": -13000,
+              "percentDiff": -26
+            },
+            {
+              "name": "반지",
+              "option": [
+                "치명타 피해%"
+              ],
+              "price": 38000,
+              "priceDiff": -35000,
+              "percentDiff": -47.95
+            },
+            {
+              "name": "반지",
+              "option": [
+                "치명타 적중률%"
+              ],
+              "price": 20000,
+              "priceDiff": -10000,
+              "percentDiff": -33.33
+            },
+            {
+              "name": "반지",
+              "option": [
+                "아군 피해 강화%"
+              ],
+              "price": 26999,
+              "priceDiff": -16001,
+              "percentDiff": -37.21
+            },
+            {
+              "name": "반지",
+              "option": [
+                "아군 공격력 강화%"
+              ],
+              "price": 11111,
+              "priceDiff": -14889,
+              "percentDiff": -57.27
+            }
+          ]
+        },
+        {
+          "enhance": "2",
+          "items": [
+            {
+              "name": "목걸이",
+              "option": [
+                "적에게 주는 피해%"
+              ],
+              "price": 30000,
+              "priceDiff": 10000,
+              "percentDiff": 50
+            },
+            {
+              "name": "목걸이",
+              "option": [
+                "추가 피해%"
+              ],
+              "price": 19000,
+              "priceDiff": 0,
+              "percentDiff": 0
+            },
+            {
+              "name": "목걸이",
+              "option": [
+                "낙인력%"
+              ],
+              "price": 17000,
+              "priceDiff": 6000,
+              "percentDiff": 54.55
+            },
+            {
+              "name": "귀걸이",
+              "option": [
+                "공격력%"
+              ],
+              "price": 30000,
+              "priceDiff": -13000,
+              "percentDiff": -30.23
+            },
+            {
+              "name": "귀걸이",
+              "option": [
+                "무기 공격력%"
+              ],
+              "price": 39000,
+              "priceDiff": -500,
+              "percentDiff": -1.27
+            },
+            {
+              "name": "반지",
+              "option": [
+                "치명타 피해%"
+              ],
+              "price": 28000,
+              "priceDiff": -5000,
+              "percentDiff": -15.15
+            },
+            {
+              "name": "반지",
+              "option": [
+                "치명타 적중률%"
+              ],
+              "price": 9999,
+              "priceDiff": -3334,
+              "percentDiff": -25.01
+            },
+            {
+              "name": "반지",
+              "option": [
+                "아군 피해 강화%"
+              ],
+              "price": 10000,
+              "priceDiff": -5000,
+              "percentDiff": -33.33
+            },
+            {
+              "name": "반지",
+              "option": [
+                "아군 공격력 강화%"
+              ],
+              "price": 2300,
+              "priceDiff": -700,
+              "percentDiff": -23.33
+            }
+          ]
+        },
+        {
+          "enhance": "3",
+          "items": [
+            {
+              "name": "목걸이",
+              "option": [
+                "적에게 주는 피해%"
+              ],
+              "price": 8888,
+              "priceDiff": 2222,
+              "percentDiff": 33.33
+            },
+            {
+              "name": "목걸이",
+              "option": [
+                "추가 피해%"
+              ],
+              "price": 3000,
+              "priceDiff": 700,
+              "percentDiff": 30.43
+            },
+            {
+              "name": "목걸이",
+              "option": [
+                "낙인력%"
+              ],
+              "price": 6900,
+              "priceDiff": -2100,
+              "percentDiff": -23.33
+            },
+            {
+              "name": "귀걸이",
+              "option": [
+                "공격력%"
+              ],
+              "price": 20000,
+              "priceDiff": -5555,
+              "percentDiff": -21.74
+            },
+            {
+              "name": "귀걸이",
+              "option": [
+                "무기 공격력%"
+              ],
+              "price": 25000,
+              "priceDiff": -3000,
+              "percentDiff": -10.71
+            },
+            {
+              "name": "반지",
+              "option": [
+                "치명타 피해%"
+              ],
+              "price": 20000,
+              "priceDiff": -1000,
+              "percentDiff": -4.76
+            },
+            {
+              "name": "반지",
+              "option": [
+                "치명타 적중률%"
+              ],
+              "price": 1300,
+              "priceDiff": 300,
+              "percentDiff": 30
+            },
+            {
+              "name": "반지",
+              "option": [
+                "아군 피해 강화%"
+              ],
+              "price": 2000,
+              "priceDiff": -900,
+              "percentDiff": -31.03
+            },
+            {
+              "name": "반지",
+              "option": [
+                "아군 공격력 강화%"
+              ],
+              "price": 700,
+              "priceDiff": 0,
+              "percentDiff": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "중",
+      "enhances": [
+        {
+          "enhance": "1",
+          "items": [
+            {
+              "name": "목걸이",
+              "option": [
+                "추가 피해%"
+              ],
+              "price": 270,
+              "priceDiff": 48,
+              "percentDiff": 21.62
+            },
+            {
+              "name": "목걸이",
+              "option": [
+                "적에게 주는 피해%"
+              ],
+              "price": 300,
+              "priceDiff": 0,
+              "percentDiff": 0
+            },
+            {
+              "name": "목걸이",
+              "option": [
+                "낙인력%"
+              ],
+              "price": 100,
+              "priceDiff": 0,
+              "percentDiff": 0
+            },
+            {
+              "name": "귀걸이",
+              "option": [
+                "공격력%"
+              ],
+              "price": 300,
+              "priceDiff": -100,
+              "percentDiff": -25
+            },
+            {
+              "name": "귀걸이",
+              "option": [
+                "무기 공격력%"
+              ],
+              "price": 500,
+              "priceDiff": 403,
+              "percentDiff": 415.46
+            },
+            {
+              "name": "반지",
+              "option": [
+                "치명타 피해%"
+              ],
+              "price": 199,
+              "priceDiff": -301,
+              "percentDiff": -60.2
+            },
+            {
+              "name": "반지",
+              "option": [
+                "치명타 적중률%"
+              ],
+              "price": 333,
+              "priceDiff": -417,
+              "percentDiff": -55.6
+            },
+            {
+              "name": "반지",
+              "option": [
+                "아군 피해 강화%"
+              ],
+              "price": 80,
+              "priceDiff": 30,
+              "percentDiff": 60
+            },
+            {
+              "name": "반지",
+              "option": [
+                "아군 공격력 강화%"
+              ],
+              "price": 99,
+              "priceDiff": -1,
+              "percentDiff": -1
+            }
+          ]
+        },
+        {
+          "enhance": "2",
+          "items": [
+            {
+              "name": "목걸이",
+              "option": [
+                "추가 피해%"
+              ],
+              "price": 222,
+              "priceDiff": 22,
+              "percentDiff": 11
+            },
+            {
+              "name": "목걸이",
+              "option": [
+                "적에게 주는 피해%"
+              ],
+              "price": 200,
+              "priceDiff": -100,
+              "percentDiff": -33.33
+            },
+            {
+              "name": "목걸이",
+              "option": [
+                "낙인력%"
+              ],
+              "price": 111,
+              "priceDiff": 0,
+              "percentDiff": 0
+            },
+            {
+              "name": "귀걸이",
+              "option": [
+                "공격력%"
+              ],
+              "price": 200,
+              "priceDiff": -22,
+              "percentDiff": -9.91
+            },
+            {
+              "name": "귀걸이",
+              "option": [
+                "무기 공격력%"
+              ],
+              "price": 500,
+              "priceDiff": 400,
+              "percentDiff": 400
+            },
+            {
+              "name": "반지",
+              "option": [
+                "치명타 피해%"
+              ],
+              "price": 150,
+              "priceDiff": -350,
+              "percentDiff": -70
+            },
+            {
+              "name": "반지",
+              "option": [
+                "치명타 적중률%"
+              ],
+              "price": 100,
+              "priceDiff": -120,
+              "percentDiff": -54.55
+            },
+            {
+              "name": "반지",
+              "option": [
+                "아군 피해 강화%"
+              ],
+              "price": 50,
+              "priceDiff": -50,
+              "percentDiff": -50
+            },
+            {
+              "name": "반지",
+              "option": [
+                "아군 공격력 강화%"
+              ],
+              "price": 100,
+              "priceDiff": -150,
+              "percentDiff": -60
+            }
+          ]
+        },
+        {
+          "enhance": "3",
+          "items": [
+            {
+              "name": "목걸이",
+              "option": [
+                "추가 피해%"
+              ],
+              "price": 777,
+              "priceDiff": 177,
+              "percentDiff": 29.5
+            },
+            {
+              "name": "목걸이",
+              "option": [
+                "적에게 주는 피해%"
+              ],
+              "price": 777,
+              "priceDiff": 177,
+              "percentDiff": 29.5
+            },
+            {
+              "name": "목걸이",
+              "option": [
+                "낙인력%"
+              ],
+              "price": 800,
+              "priceDiff": 200,
+              "percentDiff": 33.33
+            },
+            {
+              "name": "귀걸이",
+              "option": [
+                "공격력%"
+              ],
+              "price": 600,
+              "priceDiff": -88,
+              "percentDiff": -12.79
+            },
+            {
+              "name": "귀걸이",
+              "option": [
+                "무기 공격력%"
+              ],
+              "price": 700,
+              "priceDiff": 100,
+              "percentDiff": 16.67
+            },
+            {
+              "name": "반지",
+              "option": [
+                "치명타 피해%"
+              ],
+              "price": 650,
+              "priceDiff": 50,
+              "percentDiff": 8.33
+            },
+            {
+              "name": "반지",
+              "option": [
+                "치명타 적중률%"
+              ],
+              "price": 666,
+              "priceDiff": 67,
+              "percentDiff": 11.19
+            },
+            {
+              "name": "반지",
+              "option": [
+                "아군 피해 강화%"
+              ],
+              "price": 700,
+              "priceDiff": 50,
+              "percentDiff": 7.69
+            },
+            {
+              "name": "반지",
+              "option": [
+                "아군 공격력 강화%"
+              ],
+              "price": 699,
+              "priceDiff": 99,
+              "percentDiff": 16.5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "상상",
+      "enhances": [
+        {
+          "enhance": "2",
+          "items": [
+            {
+              "name": "목걸이",
+              "option": [
+                "적에게 주는 피해%",
+                "추가 피해"
+              ],
+              "price": 2300000,
+              "priceDiff": -500000,
+              "percentDiff": -17.86
+            },
+            {
+              "name": "목걸이",
+              "option": [
+                "낙인력%",
+                "세레나데"
+              ],
+              "price": 1777777,
+              "priceDiff": -2222223,
+              "percentDiff": -55.56
+            },
+            {
+              "name": "귀걸이",
+              "option": [
+                "공격력% ",
+                "무기 공격력%"
+              ],
+              "price": 1980000,
+              "priceDiff": -20000,
+              "percentDiff": -1
+            },
+            {
+              "name": "귀걸이",
+              "option": [
+                "무기 공격력%",
+                "무기 공격력+"
+              ],
+              "price": 450000,
+              "priceDiff": -100000,
+              "percentDiff": -18.18
+            },
+            {
+              "name": "반지",
+              "option": [
+                "치명타 피해% ",
+                "치명타 적중률%"
+              ],
+              "price": 1900000,
+              "priceDiff": 0,
+              "percentDiff": 0
+            },
+            {
+              "name": "반지",
+              "option": [
+                "아군 피해 강화% ",
+                "아군 공격력 강화%"
+              ],
+              "price": 1800000,
+              "priceDiff": -50000,
+              "percentDiff": -2.7
+            }
+          ]
+        },
+        {
+          "enhance": "3",
+          "items": [
+            {
+              "name": "목걸이",
+              "option": [
+                "적에게 주는 피해%",
+                "추가 피해"
+              ],
+              "price": 2250000,
+              "priceDiff": 250000,
+              "percentDiff": 12.5
+            },
+            {
+              "name": "목걸이",
+              "option": [
+                "낙인력%",
+                "세레나데"
+              ],
+              "price": 1599999,
+              "priceDiff": 0,
+              "percentDiff": 0
+            },
+            {
+              "name": "귀걸이",
+              "option": [
+                "공격력% ",
+                "무기 공격력%"
+              ],
+              "price": 1555555,
+              "priceDiff": 0,
+              "percentDiff": 0
+            },
+            {
+              "name": "귀걸이",
+              "option": [
+                "무기 공격력%",
+                "무기 공격력+"
+              ],
+              "price": 320000,
+              "priceDiff": 5000,
+              "percentDiff": 1.59
+            },
+            {
+              "name": "반지",
+              "option": [
+                "치명타 피해% ",
+                "치명타 적중률%"
+              ],
+              "price": 1333333,
+              "priceDiff": 0,
+              "percentDiff": 0
+            },
+            {
+              "name": "반지",
+              "option": [
+                "아군 피해 강화% ",
+                "아군 공격력 강화%"
+              ],
+              "price": 1499999,
+              "priceDiff": -50001,
+              "percentDiff": -3.23
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "상중",
+      "enhances": [
+        {
+          "enhance": "2",
+          "items": [
+            {
+              "name": "목걸이",
+              "option": [
+                "적에게 주는 피해%",
+                "추가 피해%"
+              ],
+              "price": 570000,
+              "priceDiff": 40000,
+              "percentDiff": 7.55
+            },
+            {
+              "name": "목걸이",
+              "option": [
+                "추가 피해%",
+                "적에게 주는 피해%"
+              ],
+              "price": 449999,
+              "priceDiff": 449199,
+              "percentDiff": 56149.88
+            },
+            {
+              "name": "목걸이",
+              "option": [
+                "낙인력%",
+                "세레나데"
+              ],
+              "price": 450000,
+              "priceDiff": 0,
+              "percentDiff": 0
+            },
+            {
+              "name": "귀걸이",
+              "option": [
+                "공격력%",
+                "무기 공격력%"
+              ],
+              "price": 500000,
+              "priceDiff": -15000,
+              "percentDiff": -2.91
+            },
+            {
+              "name": "귀걸이",
+              "option": [
+                "무기 공격력%",
+                "공격력%"
+              ],
+              "price": 325000,
+              "priceDiff": 0,
+              "percentDiff": 0
+            },
+            {
+              "name": "귀걸이",
+              "option": [
+                "무기 공격력%",
+                "무기 공격력+"
+              ],
+              "price": 130000,
+              "priceDiff": 0,
+              "percentDiff": 0
+            },
+            {
+              "name": "반지",
+              "option": [
+                "치명타 피해%",
+                "치명타 적중률%"
+              ],
+              "price": 530000,
+              "priceDiff": -1470000,
+              "percentDiff": -73.5
+            },
+            {
+              "name": "반지",
+              "option": [
+                "치명타 적중률%",
+                "치명타 피해%"
+              ],
+              "price": 250000,
+              "priceDiff": -60000,
+              "percentDiff": -19.35
+            },
+            {
+              "name": "반지",
+              "option": [
+                "아군 피해 강화%",
+                "아군 공격력 강화%"
+              ],
+              "price": 480000,
+              "priceDiff": -1370000,
+              "percentDiff": -74.05
+            },
+            {
+              "name": "반지",
+              "option": [
+                "아군 공격력 강화%",
+                "아군 피해 강화%"
+              ],
+              "price": 190000,
+              "priceDiff": -10000,
+              "percentDiff": -5
+            }
+          ]
+        },
+        {
+          "enhance": "3",
+          "items": [
+            {
+              "name": "목걸이",
+              "option": [
+                "적에게 주는 피해%",
+                "추가 피해%"
+              ],
+              "price": 535000,
+              "priceDiff": 45000,
+              "percentDiff": 9.18
+            },
+            {
+              "name": "목걸이",
+              "option": [
+                "추가 피해%",
+                "적에게 주는 피해%"
+              ],
+              "price": 411111,
+              "priceDiff": 409911,
+              "percentDiff": 34159.25
+            },
+            {
+              "name": "목걸이",
+              "option": [
+                "낙인력%",
+                "세레나데"
+              ],
+              "price": 360000,
+              "priceDiff": 10000,
+              "percentDiff": 2.86
+            },
+            {
+              "name": "귀걸이",
+              "option": [
+                "공격력%",
+                "무기 공격력%"
+              ],
+              "price": 395000,
+              "priceDiff": -95000,
+              "percentDiff": -19.39
+            },
+            {
+              "name": "귀걸이",
+              "option": [
+                "무기 공격력%",
+                "공격력%"
+              ],
+              "price": 328888,
+              "priceDiff": -11111,
+              "percentDiff": -3.27
+            },
+            {
+              "name": "귀걸이",
+              "option": [
+                "무기 공격력%",
+                "무기 공격력+"
+              ],
+              "price": 50000,
+              "priceDiff": -10000,
+              "percentDiff": -16.67
+            },
+            {
+              "name": "반지",
+              "option": [
+                "치명타 피해%",
+                "치명타 적중률%"
+              ],
+              "price": 399999,
+              "priceDiff": -1170001,
+              "percentDiff": -74.52
+            },
+            {
+              "name": "반지",
+              "option": [
+                "치명타 적중률%",
+                "치명타 피해%"
+              ],
+              "price": 225000,
+              "priceDiff": 25000,
+              "percentDiff": 12.5
+            },
+            {
+              "name": "반지",
+              "option": [
+                "아군 피해 강화%",
+                "아군 공격력 강화%"
+              ],
+              "price": 459999,
+              "priceDiff": -1090001,
+              "percentDiff": -70.32
+            },
+            {
+              "name": "반지",
+              "option": [
+                "아군 공격력 강화%",
+                "아군 피해 강화%"
+              ],
+              "price": 186000,
+              "priceDiff": -4000,
+              "percentDiff": -2.11
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "상하",
+      "enhances": [
+        {
+          "enhance": "2",
+          "items": [
+            {
+              "name": "목걸이",
+              "option": [
+                "적에게 주는 피해%",
+                "추가 피해%"
+              ],
+              "price": 65000,
+              "priceDiff": -19000,
+              "percentDiff": -22.62
+            },
+            {
+              "name": "목걸이",
+              "option": [
+                "추가 피해%",
+                "적에게 주는 피해%"
+              ],
+              "price": 50000,
+              "priceDiff": -10000,
+              "percentDiff": -16.67
+            },
+            {
+              "name": "목걸이",
+              "option": [
+                "낙인력%",
+                "세레나데"
+              ],
+              "price": 0,
+              "priceDiff": -75000,
+              "percentDiff": -100
+            },
+            {
+              "name": "귀걸이",
+              "option": [
+                "공격력%",
+                "무기 공격력%"
+              ],
+              "price": 80000,
+              "priceDiff": -30000,
+              "percentDiff": -27.27
+            },
+            {
+              "name": "귀걸이",
+              "option": [
+                "무기 공격력%",
+                "공격력%"
+              ],
+              "price": 44000,
+              "priceDiff": -6000,
+              "percentDiff": -12
+            },
+            {
+              "name": "귀걸이",
+              "option": [
+                "무기 공격력%",
+                "무기 공격력+"
+              ],
+              "price": 50000,
+              "priceDiff": 0,
+              "percentDiff": 0
+            },
+            {
+              "name": "반지",
+              "option": [
+                "치명타 피해%",
+                "치명타 적중률%"
+              ],
+              "price": 103000,
+              "priceDiff": -2000,
+              "percentDiff": -1.9
+            },
+            {
+              "name": "반지",
+              "option": [
+                "치명타 적중률%",
+                "치명타 피해%"
+              ],
+              "price": 46546,
+              "priceDiff": 1546,
+              "percentDiff": 3.44
+            },
+            {
+              "name": "반지",
+              "option": [
+                "아군 피해 강화%",
+                "아군 공격력 강화%"
+              ],
+              "price": 95000,
+              "priceDiff": -14999,
+              "percentDiff": -13.64
+            },
+            {
+              "name": "반지",
+              "option": [
+                "아군 공격력 강화%",
+                "아군 피해 강화%"
+              ],
+              "price": 5555,
+              "priceDiff": -4444,
+              "percentDiff": -44.44
+            }
+          ]
+        },
+        {
+          "enhance": "3",
+          "items": [
+            {
+              "name": "목걸이",
+              "option": [
+                "적에게 주는 피해%",
+                "추가 피해%"
+              ],
+              "price": 64999,
+              "priceDiff": -25001,
+              "percentDiff": -27.78
+            },
+            {
+              "name": "목걸이",
+              "option": [
+                "추가 피해%",
+                "적에게 주는 피해%"
+              ],
+              "price": 59000,
+              "priceDiff": -10000,
+              "percentDiff": -14.49
+            },
+            {
+              "name": "목걸이",
+              "option": [
+                "낙인력%",
+                "세레나데"
+              ],
+              "price": 90000,
+              "priceDiff": 5000,
+              "percentDiff": 5.88
+            },
+            {
+              "name": "귀걸이",
+              "option": [
+                "공격력%",
+                "무기 공격력%"
+              ],
+              "price": 85000,
+              "priceDiff": -15000,
+              "percentDiff": -15
+            },
+            {
+              "name": "귀걸이",
+              "option": [
+                "무기 공격력%",
+                "공격력%"
+              ],
+              "price": 39000,
+              "priceDiff": -7000,
+              "percentDiff": -15.22
+            },
+            {
+              "name": "귀걸이",
+              "option": [
+                "무기 공격력%",
+                "무기 공격력+"
+              ],
+              "price": 44999,
+              "priceDiff": 999,
+              "percentDiff": 2.27
+            },
+            {
+              "name": "반지",
+              "option": [
+                "치명타 피해%",
+                "치명타 적중률%"
+              ],
+              "price": 80000,
+              "priceDiff": -19999,
+              "percentDiff": -20
+            },
+            {
+              "name": "반지",
+              "option": [
+                "치명타 적중률%",
+                "치명타 피해%"
+              ],
+              "price": 30000,
+              "priceDiff": -10000,
+              "percentDiff": -25
+            },
+            {
+              "name": "반지",
+              "option": [
+                "아군 피해 강화%",
+                "아군 공격력 강화%"
+              ],
+              "price": 90000,
+              "priceDiff": 5000,
+              "percentDiff": 5.88
+            },
+            {
+              "name": "반지",
+              "option": [
+                "아군 공격력 강화%",
+                "아군 피해 강화%"
+              ],
+              "price": 7000,
+              "priceDiff": -2999,
+              "percentDiff": -29.99
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "중중",
+      "enhances": [
+        {
+          "enhance": "2",
+          "items": [
+            {
+              "name": "목걸이",
+              "option": [
+                "추가 피해%",
+                "적에게 주는 피해%"
+              ],
+              "price": 33000,
+              "priceDiff": 0,
+              "percentDiff": 0
+            },
+            {
+              "name": "목걸이",
+              "option": [
+                "낙인력%",
+                "세레나데"
+              ],
+              "price": 300,
+              "priceDiff": -200,
+              "percentDiff": -40
+            },
+            {
+              "name": "귀걸이",
+              "option": [
+                "공격력%",
+                "무기 공격력%"
+              ],
+              "price": 33333,
+              "priceDiff": -1667,
+              "percentDiff": -4.76
+            },
+            {
+              "name": "귀걸이",
+              "option": [
+                "무기 공격력%",
+                "무기 공격력+"
+              ],
+              "price": 1000,
+              "priceDiff": -6000,
+              "percentDiff": -85.71
+            },
+            {
+              "name": "반지",
+              "option": [
+                "치명타 피해%",
+                "치명타 적중률%"
+              ],
+              "price": 23500,
+              "priceDiff": 500,
+              "percentDiff": 2.17
+            },
+            {
+              "name": "반지",
+              "option": [
+                "아군 피해 강화%",
+                "아군 공격력 강화%"
+              ],
+              "price": 4000,
+              "priceDiff": 500,
+              "percentDiff": 14.29
+            }
+          ]
+        },
+        {
+          "enhance": "3",
+          "items": [
+            {
+              "name": "목걸이",
+              "option": [
+                "추가 피해%",
+                "적에게 주는 피해%"
+              ],
+              "price": 35000,
+              "priceDiff": 0,
+              "percentDiff": 0
+            },
+            {
+              "name": "목걸이",
+              "option": [
+                "낙인력%",
+                "세레나데"
+              ],
+              "price": 1000,
+              "priceDiff": 100,
+              "percentDiff": 11.11
+            },
+            {
+              "name": "귀걸이",
+              "option": [
+                "공격력%",
+                "무기 공격력%"
+              ],
+              "price": 35555,
+              "priceDiff": -2445,
+              "percentDiff": -6.43
+            },
+            {
+              "name": "귀걸이",
+              "option": [
+                "무기 공격력%",
+                "무기 공격력+"
+              ],
+              "price": 1000,
+              "priceDiff": -1000,
+              "percentDiff": -50
+            },
+            {
+              "name": "반지",
+              "option": [
+                "치명타 피해%",
+                "치명타 적중률%"
+              ],
+              "price": 20000,
+              "priceDiff": -4444,
+              "percentDiff": -18.18
+            },
+            {
+              "name": "반지",
+              "option": [
+                "아군 피해 강화%",
+                "아군 공격력 강화%"
+              ],
+              "price": 9500,
+              "priceDiff": 4500,
+              "percentDiff": 90
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "중하",
+      "enhances": [
+        {
+          "enhance": "2",
+          "items": [
+            {
+              "name": "목걸이",
+              "option": [
+                "적에게 주는 피해%",
+                "추가 피해%"
+              ],
+              "price": 800,
+              "priceDiff": 0,
+              "percentDiff": 0
+            },
+            {
+              "name": "목걸이",
+              "option": [
+                "추가 피해%",
+                "적에게 주는 피해%"
+              ],
+              "price": 200,
+              "priceDiff": -100,
+              "percentDiff": -33.33
+            },
+            {
+              "name": "목걸이",
+              "option": [
+                "낙인력%",
+                "세레나데"
+              ],
+              "price": 1000,
+              "priceDiff": 223,
+              "percentDiff": 28.7
+            },
+            {
+              "name": "귀걸이",
+              "option": [
+                "공격력%",
+                "무기 공격력%"
+              ],
+              "price": 999,
+              "priceDiff": -1,
+              "percentDiff": -0.1
+            },
+            {
+              "name": "귀걸이",
+              "option": [
+                "무기 공격력%",
+                "공격력%"
+              ],
+              "price": 790,
+              "priceDiff": 690,
+              "percentDiff": 690
+            },
+            {
+              "name": "귀걸이",
+              "option": [
+                "무기 공격력%",
+                "무기 공격력+"
+              ],
+              "price": 0,
+              "priceDiff": -555,
+              "percentDiff": -100
+            },
+            {
+              "name": "반지",
+              "option": [
+                "치명타 피해%",
+                "치명타 적중률%"
+              ],
+              "price": 666,
+              "priceDiff": -333,
+              "percentDiff": -33.33
+            },
+            {
+              "name": "반지",
+              "option": [
+                "치명타 적중률%",
+                "치명타 피해%"
+              ],
+              "price": 150,
+              "priceDiff": -850,
+              "percentDiff": -85
+            },
+            {
+              "name": "반지",
+              "option": [
+                "아군 피해 강화%",
+                "아군 공격력 강화%"
+              ],
+              "price": 300,
+              "priceDiff": 200,
+              "percentDiff": 200
+            },
+            {
+              "name": "반지",
+              "option": [
+                "아군 공격력 강화%",
+                "아군 피해 강화%"
+              ],
+              "price": 999,
+              "priceDiff": 499,
+              "percentDiff": 99.8
+            }
+          ]
+        },
+        {
+          "enhance": "3",
+          "items": [
+            {
+              "name": "목걸이",
+              "option": [
+                "적에게 주는 피해%",
+                "추가 피해%"
+              ],
+              "price": 1000,
+              "priceDiff": -200,
+              "percentDiff": -16.67
+            },
+            {
+              "name": "목걸이",
+              "option": [
+                "추가 피해%",
+                "적에게 주는 피해%"
+              ],
+              "price": 800,
+              "priceDiff": 100,
+              "percentDiff": 14.29
+            },
+            {
+              "name": "목걸이",
+              "option": [
+                "낙인력%",
+                "세레나데"
+              ],
+              "price": 800,
+              "priceDiff": 101,
+              "percentDiff": 14.45
+            },
+            {
+              "name": "귀걸이",
+              "option": [
+                "공격력%",
+                "무기 공격력%"
+              ],
+              "price": 1950,
+              "priceDiff": -50,
+              "percentDiff": -2.5
+            },
+            {
+              "name": "귀걸이",
+              "option": [
+                "무기 공격력%",
+                "공격력%"
+              ],
+              "price": 900,
+              "priceDiff": 300,
+              "percentDiff": 50
+            },
+            {
+              "name": "귀걸이",
+              "option": [
+                "무기 공격력%",
+                "무기 공격력+"
+              ],
+              "price": 900,
+              "priceDiff": 100,
+              "percentDiff": 12.5
+            },
+            {
+              "name": "반지",
+              "option": [
+                "치명타 피해%",
+                "치명타 적중률%"
+              ],
+              "price": 1999,
+              "priceDiff": 499,
+              "percentDiff": 33.27
+            },
+            {
+              "name": "반지",
+              "option": [
+                "치명타 적중률%",
+                "치명타 피해%"
+              ],
+              "price": 900,
+              "priceDiff": 300,
+              "percentDiff": 50
+            },
+            {
+              "name": "반지",
+              "option": [
+                "아군 피해 강화%",
+                "아군 공격력 강화%"
+              ],
+              "price": 900,
+              "priceDiff": 250,
+              "percentDiff": 38.46
+            },
+            {
+              "name": "반지",
+              "option": [
+                "아군 공격력 강화%",
+                "아군 피해 강화%"
+              ],
+              "price": 699,
+              "priceDiff": 99,
+              "percentDiff": 16.5
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "accessoryPriceLastUpdate": "2025-06-19 10:57:06"
+}

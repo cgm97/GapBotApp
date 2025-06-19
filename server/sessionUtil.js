@@ -5,7 +5,7 @@ const fillter = require('./accessoryFillter');  // logger.js 임포트
 const axios = require('axios');
 let lastBookPriceUpdate = 0;
 let lastJewelPriceUpdate = 0;
-let accessoryPriceLastUpdate = 0;
+// let accessoryPriceLastUpdate = 0;
 
 // 초기 데이터 설정 함수
 const initializeCache = async () => {
@@ -186,14 +186,14 @@ const getAccessoriesPrice = async () => {
     const functionSingle = fillter.getEtcOptionsSingle;
     const functionDouble = fillter.getEtcOptionsDouble;
 
-    if (now - accessoryPriceLastUpdate < 60 * 60 * 1000) { // 1시간
-        logger.info({
-            method,
-            url: "SessionUtil",
-            message: `${method}: 1시간 이내 요청 → 캐시 사용`,
-        });
-        return sessionCache.get("accessoryPrice");
-    }
+    // if (now - accessoryPriceLastUpdate < 60 * 60 * 1000) { // 1시간
+    //     logger.info({
+    //         method,
+    //         url: "SessionUtil",
+    //         message: `${method}: 1시간 이내 요청 → 캐시 사용`,
+    //     });
+    //     return sessionCache.get("accessoryPrice");
+    // }
 
     const accessoryKeys = Object.keys(accessory); // 상 상상 상중 ... 중하
     const gradeKeys = Object.keys(grade); // 고대, 유물
@@ -319,13 +319,14 @@ const getAccessoriesPrice = async () => {
 
         }
         
+        sessionCache.set("accessoryPrice", retAccessory);
+        sessionCache.set("accessoryPriceLastUpdate", getDateTime());
+
     } catch (err) {
          console.error("에러 발생:", err?.response?.data || err.message || err);
+         return [];
     }
 
-    sessionCache.set("accessoryPrice", retAccessory);
-    sessionCache.set("accessoryPriceLastUpdate", getDateTime());
-    accessoryPriceLastUpdate = now;
 
     return retAccessory;
 };

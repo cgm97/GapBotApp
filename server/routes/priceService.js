@@ -1,7 +1,7 @@
 const { Console } = require('winston/lib/winston/transports');
 const pool = require('../db/connection');
 const logger = require('../logger');  // logger.js 임포트
-const { sessionCache, getBookPrice, getDate, getJewelPrice } = require('../sessionUtil'); // 캐시 모듈 가져오기
+const { sessionCache, getBookPrice, getDate, getJewelPrice, getAccessoriesPrice, calculatePriceDiff, groupByNameArray } = require('../sessionUtil'); // 캐시 모듈 가져오기
 require('dotenv').config(); // .env 파일에서 환경 변수 로드
 
 function formatDateString(dateStr) {
@@ -388,6 +388,99 @@ exports.getJewelChartPrice = async (req, res, next) => {
             success: true,
             itemData: jewelData
         });
+
+    } catch (error) {
+        next(new Error(error));  // 에러 객체를 넘겨서 next 미들웨어로 전달
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+    finally {
+        // DB 연결 해제
+        if (connection) connection.release();
+    }
+}
+
+// 악세 시세 조회
+exports.getAccessoryPrice = async (req, res, next) => {
+
+    // DB 연결
+    const connection = await pool.getConnection();
+    try {
+
+        // 현재 각인서 가격 조회
+        let nowAccessoryPrice = sessionCache.get("accessoryPrice");
+
+        if (!nowAccessoryPrice) { // 캐쉬에 없을 경우 새로갱신
+            nowAccessoryPrice = await getAccessoriesPrice();
+        }
+        // 트랜잭션 시작
+        await connection.beginTransaction();
+
+        // 전일자 DB
+        const yesterday = getDate(-1).replaceAll("-", "");
+
+        const selectSql = `SELECT 
+                        ITEM_DATA AS ACCESSORYS_DATA
+                    FROM ITEM_PRICE_LOG 
+                        WHERE BASE_DATE = ? AND ITEM_DVCD = ?
+                        `;
+
+        const [rows] = await pool.query(selectSql, [yesterday, '03']);
+
+        const preAccessoryPrice = rows[0]?.ACCESSORYS_DATA || [];
+
+        logger.info({
+            method: req.method,
+            url: req.url,  // 요청 URL
+            message: `\nSql ${selectSql} \nParam ${[yesterday, '03']}`
+        });
+
+        // nowAccessoryPrice.forEach(items => {
+        //     console.log(items.title); // 상
+
+        //     items.enhances.forEach(enhances =>{
+        //         console.log(enhances.enhance); // 연마단계
+
+        //         enhances.items.forEach(items =>{
+        //             console.log(items.name);
+        //             console.log(items.price);
+        //             console.log(items.option);
+        //         })
+        //     })
+        // })
+        nowAccessoryPrice.forEach(nowItem => {
+            const preItem = preAccessoryPrice.find(p => p.title === nowItem.title);
+            if (!preItem) return;
+
+            nowItem.enhances.forEach(nowEnhance => {
+                const preEnhance = preItem.enhances.find(e => e.enhance === nowEnhance.enhance);
+                if (!preEnhance) return;
+
+                // 여기서 nowEnhance.items에 전일대비 값 추가해서 다시 넣는다.
+                nowEnhance.items = calculatePriceDiff(preEnhance.items, nowEnhance.items);
+            });
+        });
+
+        // "title": "상",
+        // "enhances": [
+        //     {
+        //         "enhance": "1",
+        //         "items": [
+        //             {
+        //                 "name": "목걸이",
+        //                 "option": [
+        //                     "적에게 주는 피해%"
+        //                 ],
+        //                 "price": 52999
+
+        // const accessoryPrice = calculatePriceDiff()
+
+        res.status(200).json(
+            {
+                success: true,
+                accessorysPrice: nowAccessoryPrice,
+                accessoryPriceLastUpdate: sessionCache.get("accessoryPriceLastUpdate")
+            }
+        );
 
     } catch (error) {
         next(new Error(error));  // 에러 객체를 넘겨서 next 미들웨어로 전달
