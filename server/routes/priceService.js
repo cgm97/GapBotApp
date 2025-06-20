@@ -416,8 +416,9 @@ exports.getAccessoryPrice = async (req, res, next) => {
         let nowAccessoryPrice = sessionCache.get("accessoryPrice");
 
         if (!nowAccessoryPrice) { // 캐쉬에 없을 경우 새로갱신
-            nowAccessoryPrice = await getAccessoriesPrice();
+           res.status(500).json({ message: "데이터 준비 중입니다. 잠시 후 다시 시도해주세요." });
         }
+        
         // 트랜잭션 시작
         await connection.beginTransaction();
 

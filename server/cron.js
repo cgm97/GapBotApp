@@ -2,7 +2,7 @@ const cron = require('node-cron');
 const axios = require('axios');
 const logger = require('./logger');  // logger.js 임포트
 const pool = require('./db/connection');
-const { getBookPrice, getJewelPrice, getAccessoriesPrice } = require('./sessionUtil');
+const { getBookPrice, getJewelPrice, getAccessoriesPrice, getDate } = require('./sessionUtil');
 require('dotenv').config(); // .env 파일에서 환경 변수 로드
 
 const url = 'CRON';
@@ -628,9 +628,9 @@ cron.schedule('0 0 * * *', async () => { // async로 변경
     }
 });
 
-// 매일 30분마다 _ 악세서리 조회 (재갱신)
-cron.schedule('*/30 * * * *', async () => { // async로 변경
-    var method = '매 30분 악세서리 데이터';
+// 매일 60분마다 _ 악세서리 조회 (재갱신)
+cron.schedule('*/60 * * * *', async () => { // async로 변경
+    var method = '매 60분 악세서리 데이터';
     logger.info({
         method: method,
         url: url,  // 요청 URL
@@ -643,20 +643,88 @@ cron.schedule('*/30 * * * *', async () => { // async로 변경
     if (hours === 0) {
         // 00시일 때는 실행하지 않음
         logger.info({
-        method: method,
-        url: url,  // 요청 URL
-        message: '악세서리 조회 시작 END 0시 Pass'
-    });
+            method: method,
+            url: url,  // 요청 URL
+            message: '악세서리 조회 시작 END 0시 Pass'
+        });
         return;
     }
 
-    const reload = await getAccessoriesPrice();
+    // 여기에 실제로 실행할 작업 코드 작성
+    const connection = await pool.getConnection();
+    try {
 
-    logger.info({
-        method: method,
-        url: url,  // 요청 URL
-        message: `악세서리 데이터 불러오기 성공 ${Object.keys(reload).length} 건`,
-    });
+        // 트랜잭션 시작
+        const baseDate = getDate(0).replace(/-/g, ''); // 예: 20250620
+        const accessoryPrice = await getAccessoriesPrice(); // 구조는 위와 동일
+
+        await connection.beginTransaction();
+
+        const insertSql = `
+                INSERT INTO ACCESSORY_PRICE_LOG (
+                BASE_DATE,
+                TITLE,
+                ENHANCE,
+                NAME,
+                OPTION1,
+                OPTION2,
+                PRICE
+                ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                ON DUPLICATE KEY UPDATE
+                PRICE = VALUES(PRICE),
+                FST_DTTI = CURRENT_TIMESTAMP,
+                DL_YN = 'N'
+            `;
+        // 예: INSERT
+
+        // "title": "상",
+        // "enhances": [
+        //     {
+        //         "enhance": "1",
+        //         "items": [
+        //             {
+        //                 "name": "목걸이",
+        //                 "option": [
+        //                     "적에게 주는 피해%", "추가 피해%"
+        //                 ],
+        //                 "price": 52999
+        for (const { title, enhances } of accessoryPrice) {
+            for (const { enhance, items } of enhances) {
+                for (const item of items) {
+                    const { name, price, option } = item;
+
+                    await connection.execute(insertSql, [
+                        baseDate,
+                        title,
+                        enhance,
+                        name,
+                        option[0] || null,
+                        option[1] || null,
+                        price
+                    ]);
+                }
+            }
+        }
+
+        logger.info({
+            method: method,
+            url: url,  // 요청 URL
+            message: `악세서리 데이터 불러오기 성공 및 저장 ${Object.keys(accessoryPrice).length} 건`,
+        });
+        await connection.commit(); // 커밋
+    } catch (error) {
+        // 오류 발생 시 롤백
+        await connection.rollback();
+        // 에러 로깅
+        logger.error({
+            method: method,
+            url: url,  // 요청 URL
+            message: error.stack
+        });
+    } finally {
+        // 연결 반환
+        connection.release();
+    }
 
 });
 module.exports = cron; // cron을 export하여 다른 파일에서 사용할 수 있게 함

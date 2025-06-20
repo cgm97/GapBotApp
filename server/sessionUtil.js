@@ -12,6 +12,10 @@ const initializeCache = async () => {
     try {
         const cubeInfo = await getCubeInfo(); // 비동기 함수의 결과를 대기
         sessionCache.set("cubeInfo", cubeInfo); // 실제 데이터를 Map에 저장
+
+        // 악세서리 정보 초기 초기화
+        await getAccessoriesPrice();
+
         // console.log("Session Cache:", Object.fromEntries(sessionCache)); // Map 내용을 출력
     } catch (error) {
         console.error("Failed to initialize cache:", error);
@@ -304,7 +308,7 @@ const getAccessoriesPrice = async () => {
             //             {
             //                 "name": "목걸이",
             //                 "option": [
-            //                     "적에게 주는 피해%"
+            //                     "적에게 주는 피해%", "추가 피해%"
             //                 ],
             //                 "price": 52999
                         
