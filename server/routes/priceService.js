@@ -114,7 +114,8 @@ exports.getBookChartPrice = async (req, res, next) => {
                             )
                             ) AS jt
                             WHERE jt.name = ?
-                            AND ITEM_DVCD = ?`;
+                            AND ITEM_DVCD = ?
+                            AND BASE_DATE <> CURRENT_DATE`;
         let [bookData] = await connection.execute(selectSql, [item, '02']);
 
         logger.info({
@@ -127,6 +128,7 @@ exports.getBookChartPrice = async (req, res, next) => {
         bookData = bookData.map(item => ({
             ...item,
             date: formatDateString(item.date),
+            time: formatDateString(item.date),
         }));
 
         // 현재 각인서 가격 조회 - 오늘 시세가지 차트에 적용
@@ -135,6 +137,7 @@ exports.getBookChartPrice = async (req, res, next) => {
             if (book.name == item) {
                 bookData.push({
                     date: getDate(),
+                    time: getDate(),
                     name: book.name,
                     price: book.price
                 })
@@ -352,6 +355,7 @@ exports.getJewelChartPrice = async (req, res, next) => {
                             WHERE ITEM_DVCD = '01'
                             ) AS all_jewels
                             WHERE name = ?
+                            AND BASE_DATE <> CURRENT_DATE
                             `
         let [jewelData] = await connection.execute(selectSql, [item]);
 
@@ -365,6 +369,7 @@ exports.getJewelChartPrice = async (req, res, next) => {
         jewelData = jewelData.map(item => ({
             ...item,
             date: formatDateString(item.date),
+            time: formatDateString(item.date),
         }));
 
         // 현재 각인서 가격 조회 - 오늘 시세가지 차트에 적용
@@ -378,6 +383,7 @@ exports.getJewelChartPrice = async (req, res, next) => {
             if (jewel.name == item) {
                 jewelData.push({
                     date: getDate(),
+                    time: getDate(),
                     name: jewel.name,
                     price: jewel.price
                 })

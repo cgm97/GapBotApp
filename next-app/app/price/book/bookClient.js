@@ -4,31 +4,32 @@ import { useState, useRef } from "react";
 import { Line } from "react-chartjs-2";
 import axios from "axios";
 import "@/css/BookPrice.css";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Tooltip,
-  Legend,
-  TimeScale
-} from 'chart.js';
+import LineChart from '@/components/LineChart';
+// import {
+//   Chart as ChartJS,
+//   CategoryScale,
+//   LinearScale,
+//   PointElement,
+//   LineElement,
+//   Tooltip,
+//   Legend,
+//   TimeScale
+// } from 'chart.js';
 
-import annotationPlugin from 'chartjs-plugin-annotation';
+// import annotationPlugin from 'chartjs-plugin-annotation';
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Tooltip,
-  Legend,
-  TimeScale,
-  annotationPlugin
-);
+// ChartJS.register(
+//   CategoryScale,
+//   LinearScale,
+//   PointElement,
+//   LineElement,
+//   Tooltip,
+//   Legend,
+//   TimeScale,
+//   annotationPlugin
+// );
 
-ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip, Legend);
+// ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip, Legend);
 
 export default function BookClient({ booksPrice, bookLastUpdate }) {
   const [activeTab, setActiveTab] = useState("price");
@@ -81,59 +82,59 @@ export default function BookClient({ booksPrice, bookLastUpdate }) {
     alertTimeoutRef.current = setTimeout(() => setAlert(null), 1800);
   };
 
-const annotationData = [
-  { date: '2025-04-30', label: 'Live 골두껍이 언급' }
-];
+// const annotationData = [
+//   { date: '2025-04-30', label: 'Live 골두껍이 언급' }
+// ];
 
-const annotationLines = annotationData.reduce((acc, { date, label }, idx) => {
-  acc[`line${idx}`] = {
-    type: 'line',
-    scaleID: 'x',
-    value: date,
-    borderColor: 'black',
-    borderWidth: 1,
-    label: {
-      display: true,
-      content: label,
-      color: '#fff',
-      backgroundColor: 'rgba(0, 0, 0, 0.6)',
-      position: 'end'
-    },
-  };
-  return acc;
-}, {});
+// const annotationLines = annotationData.reduce((acc, { date, label }, idx) => {
+//   acc[`line${idx}`] = {
+//     type: 'line',
+//     scaleID: 'x',
+//     value: date,
+//     borderColor: 'black',
+//     borderWidth: 1,
+//     label: {
+//       display: true,
+//       content: label,
+//       color: '#fff',
+//       backgroundColor: 'rgba(0, 0, 0, 0.6)',
+//       position: 'end'
+//     },
+//   };
+//   return acc;
+// }, {});
 
-  const chartOptions = {
-  responsive: true,
-  plugins: {
-    legend: { position: 'top' },
-    tooltip: { enabled: true },
-    annotation: {
-      annotations: annotationLines, // ✅ 여기!
-    },
-  },
-  scales: {
-    y: { beginAtZero: false },
-    x: { ticks: { autoSkip: false } }
-  }
-};
+//   const chartOptions = {
+//   responsive: true,
+//   plugins: {
+//     legend: { position: 'top' },
+//     tooltip: { enabled: true },
+//     annotation: {
+//       annotations: annotationLines, // ✅ 여기!
+//     },
+//   },
+//   scales: {
+//     y: { beginAtZero: false },
+//     x: { ticks: { autoSkip: false } }
+//   }
+// };
 
-  const datasets = selectedItems.map((itemName, idx) => ({
-    label: itemName,
-    data: chartData[itemName]?.map((d) => d.price) || [],
-    borderColor: `hsl(${(idx * 60) % 360}, 70%, 50%)`,
-    backgroundColor: `hsla(${(idx * 60) % 360}, 70%, 50%, 0.2)`,
-    tension: 0.3,
-    fill: true,
-    pointRadius: 4,
-    pointHoverRadius: 6,
-  }));
+//   const datasets = selectedItems.map((itemName, idx) => ({
+//     label: itemName,
+//     data: chartData[itemName]?.map((d) => d.price) || [],
+//     borderColor: `hsl(${(idx * 60) % 360}, 70%, 50%)`,
+//     backgroundColor: `hsla(${(idx * 60) % 360}, 70%, 50%, 0.2)`,
+//     tension: 0.3,
+//     fill: true,
+//     pointRadius: 4,
+//     pointHoverRadius: 6,
+//   }));
 
-  const allDates = Array.from(
-    new Set(
-      selectedItems.flatMap((itemName) => chartData[itemName]?.map((d) => d.date) || [])
-    )
-  ).sort();
+//   const allDates = Array.from(
+//     new Set(
+//       selectedItems.flatMap((itemName) => chartData[itemName]?.map((d) => d.date) || [])
+//     )
+//   ).sort();
 
   return (
     <>
@@ -248,11 +249,12 @@ const annotationLines = annotationData.reduce((acc, { date, label }, idx) => {
       {/* 차트 */}
       {activeTab === 'chart' && selectedItems.length > 0 && (
   <div style={{ marginTop: '1rem' }}>
-    <h5>※ 유물 각인서 시세를 차트로 확인할 수 있습니다.</h5>
-    <Line
+    <h5>※ 하단 라벨을 클릭하여 해당 시리즈를 켜거나 끌 수 있습니다.</h5>
+    {/* <Line
       data={{ labels: allDates, datasets }}
       options={chartOptions}
-    />
+    /> */}
+    <LineChart rawData={chartData} />
   </div>)}
       {/* 알림 메시지 */}
       {alert && (
