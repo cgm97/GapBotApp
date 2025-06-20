@@ -4,31 +4,32 @@ import { useState, useRef } from 'react';
 import axios from 'axios';
 import { Line } from 'react-chartjs-2';
 import "@/css/BookPrice.css";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Tooltip,
-  Legend,
-  TimeScale
-} from 'chart.js';
+import LineChart from '@/components/LineChart';
+// import {
+//   Chart as ChartJS,
+//   CategoryScale,
+//   LinearScale,
+//   PointElement,
+//   LineElement,
+//   Tooltip,
+//   Legend,
+//   TimeScale
+// } from 'chart.js';
 
-import annotationPlugin from 'chartjs-plugin-annotation';
+// import annotationPlugin from 'chartjs-plugin-annotation';
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Tooltip,
-  Legend,
-  TimeScale,
-  annotationPlugin
-);
+// ChartJS.register(
+//   CategoryScale,
+//   LinearScale,
+//   PointElement,
+//   LineElement,
+//   Tooltip,
+//   Legend,
+//   TimeScale,
+//   annotationPlugin
+// );
 
-ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip, Legend);
+// ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip, Legend);
 
 export default function JewelClient({ jewelsPrice, jewelPriceLastUpdate }) {
   const [activeTab, setActiveTab] = useState('price');
@@ -73,58 +74,58 @@ export default function JewelClient({ jewelsPrice, jewelPriceLastUpdate }) {
     alertTimeoutRef.current = setTimeout(() => setAlert(null), 1800);
   };
 
-const annotationData = [
-  { date: '2025-04-30', label: 'Live 광휘 언급' },
-  { date: '2025-05-20', label: 'Live 공증 삭제' }
-];
+  // const annotationData = [
+  //   { date: '2025-04-30', label: 'Live 광휘 언급' },
+  //   { date: '2025-05-20', label: 'Live 공증 삭제' }
+  // ];
 
-const annotationLines = annotationData.reduce((acc, { date, label }, idx) => {
- acc[`line${idx}`] = {
-    type: 'line',
-    scaleID: 'x',
-    value: date,
-    borderColor: 'black',
-    borderWidth: 1,
-    label: {
-      display: true,
-      content: label,
-      color: '#fff',
-      backgroundColor: 'rgba(0, 0, 0, 0.6)',
-      position: 'end'
-    },
-  };
-  return acc;
-}, {});
+  // const annotationLines = annotationData.reduce((acc, { date, label }, idx) => {
+  //   acc[`line${idx}`] = {
+  //     type: 'line',
+  //     scaleID: 'x',
+  //     value: date,
+  //     borderColor: 'black',
+  //     borderWidth: 1,
+  //     label: {
+  //       display: true,
+  //       content: label,
+  //       color: '#fff',
+  //       backgroundColor: 'rgba(0, 0, 0, 0.6)',
+  //       position: 'end'
+  //     },
+  //   };
+  //   return acc;
+  // }, {});
 
-  const chartOptions = {
-  responsive: true,
-  plugins: {
-    legend: { position: 'top' },
-    tooltip: { enabled: true },
-    annotation: {
-      annotations: annotationLines, // ✅ 여기!
-    },
-  },
-  scales: {
-    y: { beginAtZero: false },
-    x: { ticks: { autoSkip: false } }
-  }
-};
+  // const chartOptions = {
+  //   responsive: true,
+  //   plugins: {
+  //     legend: { position: 'top' },
+  //     tooltip: { enabled: true },
+  //     annotation: {
+  //       annotations: annotationLines, //
+  //     },
+  //   },
+  //   scales: {
+  //     y: { beginAtZero: false },
+  //     x: { ticks: { autoSkip: false } }
+  //   }
+  // };
 
-  const datasets = selectedItems.map((item, idx) => ({
-    label: item,
-    data: chartData[item]?.map(d => d.price) || [],
-    borderColor: `hsl(${(idx * 60) % 360}, 70%, 50%)`,
-    backgroundColor: `hsla(${(idx * 60) % 360}, 70%, 50%, 0.2)`,
-    fill: true,
-    tension: 0.3,
-    pointRadius: 3,
-    pointHoverRadius: 6,
-  }));
+  // const datasets = selectedItems.map((item, idx) => ({
+  //   label: item,
+  //   data: chartData[item]?.map(d => d.price) || [],
+  //   borderColor: `hsl(${(idx * 60) % 360}, 70%, 50%)`,
+  //   backgroundColor: `hsla(${(idx * 60) % 360}, 70%, 50%, 0.2)`,
+  //   fill: true,
+  //   tension: 0.3,
+  //   pointRadius: 3,
+  //   pointHoverRadius: 6,
+  // }));
 
-  const allDates = Array.from(
-    new Set(selectedItems.flatMap(item => chartData[item]?.map(d => d.date) || []))
-  ).sort();
+  // const allDates = Array.from(
+  //   new Set(selectedItems.flatMap(item => chartData[item]?.map(d => d.date) || []))
+  // ).sort();
 
   return (
     <>
@@ -138,7 +139,7 @@ const annotationLines = annotationData.reduce((acc, { date, label }, idx) => {
           차트
         </button>
       </div>
-      
+
       {activeTab === 'price' && (
         <div className="price-table-container">
           <div style={{ textAlign: "center", marginBottom: "1rem", color: "#555" }}>
@@ -151,58 +152,59 @@ const annotationLines = annotationData.reduce((acc, { date, label }, idx) => {
             </h5>
             <h5 style={{ margin: "0.5rem 0" }}>last update {jewelPriceLastUpdate}</h5>
           </div>
-        <table className="price-table">
-          <thead>
-            <tr>
-              <th>보석</th>
-              <th>가격</th>
-              <th>변동</th>
-              <th>차트</th>
-            </tr>
-          </thead>
-          <tbody>
-            {Object.values(jewelsPrice).map(item => {
-              const isSelected = selectedItems.includes(item.name);
-              return (
-                <tr key={item.name}>
-                  <td><img src={item.icon} alt={item.name} className="icon" /> {item.name}</td>
-                  <td>{item.price.toLocaleString()}</td>
-                  <td style={{ color: item.diffPrice > 0 ? 'green' : item.diffPrice < 0 ? 'red' : 'gray' }}>
-                    {item.diffPrice > 0 ? '▲' : item.diffPrice < 0 ? '▼' : '—'}{' '}
-                    {Math.abs(item.diffPrice).toLocaleString()} ({item.percent}%)
-                  </td>
-                  <td>
-                    <button
-                      onClick={(e) => handleItemToggle(item.name, e)}
-                      style={{
-                        border: '1px solid',
-                        borderColor: isSelected ? 'green' : 'gray',
-                        color: isSelected ? 'green' : 'gray',
-                        borderRadius: 4,
-                        padding: '4px 8px',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      {isSelected ? '−' : '+'}
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+          <table className="price-table">
+            <thead>
+              <tr>
+                <th>보석</th>
+                <th>가격</th>
+                <th>변동</th>
+                <th>차트</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Object.values(jewelsPrice).map(item => {
+                const isSelected = selectedItems.includes(item.name);
+                return (
+                  <tr key={item.name}>
+                    <td><img src={item.icon} alt={item.name} className="icon" /> {item.name}</td>
+                    <td>{item.price.toLocaleString()}</td>
+                    <td style={{ color: item.diffPrice > 0 ? 'green' : item.diffPrice < 0 ? 'red' : 'gray' }}>
+                      {item.diffPrice > 0 ? '▲' : item.diffPrice < 0 ? '▼' : '—'}{' '}
+                      {Math.abs(item.diffPrice).toLocaleString()} ({item.percent}%)
+                    </td>
+                    <td>
+                      <button
+                        onClick={(e) => handleItemToggle(item.name, e)}
+                        style={{
+                          border: '1px solid',
+                          borderColor: isSelected ? 'green' : 'gray',
+                          color: isSelected ? 'green' : 'gray',
+                          borderRadius: 4,
+                          padding: '4px 8px',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        {isSelected ? '−' : '+'}
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       )}
 
       {activeTab === 'chart' && selectedItems.length > 0 && (
-  <div style={{ marginTop: '1rem' }}>
-    <h5>※ 보석 시세를 차트로 확인할 수 있습니다.</h5>
-    <Line
-      data={{ labels: allDates, datasets }}
-      options={chartOptions}
-    />
-  </div>
-)}
+        <div >
+          <h5>※ 하단 라벨을 클릭하여 해당 시리즈를 켜거나 끌 수 있습니다.</h5>
+          {/* <Line
+            data={{ labels: allDates, datasets }}
+            options={chartOptions}
+           /> */}
+          <LineChart rawData={chartData} />
+        </div>
+      )}
 
       {alert && (
         <div
