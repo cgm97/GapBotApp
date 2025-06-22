@@ -107,6 +107,15 @@ export default function BookClient({ booksPrice, bookLastUpdate }) {
 
     if (isSelected) {
       newSelected = selectedItems.filter((name) => name !== itemName);
+
+      // chartData에서도 삭제
+      setChartData(prev => {
+        const updated = { ...prev };
+        delete updated[itemName];
+        return updated;
+      });
+
+
       setAlert({ message: `${itemName} 제거됨`, type: "remove", position: { top, left } });
     } else {
       newSelected = [...selectedItems, itemName];
