@@ -285,4 +285,7 @@ router.get('/jewel/chart', priceService.getJewelChartPrice);
  *         description: 서버 오류
  */
 router.get('/accessory', priceService.getAccessoryPrice);
+
+router.get('/accessory/chart', priceService.getAccessoryChart);
+
 module.exports = router;
