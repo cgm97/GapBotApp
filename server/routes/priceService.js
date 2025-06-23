@@ -1,7 +1,7 @@
 const { Console } = require('winston/lib/winston/transports');
 const pool = require('../db/connection');
 const logger = require('../logger');  // logger.js 임포트
-const { sessionCache, getBookPrice, getDate, getJewelPrice, getAccessoriesPrice, calculatePriceDiff, groupByNameArray } = require('../sessionUtil'); // 캐시 모듈 가져오기
+const { sessionCache, getBookPrice, getDate, getJewelPrice, calculatePriceDiff, groupByNameArray } = require('../sessionUtil'); // 캐시 모듈 가져오기
 require('dotenv').config(); // .env 파일에서 환경 변수 로드
 
 function formatDateString(dateStr) {
@@ -62,15 +62,15 @@ exports.getBookPrice = async (req, res, next) => {
             });
         });
 
-        res.status(200).json({
+        return res.status(200).json({
             success: true,
             booksPrice: retBooks,
             bookPriceLastUpdate: sessionCache.get("bookPriceLastUpdate")
         });
 
     } catch (error) {
-        next(new Error(error));  // 에러 객체를 넘겨서 next 미들웨어로 전달
-        res.status(500).json({ message: "Internal Server Error" });
+        // next(new Error(error));  // 에러 객체를 넘겨서 next 미들웨어로 전달
+        return res.status(500).json({ message: "Internal Server Error" });
     }
     finally {
         // DB 연결 해제
@@ -144,14 +144,14 @@ exports.getBookChartPrice = async (req, res, next) => {
             }
         });
 
-        res.status(200).json({
+        return res.status(200).json({
             success: true,
             itemData: bookData
         });
 
     } catch (error) {
-        next(new Error(error));  // 에러 객체를 넘겨서 next 미들웨어로 전달
-        res.status(500).json({ message: "Internal Server Error" });
+        // next(new Error(error));  // 에러 객체를 넘겨서 next 미들웨어로 전달
+        return res.status(500).json({ message: "Internal Server Error" });
     }
     finally {
         // DB 연결 해제
@@ -216,15 +216,15 @@ exports.getJewelPrice = async (req, res, next) => {
             });
         });
 
-        res.status(200).json({
+        return res.status(200).json({
             success: true,
             jewelsPrice: retJewels,
             jewelPriceLastUpdate: sessionCache.get("jewelPriceLastUpdate")
         });
 
     } catch (error) {
-        next(new Error(error));  // 에러 객체를 넘겨서 next 미들웨어로 전달
-        res.status(500).json({ message: "Internal Server Error" });
+        // next(new Error(error));  // 에러 객체를 넘겨서 next 미들웨어로 전달
+        return res.status(500).json({ message: "Internal Server Error" });
     }
     finally {
         // DB 연결 해제
@@ -390,14 +390,14 @@ exports.getJewelChartPrice = async (req, res, next) => {
             }
         });
 
-        res.status(200).json({
+        return res.status(200).json({
             success: true,
             itemData: jewelData
         });
 
     } catch (error) {
-        next(new Error(error));  // 에러 객체를 넘겨서 next 미들웨어로 전달
-        res.status(500).json({ message: "Internal Server Error" });
+        // next(new Error(error));  // 에러 객체를 넘겨서 next 미들웨어로 전달
+        return res.status(500).json({ message: "Internal Server Error" });
     }
     finally {
         // DB 연결 해제
@@ -416,7 +416,7 @@ exports.getAccessoryPrice = async (req, res, next) => {
         let nowAccessoryPrice = sessionCache.get("accessoryPrice");
 
         if (!nowAccessoryPrice) { // 캐쉬에 없을 경우 새로갱신
-           return res.status(500).json({ message: "데이터 준비 중입니다. 잠시 후 다시 시도해주세요." });
+            return res.status(500).json({ message: "데이터 준비 중입니다. 잠시 후 다시 시도해주세요." });
         }
 
         // 트랜잭션 시작
@@ -481,13 +481,114 @@ exports.getAccessoryPrice = async (req, res, next) => {
 
         // const accessoryPrice = calculatePriceDiff()
 
-        res.status(200).json(
+        return res.status(200).json(
             {
                 success: true,
                 accessorysPrice: nowAccessoryPrice,
                 accessoryPriceLastUpdate: sessionCache.get("accessoryPriceLastUpdate")
             }
         );
+
+    } catch (error) {
+        // next(new Error(error));  // 에러 객체를 넘겨서 next 미들웨어로 전달
+        return res.status(500).json({ message: "Internal Server Error" });
+    }
+    finally {
+        // DB 연결 해제
+        if (connection) connection.release();
+    }
+}
+
+// 악세서리 차트 조회
+exports.getAccessoryChart = async (req, res, next) => {
+
+    const { title, enhance, name, option1, option2 } = req.query;
+
+    // 로깅
+    const referer = req.headers.referer || req.headers.origin;
+    logger.info({
+        method: req.method,
+        url: req.url,
+        message: `요청 Host: ${referer} 유각조회: ${title}, ${enhance}, ${name}, ${option1}, ${option2}`,
+    });
+
+    // if (!referer || (!referer.includes('loagap.com') && !referer.includes('localhost'))) {
+    //     return res.status(403).json({ message: 'Invalid host' });
+    // }
+
+    if (!title || !enhance || !name || !option1) {
+        return res.status(400).json({ message: '필수값 누락' });
+    }
+
+    // DB 연결
+    const connection = await pool.getConnection();
+    try {
+
+        // 트랜잭션 시작
+        await connection.beginTransaction();
+
+        let selectSql = `
+        SELECT 
+            CAST(
+                UNIX_TIMESTAMP(
+                    CONCAT(DATE(MIN(FST_DTTI)), ' ', LPAD(FLOOR(HOUR(MIN(FST_DTTI)) / 4) * 4, 2, '0'), ':00:00')
+                ) AS UNSIGNED
+            ) AS time,
+            MIN(PRICE) AS low,
+            MAX(PRICE) AS high,
+            SUBSTRING_INDEX(GROUP_CONCAT(PRICE ORDER BY FST_DTTI), ',', 1) AS open,
+            SUBSTRING_INDEX(GROUP_CONCAT(PRICE ORDER BY FST_DTTI DESC), ',', 1) AS close
+        FROM 
+            ACCESSORY_PRICE_LOG
+        WHERE 
+            TITLE = ?
+            AND ENHANCE = ?
+            AND NAME = ?
+            AND OPTION1 = ?
+            AND (
+            (? = 1 AND OPTION2 IS NULL)
+            OR
+            (? = 0 AND OPTION2 = ?)
+            )
+            AND DL_YN = 'N'
+        GROUP BY 
+            DATE(FST_DTTI), FLOOR(HOUR(FST_DTTI) / 4)
+        ORDER BY 
+            time ASC
+        `;
+
+        const option2Value = option2 === '' ? null : option2;
+        const option2IsNull = option2Value == null ? 1 : 0;
+
+        const params = [
+            title,
+            enhance,
+            name,
+            option1,
+            option2IsNull,
+            option2IsNull,
+            option2Value,
+        ];
+        const [rows] = await connection.execute(selectSql, params);
+
+        const itemData = rows.map(item => ({
+            time: Number(item.time),       // ← 문자열 → 숫자 변환
+            low: Number(item.low),
+            high: Number(item.high),
+            open: Number(item.open),
+            close: Number(item.close),
+        }));
+
+        logger.info({
+            method: req.method,
+            url: req.url,  // 요청 URL
+            message: `\nSql ${selectSql} \nParam ${params}`
+        });
+
+        res.status(200).json({
+            success: true,
+            itemData: itemData
+        });
 
     } catch (error) {
         next(new Error(error));  // 에러 객체를 넘겨서 next 미들웨어로 전달
