@@ -1,0 +1,43 @@
+name: Deploy Dev to EC2 (Build on Actions)
+
+on:
+  push:
+    branches:
+      - dev
+  workflow_dispatch: # 수동 실행 버튼 추가
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies & build
+        run: |
+          cd next-app
+          npm ci
+          npm run build
+          cd ..
+
+      - name: Save SSH Key
+        run: |
+          echo "${{ secrets.EC2_KEY }}" > key.pem
+          chmod 600 key.pem
+
+      - name: Upload build to EC2
+        run: |
+          rsync -avz -e "ssh -i key.pem -o StrictHostKeyChecking=no" \
+            ./next-app/.next \
+            ./next-app/package.json \
+            ./next-app/package-lock.json \
+            ./next-app/public \
+            ./next-app/node_modules \
+            ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/GapBotApp-dev/next-app
+
+      - name: Restart PM2 on EC2
+        run: |
+          ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+            cd /home/ubuntu/GapBotApp-dev/next-app
+            # pm2 restart GapAppClient-dev --update-env || pm2 start npm --name GapAppClient-dev -- start -- --port 3001
+          EOF

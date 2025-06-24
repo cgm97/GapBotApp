@@ -1,0 +1,77 @@
+name: Deploy Prod to EC2 via Git Pull
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Save SSH Key
+        run: |
+          echo "${{ secrets.EC2_KEY }}" > key.pem
+          chmod 600 key.pem
+
+      - name: Deploy to EC2 (git pull & build)
+        run: |
+          ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+            set -e
+
+            cd /home/ubuntu/GapBotApp
+
+            echo "Fetch latest master"
+            git fetch origin master
+
+            LOCAL_HASH=$(git rev-parse HEAD)
+            REMOTE_HASH=$(git rev-parse origin/master)
+
+            # 최초 배포 대비 - 원격 기준으로 저장
+            if [ ! -s .last_deploy_commit ]; then
+              echo "$REMOTE_HASH" > .last_deploy_commit
+            fi
+
+            LAST_DEPLOY_COMMIT=$(cat .last_deploy_commit)
+
+            if [ "$LOCAL_HASH" != "$REMOTE_HASH" ]; then
+              echo "Resetting to remote master..."
+              git reset --hard origin/master
+              LOCAL_HASH=$(git rev-parse HEAD)
+
+              echo "Detecting changes since $LAST_DEPLOY_COMMIT"
+              changed_files=$(git diff --name-only "$LAST_DEPLOY_COMMIT" "$LOCAL_HASH")
+
+              echo "Changed files:"
+              echo "$changed_files"
+
+              if echo "$changed_files" | grep -q "^next-app/"; then
+                echo "Next-app changed: Building and Restarting PM2..."
+                cd next-app
+                # npm ci
+                npm run build
+                pm2 restart GapAppClient --update-env
+                cd ..
+              else
+                echo "No changes in next-app. Skipping build and restart PM2."
+              fi
+
+              if echo "$changed_files" | grep -q "^server/"; then
+                echo "Server changed: Restarting PM2..."
+                pm2 restart GapAppServer --update-env
+              else
+                echo "No changes in server. Skipping restart PM2."
+              fi
+
+              if echo "$changed_files" | grep -q "^next-app/"; then
+                echo "Restarting nginx..."
+                sudo systemctl restart nginx
+              fi
+
+              echo "$LOCAL_HASH" > .last_deploy_commit
+              echo "Deployment complete."
+            else
+              echo "No changes detected. Skipping build and restart."
+            fi
+          EOF

@@ -1,77 +1,98 @@
-name: Deploy to EC2 via Git Pull
+name: Deploy to EC2 with Conditional Build (Client build, Server pull)
 
 on:
   push:
     branches:
       - master
+  workflow_dispatch:
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # 전체 히스토리 필요
+
+      - name: Load last deploy commit
+        id: last_commit
+        run: |
+          if [ -f .last_deploy_commit ]; then
+            echo "last_commit=$(cat .last_deploy_commit)" >> $GITHUB_OUTPUT
+          else
+            echo "last_commit=" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Fetch latest origin/master
+        run: git fetch origin master
+
+      - name: Detect changed files
+        id: detect_changes
+        run: |
+          LAST_COMMIT=${{ steps.last_commit.outputs.last_commit }}
+          if [ -z "$LAST_COMMIT" ]; then
+            echo "No last deploy commit found, assume build and deploy needed."
+            echo "client_changed=true" >> $GITHUB_OUTPUT
+            echo "server_changed=true" >> $GITHUB_OUTPUT
+            echo "$(git rev-parse origin/master)" > .last_deploy_commit
+          else
+            CHANGED_FILES=$(git diff --name-only $LAST_COMMIT origin/master)
+            echo "Changed files since last deploy commit:"
+            echo "$CHANGED_FILES"
+
+            echo "$CHANGED_FILES" | grep -q "^next-app/" && echo "client_changed=true" >> $GITHUB_OUTPUT || echo "client_changed=false" >> $GITHUB_OUTPUT
+            echo "$CHANGED_FILES" | grep -q "^server/" && echo "server_changed=true" >> $GITHUB_OUTPUT || echo "server_changed=false" >> $GITHUB_OUTPUT
+
+            echo "$(git rev-parse origin/master)" > .last_deploy_commit
+          fi
+
+      - name: Checkout master at latest commit
+        run: git checkout origin/master
+
+      - name: Build next-app (if changed)
+        if: steps.detect_changes.outputs.client_changed == 'true'
+        run: |
+          cd next-app
+          npm ci
+          npm run build
+          cd ..
+
       - name: Save SSH Key
         run: |
           echo "${{ secrets.EC2_KEY }}" > key.pem
           chmod 600 key.pem
 
-      - name: Deploy to EC2 (git pull & build)
+      - name: Upload build to EC2 (if client changed)
+        if: steps.detect_changes.outputs.client_changed == 'true'
+        run: |
+          rsync -avz -e "ssh -i key.pem -o StrictHostKeyChecking=no" \
+            ./next-app/.next \
+            ./next-app/package.json \
+            ./next-app/package-lock.json \
+            ./next-app/public \
+            ./next-app/node_modules \
+            ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/GapBotApp/next-app
+
+      - name: Restart PM2 Client and nginx (if client changed)
+        if: steps.detect_changes.outputs.client_changed == 'true'
         run: |
           ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-            set -e
+            cd /home/ubuntu/GapBotApp/next-app
+            pm2 restart GapAppClient --update-env || pm2 start npm --name GapAppClient -- start
+            sudo systemctl restart nginx
+          EOF
 
+      - name: Pull & restart server on EC2 (if server changed)
+        if: steps.detect_changes.outputs.server_changed == 'true'
+        run: |
+          ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             cd /home/ubuntu/GapBotApp
-
-            echo "Fetch latest master"
+            echo "Fetching latest server code..."
             git fetch origin master
+            git reset --hard origin/master
 
-            LOCAL_HASH=$(git rev-parse HEAD)
-            REMOTE_HASH=$(git rev-parse origin/master)
-
-            # 최초 배포 대비 - 원격 기준으로 저장
-            if [ ! -s .last_deploy_commit ]; then
-              echo "$REMOTE_HASH" > .last_deploy_commit
-            fi
-
-            LAST_DEPLOY_COMMIT=$(cat .last_deploy_commit)
-
-            if [ "$LOCAL_HASH" != "$REMOTE_HASH" ]; then
-              echo "Resetting to remote master..."
-              git reset --hard origin/master
-              LOCAL_HASH=$(git rev-parse HEAD)
-
-              echo "Detecting changes since $LAST_DEPLOY_COMMIT"
-              changed_files=$(git diff --name-only "$LAST_DEPLOY_COMMIT" "$LOCAL_HASH")
-
-              echo "Changed files:"
-              echo "$changed_files"
-
-              if echo "$changed_files" | grep -q "^next-app/"; then
-                echo "Next-app changed: Building and Restarting PM2..."
-                cd next-app
-                # npm ci
-                npm run build
-                pm2 restart GapAppClient --update-env
-                cd ..
-              else
-                echo "No changes in next-app. Skipping build and restart PM2."
-              fi
-
-              if echo "$changed_files" | grep -q "^server/"; then
-                echo "Server changed: Restarting PM2..."
-                pm2 restart GapAppServer --update-env
-              else
-                echo "No changes in server. Skipping restart PM2."
-              fi
-
-              if echo "$changed_files" | grep -q "^next-app/"; then
-                echo "Restarting nginx..."
-                sudo systemctl restart nginx
-              fi
-
-              echo "$LOCAL_HASH" > .last_deploy_commit
-              echo "Deployment complete."
-            else
-              echo "No changes detected. Skipping build and restart."
-            fi
+            echo "Restarting server process..."
+            pm2 restart GapAppServer --update-env || pm2 start npm --name GapAppServer -- start
           EOF
