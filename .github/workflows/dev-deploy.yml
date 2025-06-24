@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - dev
-
+  workflow_dispatch: # 수동 실행 버튼 추가
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -25,7 +25,7 @@ jobs:
           echo "${{ secrets.EC2_KEY }}" > key.pem
           chmod 600 key.pem
 
-      - name: Upload build to EC2 (via rsync)
+      - name: Upload build to EC2
         run: |
           rsync -avz -e "ssh -i key.pem -o StrictHostKeyChecking=no" \
             ./next-app/.next \
@@ -39,5 +39,5 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             cd /home/ubuntu/GapBotApp-dev/next-app
-            pm2 restart GapAppClient-dev --update-env || pm2 start npm --name GapAppClient-dev -- start -- --port 3001
+            # pm2 restart GapAppClient-dev --update-env || pm2 start npm --name GapAppClient-dev -- start -- --port 3001
           EOF
