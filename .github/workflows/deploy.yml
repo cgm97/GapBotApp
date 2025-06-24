@@ -49,7 +49,7 @@ jobs:
               if echo "$changed_files" | grep -q "^next-app/"; then
                 echo "Next-app changed: Building and Restarting PM2..."
                 cd next-app
-                npm ci
+                # npm ci
                 npm run build
                 pm2 restart GapAppClient --update-env
                 cd ..
