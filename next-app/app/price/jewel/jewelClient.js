@@ -236,36 +236,43 @@ export default function JewelClient({ jewelsPrice, jewelPriceLastUpdate }) {
 
       {activeTab === 'price' && (
         <div className="price-table-container">
-          <div style={{ textAlign: "center", marginBottom: "1rem", color: "#555" }}>
-            <h3 style={{ margin: "0.5rem 0" }}>※ 로스트아크 보석 실시간 시세를 조회할 수 있습니다.</h3>
-            <h4 style={{ margin: "0.5rem 0" }}>
-              변동가격은 기준일자 0시 기준으로 계산된 값이며, 차트를 추가하거나 제거할 수 있습니다.
-            </h4>
-            <h5 style={{ margin: "0.5rem 0" }}>
-              기준일자 : {new Date(new Date().setDate(new Date().getDate() - 1)).toISOString().slice(0, 10)}
-            </h5>
-            <h5 className="my-2 text-gray-700">
-              <span className="ml-1 text-xs text-gray-400">
-                1분마다 자동 갱신 / 다음 갱신까지 <b className='text-red-400'>{nextUpdateIn}초</b> 남음
-              </span><br />
-              <span className="ml-1 text-xs text-gray-400">
+          <main className="max-w-screen-lg mx-auto px-4 py-6">
+            <section
+              className="text-center mb-6 text-gray-700"
+              aria-labelledby="jewel-price-guide"
+            >
+              <h1 id="jewel-price-guide" className="text-xl font-bold my-2">
+                로스트아크 보석 실시간 시세 조회
+              </h1>
+              <p className="text-sm my-2">
+                변동가격은 기준일자 0시 기준으로 계산된 값이며, 차트를 추가하거나 제거할 수 있습니다.
+              </p>
+              <p className="text-sm my-2">
+                <strong>기준일자:</strong>{' '}
+                <time dateTime={new Date(new Date().setDate(new Date().getDate() - 1)).toISOString().slice(0, 10)}>{new Date(new Date().setDate(new Date().getDate() - 1)).toISOString().slice(0, 10)}</time>
+              </p>
+              <p className="text-sm my-2 text-gray-400">
+                1분마다 자동 갱신 / 다음 갱신까지{' '}
+                <b className="text-red-500">{nextUpdateIn}초</b> 남음
+                <br />
                 (갱신 시 1분 대비 가격 변동이 약 50초간 표시됩니다.)
-              </span><br />
-              last update <span className="font-semibold">{lastUpdate}</span>
-
-            </h5>
-          </div>
+              </p>
+              <p className="text-sm my-2">
+                <strong>마지막 업데이트:</strong> <span className="font-semibold">{lastUpdate}</span>
+              </p>
+            </section>
+          </main>
           <table className="price-table">
             <thead>
               <tr>
-                <th className='p-2 border w-[200px]'>보석</th>
+                <th className='p-2 border w-[300px]'>보석</th>
                 <th className="p-2 border w-[200px] text-left">
                   현재 가격 <span className="ml-1 text-xs text-gray-300">(1분 대비)</span>
                 </th>
                 <th className='p-2 border w-[200px]'>
                   변동 가격 <span className="ml-1 text-xs text-gray-300">(기준일자 대비)</span>
                 </th>
-                <th>차트</th>
+                <th className='p-2 border w-[50px]'>차트</th>
               </tr>
             </thead>
             <tbody>

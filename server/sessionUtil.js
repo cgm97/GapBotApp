@@ -14,7 +14,15 @@ const initializeCache = async () => {
         sessionCache.set("cubeInfo", cubeInfo); // 실제 데이터를 Map에 저장
 
         // 악세서리 정보 초기 초기화
-        await getAccessoriesPrice();
+        if (process.env.NODE_ENV == "PROD") {
+            await getBookPrice();
+            await getJewelPrice();
+
+            // 느린 작업: 백그라운드 처리
+            getAccessoriesPrice()
+                .then(() => console.log("악세서리 가격 캐시 완료"))
+                .catch(err => console.error("악세서리 캐시 실패:", err));
+        }
 
         // console.log("Session Cache:", Object.fromEntries(sessionCache)); // Map 내용을 출력
     } catch (error) {
@@ -65,14 +73,14 @@ const getBookPrice = async () => {
     const method = 'getBookPrice';
     const now = Date.now();
 
-    if (now - lastBookPriceUpdate < 60 * 1000) {
-        logger.info({
-            method,
-            url: "SessionUtil",
-            message: `bookPrice: 1분 이내 요청 → 캐시 사용`,
-        });
-        return sessionCache.get("bookPrice");
-    }
+    // if (now - lastBookPriceUpdate < 60 * 1000) {
+    //     logger.info({
+    //         method,
+    //         url: "SessionUtil",
+    //         message: `bookPrice: 1분 이내 요청 → 캐시 사용`,
+    //     });
+    //     return sessionCache.get("bookPrice");
+    // }
 
     const API_URL = "https://developer-lostark.game.onstove.com/markets/items";
     let bookArr = [];
@@ -133,14 +141,14 @@ const getJewelPrice = async () => {
     const method = 'getJewelPrice';
     const now = Date.now();
 
-    if (now - lastJewelPriceUpdate < 60 * 1000) {
-        logger.info({
-            method,
-            url: "SessionUtil",
-            message: `getJewelPrice: 1분 이내 요청 → 캐시 사용`,
-        });
-        return sessionCache.get("jewelPrice");
-    }
+    // if (now - lastJewelPriceUpdate < 60 * 1000) {
+    //     logger.info({
+    //         method,
+    //         url: "SessionUtil",
+    //         message: `getJewelPrice: 1분 이내 요청 → 캐시 사용`,
+    //     });
+    //     return sessionCache.get("jewelPrice");
+    // }
 
     const API_URL = "https://developer-lostark.game.onstove.com/auctions/items";
     let jemArr = {};
@@ -173,6 +181,12 @@ const getJewelPrice = async () => {
             });
         }
     }
+    logger.info({
+        method,
+        url: "SessionUtil",
+        message: `jewelPrice 갱신 완료 - ${Object.values(jemArr).reduce((acc, arr) => acc + arr.length, 0)}건`,
+    });
+
     sessionCache.set("jewelPrice", jemArr);
     sessionCache.set("jewelPriceLastUpdate", getDateTime());
     lastJewelPriceUpdate = now;
@@ -182,7 +196,6 @@ const getJewelPrice = async () => {
 
 const getAccessoriesPrice = async () => {
     const method = 'getAccessoriesPrice';
-    const now = Date.now();
 
     const accessory = fillter.ACCESSORY;
     const grade = fillter.GRADE;
@@ -260,7 +273,7 @@ const getAccessoriesPrice = async () => {
                             if (cnt > 95) {
                                 authorization = LOA_API2;
                             }
-                            
+
                             const response = await axios.post(API_URL, body, {
                                 headers: {
                                     'accept': 'application/json',
@@ -299,19 +312,19 @@ const getAccessoriesPrice = async () => {
                             cnt++;
 
                             await new Promise(resolve => setTimeout(resolve, 1000));
-                                   
-            // "title": "상",
-            // "enhances": [
-            //     {
-            //         "enhance": "1",
-            //         "items": [
-            //             {
-            //                 "name": "목걸이",
-            //                 "option": [
-            //                     "적에게 주는 피해%", "추가 피해%"
-            //                 ],
-            //                 "price": 52999
-                        
+
+                            // "title": "상",
+                            // "enhances": [
+                            //     {
+                            //         "enhance": "1",
+                            //         "items": [
+                            //             {
+                            //                 "name": "목걸이",
+                            //                 "option": [
+                            //                     "적에게 주는 피해%", "추가 피해%"
+                            //                 ],
+                            //                 "price": 52999
+
                         }
 
 
@@ -323,13 +336,13 @@ const getAccessoriesPrice = async () => {
             }
 
         }
-        
+
         sessionCache.set("accessoryPrice", retAccessory);
         sessionCache.set("accessoryPriceLastUpdate", getDateTime());
 
     } catch (err) {
-         console.error("에러 발생:", err?.response?.data || err.message || err);
-         return [];
+        console.error("에러 발생:", err?.response?.data || err.message || err);
+        return [];
     }
 
 
@@ -365,43 +378,43 @@ const getDate = (offsetDays = 0) => {
 
 // 악세 가격 차이 계산
 const calculatePriceDiff = (yesterdayItems, todayItems) => {
-  const yesterdayMap = new Map();
+    const yesterdayMap = new Map();
 
-  for (const item of yesterdayItems) {
-    const key = makeStrictKey(item);
-    if (!yesterdayMap.has(key)) {
-      yesterdayMap.set(key, item.price);
-    } else {
-      const prev = yesterdayMap.get(key);
-      yesterdayMap.set(key, Math.min(prev, item.price)); // 최저가 기준
-    }
-  }
-
-  return todayItems.map(item => {
-    const key = makeStrictKey(item);
-    const yesterdayPrice = yesterdayMap.get(key);
-
-    let priceDiff = 0;
-    let percentDiff = 0;
-
-    if (typeof yesterdayPrice === 'number' && yesterdayPrice > 0) {
-      priceDiff = item.price - yesterdayPrice;
-      percentDiff = (priceDiff / yesterdayPrice) * 100;
-      // 소수점 둘째 자리까지 반올림
-      percentDiff = Math.round(percentDiff * 100) / 100;
+    for (const item of yesterdayItems) {
+        const key = makeStrictKey(item);
+        if (!yesterdayMap.has(key)) {
+            yesterdayMap.set(key, item.price);
+        } else {
+            const prev = yesterdayMap.get(key);
+            yesterdayMap.set(key, Math.min(prev, item.price)); // 최저가 기준
+        }
     }
 
-    return {
-      ...item,
-      priceDiff,
-      percentDiff
-    };
-  });
+    return todayItems.map(item => {
+        const key = makeStrictKey(item);
+        const yesterdayPrice = yesterdayMap.get(key);
+
+        let priceDiff = 0;
+        let percentDiff = 0;
+
+        if (typeof yesterdayPrice === 'number' && yesterdayPrice > 0) {
+            priceDiff = item.price - yesterdayPrice;
+            percentDiff = (priceDiff / yesterdayPrice) * 100;
+            // 소수점 둘째 자리까지 반올림
+            percentDiff = Math.round(percentDiff * 100) / 100;
+        }
+
+        return {
+            ...item,
+            priceDiff,
+            percentDiff
+        };
+    });
 }
 
 // 악세 전일자대비 구하기
 const makeStrictKey = (item) => {
-  return `${item.name}|${item.option.join(',')}`;
+    return `${item.name}|${item.option.join(',')}`;
 }
 
 module.exports = {

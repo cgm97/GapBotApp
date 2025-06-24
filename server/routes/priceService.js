@@ -24,7 +24,13 @@ exports.getBookPrice = async (req, res, next) => {
     try {
 
         // 현재 각인서 가격 조회
-        const nowBookPrice = await getBookPrice();
+        // const nowBookPrice = await getBookPrice();
+        // 현재 각인서 가격 조회
+        const nowBookPrice = sessionCache.get("bookPrice");
+
+        if (!nowBookPrice) { // 캐쉬에 없을 경우 새로갱신
+            return res.status(500).json({ message: "데이터 준비 중입니다. 잠시 후 다시 시도해주세요." });
+        }
 
         // 트랜잭션 시작
         await connection.beginTransaction();
@@ -35,11 +41,11 @@ exports.getBookPrice = async (req, res, next) => {
                  `;
         const [yesterdayPrice] = await connection.execute(selectSql, [yesterday, '02']);
 
-        logger.info({
-            method: req.method,
-            url: req.url,  // 요청 URL
-            message: `\nSql ${selectSql} \nParam ${[yesterday, '02']}`
-        });
+        // logger.info({
+        //     method: req.method,
+        //     url: req.url,  // 요청 URL
+        //     message: `\nSql ${selectSql} \nParam ${[yesterday, '02']}`
+        // });
 
         const preBookPrice = yesterdayPrice[0]?.BOOKS_DATA || [];
 
@@ -69,8 +75,8 @@ exports.getBookPrice = async (req, res, next) => {
         });
 
     } catch (error) {
-        // next(new Error(error));  // 에러 객체를 넘겨서 next 미들웨어로 전달
-        return res.status(500).json({ message: "Internal Server Error" });
+        next(new Error(error));  // 에러 객체를 넘겨서 next 미들웨어로 전달
+        // return res.status(500).json({ message: "Internal Server Error" });
     }
     finally {
         // DB 연결 해제
@@ -88,7 +94,7 @@ exports.getBookChartPrice = async (req, res, next) => {
     logger.info({
         method: req.method,
         url: req.url,
-        message: `요청 Host: ${referer} 유각조회: ${item}`,
+        message: `요청 Host: ${referer} 유각차트조회: ${item}`,
     });
 
     if (!referer || (!referer.includes('loagap.com') && !referer.includes('localhost'))) {
@@ -118,11 +124,11 @@ exports.getBookChartPrice = async (req, res, next) => {
                             AND BASE_DATE <> CURRENT_DATE`;
         let [bookData] = await connection.execute(selectSql, [item, '02']);
 
-        logger.info({
-            method: req.method,
-            url: req.url,  // 요청 URL
-            message: `\nSql ${selectSql} \nParam ${[item]}`
-        });
+        // logger.info({
+        //     method: req.method,
+        //     url: req.url,  // 요청 URL
+        //     message: `\nSql ${selectSql} \nParam ${[item]}`
+        // });
 
         // 날자 포멧 변경
         bookData = bookData.map(item => ({
@@ -132,7 +138,8 @@ exports.getBookChartPrice = async (req, res, next) => {
         }));
 
         // 현재 각인서 가격 조회 - 오늘 시세가지 차트에 적용
-        const nowBookPrice = await getBookPrice();
+        //  const nowBookPrice = await getJewelPrice();
+        const nowBookPrice = sessionCache.get("bookPrice");
         nowBookPrice.forEach(book => {
             if (book.name == item) {
                 bookData.push({
@@ -150,8 +157,8 @@ exports.getBookChartPrice = async (req, res, next) => {
         });
 
     } catch (error) {
-        // next(new Error(error));  // 에러 객체를 넘겨서 next 미들웨어로 전달
-        return res.status(500).json({ message: "Internal Server Error" });
+        next(new Error(error));  // 에러 객체를 넘겨서 next 미들웨어로 전달
+        // return res.status(500).json({ message: "Internal Server Error" });
     }
     finally {
         // DB 연결 해제
@@ -169,7 +176,8 @@ exports.getJewelPrice = async (req, res, next) => {
     try {
 
         // 현재 각인서 가격 조회
-        const nowJewelPricePre = await getJewelPrice();
+        // const nowJewelPricePre = await getJewelPrice();
+        const nowJewelPricePre = sessionCache.get("jewelPrice");
 
         // 트랜잭션 시작
         await connection.beginTransaction();
@@ -180,11 +188,11 @@ exports.getJewelPrice = async (req, res, next) => {
                  `;
         const [yesterdayPrice] = await connection.execute(selectSql, [yesterday, '01']);
 
-        logger.info({
-            method: req.method,
-            url: req.url,  // 요청 URL
-            message: `\nSql ${selectSql} \nParam ${[yesterday, '01']}`
-        });
+        // logger.info({
+        //     method: req.method,
+        //     url: req.url,  // 요청 URL
+        //     message: `\nSql ${selectSql} \nParam ${[yesterday, '01']}`
+        // });
 
         const preJewelPricePre = yesterdayPrice[0]?.JEWELS_DATA || [];
 
@@ -223,8 +231,8 @@ exports.getJewelPrice = async (req, res, next) => {
         });
 
     } catch (error) {
-        // next(new Error(error));  // 에러 객체를 넘겨서 next 미들웨어로 전달
-        return res.status(500).json({ message: "Internal Server Error" });
+        next(new Error(error));  // 에러 객체를 넘겨서 next 미들웨어로 전달
+        // return res.status(500).json({ message: "Internal Server Error" });
     }
     finally {
         // DB 연결 해제
@@ -359,11 +367,11 @@ exports.getJewelChartPrice = async (req, res, next) => {
                             `
         let [jewelData] = await connection.execute(selectSql, [item]);
 
-        logger.info({
-            method: req.method,
-            url: req.url,  // 요청 URL
-            message: `\nSql ${selectSql} \nParam ${[item]}`
-        });
+        // logger.info({
+        //     method: req.method,
+        //     url: req.url,  // 요청 URL
+        //     message: `\nSql ${selectSql} \nParam ${[item]}`
+        // });
 
         // 날자 포멧 변경
         jewelData = jewelData.map(item => ({
@@ -373,7 +381,8 @@ exports.getJewelChartPrice = async (req, res, next) => {
         }));
 
         // 현재 각인서 가격 조회 - 오늘 시세가지 차트에 적용
-        const nowjewelPricePre = await getJewelPrice();
+        // const nowjewelPricePre = await getJewelPrice();
+        const nowjewelPricePre = sessionCache.get("jewelPrice");
         const nowjewelPrice = Object.keys(nowjewelPricePre).sort((a, b) => Number(b) - Number(a)) // 10 → 7 내림차순
             .flatMap((level) =>
                 nowjewelPricePre[level]
@@ -396,8 +405,8 @@ exports.getJewelChartPrice = async (req, res, next) => {
         });
 
     } catch (error) {
-        // next(new Error(error));  // 에러 객체를 넘겨서 next 미들웨어로 전달
-        return res.status(500).json({ message: "Internal Server Error" });
+        next(new Error(error));  // 에러 객체를 넘겨서 next 미들웨어로 전달
+        // return res.status(500).json({ message: "Internal Server Error" });
     }
     finally {
         // DB 연결 해제
@@ -413,7 +422,7 @@ exports.getAccessoryPrice = async (req, res, next) => {
     try {
 
         // 현재 각인서 가격 조회
-        let nowAccessoryPrice = sessionCache.get("accessoryPrice");
+        const nowAccessoryPrice = sessionCache.get("accessoryPrice");
 
         if (!nowAccessoryPrice) { // 캐쉬에 없을 경우 새로갱신
             return res.status(500).json({ message: "데이터 준비 중입니다. 잠시 후 다시 시도해주세요." });
@@ -435,11 +444,11 @@ exports.getAccessoryPrice = async (req, res, next) => {
 
         const preAccessoryPrice = rows[0]?.ACCESSORYS_DATA || [];
 
-        logger.info({
-            method: req.method,
-            url: req.url,  // 요청 URL
-            message: `\nSql ${selectSql} \nParam ${[yesterday, '03']}`
-        });
+        // logger.info({
+        //     method: req.method,
+        //     url: req.url,  // 요청 URL
+        //     message: `\nSql ${selectSql} \nParam ${[yesterday, '03']}`
+        // });
 
         // nowAccessoryPrice.forEach(items => {
         //     console.log(items.title); // 상
@@ -490,8 +499,8 @@ exports.getAccessoryPrice = async (req, res, next) => {
         );
 
     } catch (error) {
-        // next(new Error(error));  // 에러 객체를 넘겨서 next 미들웨어로 전달
-        return res.status(500).json({ message: "Internal Server Error" });
+        next(new Error(error));  // 에러 객체를 넘겨서 next 미들웨어로 전달
+        // return res.status(500).json({ message: "Internal Server Error" });
     }
     finally {
         // DB 연결 해제
@@ -502,21 +511,21 @@ exports.getAccessoryPrice = async (req, res, next) => {
 // 악세서리 차트 조회
 exports.getAccessoryChart = async (req, res, next) => {
 
-    const { title, enhance, name, option1, option2 } = req.query;
+    const { title, enhance, name, option, extra = '' } = req.query;
 
     // 로깅
     const referer = req.headers.referer || req.headers.origin;
     logger.info({
         method: req.method,
         url: req.url,
-        message: `요청 Host: ${referer} 유각조회: ${title}, ${enhance}, ${name}, ${option1}, ${option2}`,
+        message: `요청 Host: ${referer} 악세차트조회: ${title}, ${enhance}, ${name}, ${option}, ${extra}`,
     });
 
-    // if (!referer || (!referer.includes('loagap.com') && !referer.includes('localhost'))) {
-    //     return res.status(403).json({ message: 'Invalid host' });
-    // }
+    if (!referer || (!referer.includes('loagap.com') && !referer.includes('localhost'))) {
+        return res.status(403).json({ message: 'Invalid host' });
+    }
 
-    if (!title || !enhance || !name || !option1) {
+    if (!title || !enhance || !name || !option) {
         return res.status(400).json({ message: '필수값 누락' });
     }
 
@@ -557,14 +566,14 @@ exports.getAccessoryChart = async (req, res, next) => {
             time ASC
         `;
 
-        const option2Value = option2 === '' ? null : option2;
+        const option2Value = extra === '' ? null : extra;
         const option2IsNull = option2Value == null ? 1 : 0;
 
         const params = [
             title,
             enhance,
             name,
-            option1,
+            option,
             option2IsNull,
             option2IsNull,
             option2Value,
@@ -579,20 +588,19 @@ exports.getAccessoryChart = async (req, res, next) => {
             close: Number(item.close),
         }));
 
-        logger.info({
-            method: req.method,
-            url: req.url,  // 요청 URL
-            message: `\nSql ${selectSql} \nParam ${params}`
-        });
+        // logger.info({
+        //     method: req.method,
+        //     url: req.url,  // 요청 URL
+        //     message: `\nSql ${selectSql} \nParam ${params}`
+        // });
 
-        res.status(200).json({
+        return res.status(200).json({
             success: true,
             itemData: itemData
         });
 
     } catch (error) {
         next(new Error(error));  // 에러 객체를 넘겨서 next 미들웨어로 전달
-        res.status(500).json({ message: "Internal Server Error" });
     }
     finally {
         // DB 연결 해제

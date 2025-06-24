@@ -13,7 +13,7 @@ async function getBooksPriceData() {
 export const metadata = {
   title: '유각시세 · 유각차트 | LOAGAP',
   description: '로스트아크의 실시간 유물 각인서 시세, 차트, 가격 변동, 랭킹 정보를 빠르게 확인해보세요.',
-  keywords: 'LOAGAP, 빈틈봇, 로아 ,실시간, 유각, 유각 시세, 유각 차트, 유각가격, 유각랭킹, 유각순위, 유물, 유물 각인서, 각인서, 아드, 원한, 로스트아크, 실시간 로아 시세',
+  keywords: '로스트아크, 로아 유각 시세, 로아 유각 차트, 유물 각인서 가격, 아드레날린, 원한, 실시간 로아 시세, LOAGAP, 빈틈봇',
   openGraph: {
     title: '유각시세 · 유각차트 | LOAGAP',
     description: '로스트아크의 실시간 유물 각인서 시세, 차트, 가격 변동, 랭킹 정보를 빠르게 확인해보세요.',
