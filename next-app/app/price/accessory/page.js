@@ -21,11 +21,11 @@ async function getAccessoryPriceData() {
 
 export const metadata = {
   title: '악세시세 · 악세차트 | LOAGAP',
-  description: '로스트아크의 실시간 악세서리 시세, 악세 차트, 가격 변동, 랭킹 정보를 빠르게 확인해보세요.',
-  keywords: '로스트아크 악세 시세, 로스트아크 악세서리 차트, 로아 악세 시세, 로아 악세 가격, LOAGAP, 빈틈봇, 고대 악세, 유물 악세',
+  description: '로스트아크의 실시간 악세서리 시세, 연마 단계별 가격, 상세 차트를 확인하세요.',
+  keywords: '로스트아크 악세서리 시세, 고대 악세, 유물 악세, 로아 악세 차트, 연마 단계 시세, 실시간 악세 가격, 로아 악세 시세, LOAGAP, 빈틈봇',
   openGraph: {
     title: '악세시세 · 악세차트 | LOAGAP',
-    description: '로스트아크의 실시간 악세서리 시세, 악세 차트, 가격 변동, 랭킹 정보를 빠르게 확인해보세요.',
+    description: '로스트아크의 실시간 악세서리 시세, 연마 단계별 가격, 상세 차트를 확인하세요.',
     url: 'https://loagap.com/price/accessory',
     type: 'website',
     images: [
