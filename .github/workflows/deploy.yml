@@ -49,8 +49,9 @@ jobs:
               if echo "$changed_files" | grep -q "^next-app/"; then
                 echo "Next-app changed: Building and Restarting PM2..."
                 cd next-app
+                npm ci
                 npm run build
-                pm2 restart 2
+                pm2 restart GapAppClient --update-env
                 cd ..
               else
                 echo "No changes in next-app. Skipping build and restart PM2."
@@ -58,7 +59,7 @@ jobs:
 
               if echo "$changed_files" | grep -q "^server/"; then
                 echo "Server changed: Restarting PM2..."
-                pm2 restart 0
+                pm2 restart GapAppServer --update-env
               else
                 echo "No changes in server. Skipping restart PM2."
               fi
