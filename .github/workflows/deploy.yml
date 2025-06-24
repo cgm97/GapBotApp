@@ -1,4 +1,4 @@
-name: Deploy to EC2 via Git Pull
+name: Deploy Prod to EC2 via Git Pull
 
 on:
   push:
