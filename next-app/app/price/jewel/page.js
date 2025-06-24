@@ -14,10 +14,10 @@ async function getJewelsPriceData() {
 export const metadata = {
   title: '보석시세 · 보석차트 | LOAGAP',
   description: '로스트아크의 실시간 1~10레벨 보석시세, 차트, 가격 변동, 랭킹 정보를 빠르게 확인해보세요.',
-  keywords: '로스트아크, 로아, 보석 시세, 보석 차트, 로아 보석 가격, 겁화, 작열, 멸화, 홍염, LOAGAP, 빈틈봇, 보석 랭킹, 로아 시세, 실시간 로아 시세',
+  keywords: '로스트아크 보석 시세, 로아 보석 가격, 겁화 보석, 작열 보석, 정화 보석, 로아 보석 차트, 로아 보석 시세, LOAGAP',
   openGraph: {
     title: '보석시세 · 보석차트 | LOAGAP',
-    description: '로스트아크의 실시간  1~10레벨 보석시세, 차트, 가격 변동, 랭킹 정보를 빠르게 확인해보세요.',
+    description: '로스트아크의 실시간 1~10레벨 보석시세, 차트, 가격 변동, 랭킹 정보를 빠르게 확인해보세요.',
     url: 'https://loagap.com/price/jewel',
     type: 'website',
     images: [
