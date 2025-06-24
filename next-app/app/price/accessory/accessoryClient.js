@@ -1,12 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-// import sampleData from './data.json';
+import CandleChart from '@/components/CandleChart';
+import axios from 'axios';
 
 export default function AccessoryClient({ accessorysPrice, accessoryLastUpdate }) {
   const [selectedTitles, setSelectedTitles] = useState([]);
   const [selectedEnhances, setSelectedEnhances] = useState([]);
   const [selectedNames, setSelectedNames] = useState([]);
+  const [chartData, setChartData] = useState(null);
+  const [modalItem, setModalItem] = useState(null); // 이름, title, enhance, option 포함
 
   const allTitles = ['전체', ...accessorysPrice.map((tier) => tier.title)];
   const allEnhanceLevels = ['전체', '1', '2', '3'];
@@ -51,17 +54,46 @@ export default function AccessoryClient({ accessorysPrice, accessoryLastUpdate }
   baseDate.setDate(baseDate.getDate() - 1);
   const baseDateString = baseDate.toISOString().slice(0, 10);
 
+  const fetchChartData = async (link, itemMeta) => {
+    try {
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}${link}`);
+      setChartData({ itemData: res.data.itemData });
+      setModalItem(itemMeta);
+    } catch (e) {
+      console.error("차트 데이터 오류:", e);
+    }
+  };
+
   return (
     <div className="p-4 max-w-screen-lg mx-auto">
       {/* 안내 메시지 */}
-      <div style={{ textAlign: 'center', marginBottom: '1rem', color: '#555' }}>
-        <h3 style={{ margin: '0.5rem 0' }}>※ 로스트아크 악세 실시간 시세를 조회할 수 있습니다.</h3>
-        <h4 style={{ margin: '0.5rem 0' }}>
-          변동가격은 기준일자 0시 기준으로 계산된 값이며, 차트를 추가하거나 제거할 수 있습니다.
-        </h4>
-        <h5 style={{ margin: '0.5rem 0' }}>기준일자 : {baseDateString}</h5>
-        <h5 style={{ margin: '0.5rem 0' }}>last update {accessoryLastUpdate}</h5>
-      </div>
+      <main className="max-w-screen-lg mx-auto px-4 py-6">
+      <section
+        className="text-center mb-6 text-gray-700"
+        aria-labelledby="artifact-price-guide"
+      >
+        <h1 id="artifact-price-guide" className="text-xl font-bold my-2">
+          로스트아크 악세서리 실시간 시세 조회
+        </h1>
+        <p className="text-sm my-2">
+          변동가격은 기준일자 0시 기준으로 계산되며, 목록을 클릭하면 상세 차트를 확인하실 수 있습니다.
+        </p>
+        <p className="text-sm my-2">
+          <strong>기준일자:</strong>{' '}
+          <time dateTime={new Date(new Date().setDate(new Date().getDate() - 1)).toISOString().slice(0, 10)}>{new Date(new Date().setDate(new Date().getDate() - 1)).toISOString().slice(0, 10)}</time>
+        </p>
+        <p className="text-sm my-2 text-gray-400">
+          1시간마다 갱신
+          {/* 1분마다 자동 갱신 / 다음 갱신까지{' '}
+              <b className="text-red-500">{nextUpdateIn}초</b> 남음
+              <br />
+              (갱신 시 1분 대비 가격 변동이 약 50초간 표시됩니다.) */}
+        </p>
+        <p className="text-sm my-2">
+          <strong>마지막 업데이트:</strong> <span className="font-semibold">{accessoryLastUpdate}</span>
+        </p>
+      </section>
+      </main>
       {/* 전체 필터 영역을 감싸는 박스 */}
       <div className="flex justify-center mb-6">
         <div className="flex flex-col items-start gap-4">
@@ -126,8 +158,6 @@ export default function AccessoryClient({ accessorysPrice, accessoryLastUpdate }
             key={tier.title}
             className={`mb-8 border rounded-lg shadow-sm p-4 bg-gray-100`}
           >
-
-
             {tier.enhances.map((enhance) => (
               <div key={enhance.enhance} className="mb-4">
                 <h4 className="text-lg font-semibold text-gray-800 mb-2 flex items-center gap-2">
@@ -145,44 +175,65 @@ export default function AccessoryClient({ accessorysPrice, accessoryLastUpdate }
                       </tr>
                     </thead>
                     <tbody className="bg-white">
-                      {enhance.items.map((item, idx) => (
-                        <tr key={idx} className="text-center">
-                          <td className="border px-3 py-1">{item.name}</td>
-                          <td className="border px-3 py-1 accessory-options">
-                            {item.option.map((opt, idx) => {
-                              const grade = tier.title[idx] || '';
+                      {enhance.items.map((item, idx) => {
+                        const query = new URLSearchParams();
+                        query.set('title', tier.title);
+                        query.set('enhance', enhance.enhance);
+                        query.set('name', item.name);
+                        query.set('option', item.option[0]);
+                        if (item.option[1]) query.set('extra', item.option[1]);
 
-                              // Tailwind 클래스 매핑
-                              const gradeClass = {
-                                '상': 'bg-yellow-400 text-white text-xs px-1 rounded',
-                                '중': 'bg-purple-700 text-white text-xs px-1 rounded',
-                                '하': 'bg-blue-600 text-white text-xs px-1 rounded',
-                              }[grade] || 'text-xs';
+                        const link = `/price/accessory/chart?${query.toString()}`;
 
-                              return (
-                                <span key={`${opt}-${idx}`} className="mr-1 inline-block">
-                                  <span className={`${gradeClass}`}>{grade}</span> {opt}
-                                </span>
-                              );
-                            })}
-                          </td>
-                          <td className="border px-3 py-1">{item.price.toLocaleString() != 0 ? item.price.toLocaleString() : '매물없음'}</td>
-                          <td
-                            className={`border px-3 py-1 font-medium ${item.price === 0
-                              ? 'text-gray-400'
-                              : item.priceDiff > 0
-                                ? 'text-green-600'
-                                : item.priceDiff < 0
-                                  ? 'text-red-600'
-                                  : 'text-gray-500'
-                              }`}
+                        return (
+                          <tr
+                            key={idx}
+                            onClick={() =>
+                              fetchChartData(link, {
+                                title: tier.title,
+                                enhance: enhance.enhance,
+                                name: item.name,
+                                option: item.option[0],
+                                extra: item.option[1] || ''
+                              })
+                            }
+                            className="text-center hover:bg-blue-50 cursor-pointer transition"
                           >
-                            {item.price === 0
-                              ? '—'
-                              : `${item.priceDiff > 0 ? '▲' : item.priceDiff < 0 ? '▼' : '—'} ${Math.abs(item.priceDiff).toLocaleString()} (${item.percentDiff}%)`}
-                          </td>
-                        </tr>
-                      ))}
+                            <td className="border px-3 py-1">{item.name}</td>
+                            <td className="border px-3 py-1">
+                              {item.option.map((opt, idx2) => {
+                                const grade = tier.title[idx2] || '';
+                                const gradeClass = {
+                                  '상': 'bg-yellow-400 text-white text-xs px-1 rounded',
+                                  '중': 'bg-purple-700 text-white text-xs px-1 rounded',
+                                  '하': 'bg-blue-600 text-white text-xs px-1 rounded',
+                                }[grade] || 'text-xs';
+
+                                return (
+                                  <span key={`${opt}-${idx2}`} className="mr-1 inline-block">
+                                    <span className={`${gradeClass}`}>{grade}</span> {opt}
+                                  </span>
+                                );
+                              })}
+                            </td>
+                            <td className="border px-3 py-1">{item.price.toLocaleString() != 0 ? item.price.toLocaleString() : '매물없음'}</td>
+                            <td
+                              className={`border px-3 py-1 font-medium ${item.price === 0
+                                ? 'text-gray-400'
+                                : item.priceDiff > 0
+                                  ? 'text-green-600'
+                                  : item.priceDiff < 0
+                                    ? 'text-red-600'
+                                    : 'text-gray-500'
+                                }`}
+                            >
+                              {item.price === 0
+                                ? '—'
+                                : `${item.priceDiff > 0 ? '▲' : item.priceDiff < 0 ? '▼' : '—'} ${Math.abs(item.priceDiff).toLocaleString()} (${item.percentDiff}%)`}
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
@@ -190,6 +241,66 @@ export default function AccessoryClient({ accessorysPrice, accessoryLastUpdate }
             ))}
           </div>
         ))
+      )}
+      {chartData && modalItem && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center px-4">
+          <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-3xl relative">
+            {/* 상단: 제목 + 닫기 버튼 */}
+            <div className="flex justify-between items-start mb-4">
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">{`${modalItem.title} 연마 ${modalItem.enhance}단계`}</h2>
+                <div className="flex flex-wrap gap-2 mt-2 text-sm items-center">
+                  <span className="text-gray-700 font-semibold">{modalItem.name}</span>
+                  {(() => {
+                    const decodedTitle = modalItem.title || '';
+                    const decodedOption = modalItem.option || '';
+                    const extra = modalItem.extra || '';
+
+                    const gradeArr = [];
+                    if (decodedTitle.length < 2) {
+                      gradeArr.push({ grade: decodedTitle, option: decodedOption });
+                    } else {
+                      gradeArr.push({ grade: decodedTitle.substring(0, 1), option: decodedOption });
+                      gradeArr.push({ grade: decodedTitle.substring(1), option: extra });
+                    }
+
+                    return gradeArr.map((item, idx) => {
+                      const gradeClass = {
+                        '상': 'bg-yellow-500',
+                        '중': 'bg-purple-500',
+                        '하': 'bg-blue-500',
+                      }[item.grade] || 'bg-gray-400';
+
+                      return (
+                        <span key={`${item.option}-${idx}`} className="flex items-center gap-1">
+                          <span className={`text-white text-xs font-semibold px-2 py-0.5 rounded-full ${gradeClass}`}>
+                            {item.grade}
+                          </span>
+                          <span className="text-gray-800">{item.option}</span>
+                        </span>
+                      );
+                    });
+                  })()}
+                </div>
+              </div>
+
+              <button
+                className="text-gray-400 hover:text-gray-700 transition text-xl"
+                onClick={() => {
+                  setChartData(null);
+                  setModalItem(null);
+                }}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* 캔들 차트 */}
+            <div className="mt-4">
+              <CandleChart chartData={chartData.itemData} />
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
