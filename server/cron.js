@@ -415,9 +415,9 @@ cron.schedule('1 10 * * 3', async () => { // async로 변경
     }
 });
 
-// 매일 0시 _ 보석 조회
-cron.schedule('0 0 * * *', async () => { // async로 변경
-    var method = '매일 0시 보석 데이터';
+// 매일 0시 30분 _ 보석 조회
+cron.schedule('30 0 * * *', async () => { // async로 변경
+    var method = '매일 0시 30분 보석 데이터';
     logger.info({
         method: method,
         url: url,  // 요청 URL
@@ -580,17 +580,8 @@ cron.schedule('0 0 * * *', async () => { // async로 변경
             message: `데이터 불러오기 성공 ${Object.keys(accessArr).length} 건`,
         });
 
-        const today = new Date();
-
-        // 년, 월, 일 구하기
-        const year = today.getFullYear();  // 4자리 연도
-        const month = (today.getMonth() + 1).toString().padStart(2, '0');  // 월 (0부터 시작하므로 +1, 두 자릿수로 만들기)
-        const day = today.getDate().toString().padStart(2, '0');  // 일, 두 자릿수로 만들기
-
         // 'YYYYMMDD' 형식으로 결합
-        const baseDate = `${year}${month}${day}`;
-
-        console.log(baseDate);  // 예: 20250330
+        const baseDate = getDate(0).replace(/-/g, ''); // 예: 20250620
 
         // // 쿼리
         const insertSql = `INSERT INTO ITEM_PRICE_LOG (
@@ -604,6 +595,57 @@ cron.schedule('0 0 * * *', async () => { // async로 변경
             '03', // 악세서리 03
             accessArr
         ]);
+
+        // 트랜잭션 시작 - ACCESSORY_PRICE_LOG ChartData 용
+        const accessoryPrice = accessArr; // 구조는 위와 동일
+
+        await connection.beginTransaction();
+
+        const insertSql1 = `
+                INSERT INTO ACCESSORY_PRICE_LOG (
+                BASE_DATE,
+                TITLE,
+                ENHANCE,
+                NAME,
+                OPTION1,
+                OPTION2,
+                PRICE
+                ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                ON DUPLICATE KEY UPDATE
+                PRICE = VALUES(PRICE),
+                FST_DTTI = CURRENT_TIMESTAMP,
+                DL_YN = 'N'
+            `;
+        // 예: INSERT
+
+        // "title": "상",
+        // "enhances": [
+        //     {
+        //         "enhance": "1",
+        //         "items": [
+        //             {
+        //                 "name": "목걸이",
+        //                 "option": [
+        //                     "적에게 주는 피해%", "추가 피해%"
+        //                 ],
+        //                 "price": 52999
+        for (const { title, enhances } of accessoryPrice) {
+            for (const { enhance, items } of enhances) {
+                for (const item of items) {
+                    const { name, price, option } = item;
+
+                    await connection.execute(insertSql1, [
+                        baseDate,
+                        title,
+                        enhance,
+                        name,
+                        option[0] || null,
+                        option[1] || null,
+                        price
+                    ]);
+                }
+            }
+        }
 
         // 트랜잭션 커밋
         await connection.commit();
@@ -639,6 +681,7 @@ cron.schedule('*/60 * * * *', async () => { // async로 변경
 
     const now = new Date();
     const hours = now.getHours();
+    const minutes = now.getMinutes();
 
     if (hours === 0) {
         // 00시일 때는 실행하지 않음
@@ -726,5 +769,44 @@ cron.schedule('*/60 * * * *', async () => { // async로 변경
         connection.release();
     }
 
+});
+
+// 매일 1분마다 보석, 각인서 갱신
+cron.schedule('* * * * *', async () => {
+
+    var method = '매 1분 각인서, 보석 데이터';
+
+    logger.info({
+        method: method,
+        url: url,  // 요청 URL
+        message: `Start`,
+    });
+
+    const now = new Date();
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+
+    // 매일 0시 30분은 skip
+    if (hours === 0 && minutes === 30) {
+        logger.info({
+            method: method,
+            url: url,  // 요청 URL
+            message: `0시 30분은 기존 배치로 처리됨 → skip`,
+        });
+        return;
+    }
+
+    try {
+        await getBookPrice();; // 각인서
+        await getJewelPrice(); // 보석
+
+    } catch (error) {
+        console.error('1분마다 작업 중 오류 발생:', error);
+    }
+    logger.info({
+        method: method,
+        url: url,  // 요청 URL
+        message: `End`,
+    });
 });
 module.exports = cron; // cron을 export하여 다른 파일에서 사용할 수 있게 함
