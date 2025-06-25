@@ -14,7 +14,7 @@ const getCharacterProfile = async (nickName) => {
 const insertCharacterInfo = async (equipItems, gemItems, accessoryItems, cardItems, engravings, profile, guild, wisdom, arkItems) => {
 
     const method = 'insertCharacterInfo';
-
+    // console.log(equipItems, gemItems, accessoryItems, cardItems, engravings, profile, guild, wisdom, arkItems);
     const connection = await pool.getConnection()
     try {
         if (!profile) {
@@ -36,9 +36,9 @@ const insertCharacterInfo = async (equipItems, gemItems, accessoryItems, cardIte
         // 캐릭터 정보 삽입 SQL
         const charInsertSql = `
             INSERT INTO CHARACTER_INFO (
-                NICKNAME, SERVER, JOB, SUBJOB, TITLE, CHARACTER_LEVEL, EXPEDITION_LEVEL, ITEM_LEVEL, ITEM_LEVEL_HISTORY, PVP_GRADE, STATS, IMG_URL
+                NICKNAME, SERVER, JOB, SUBJOB, TITLE, CHARACTER_LEVEL, EXPEDITION_LEVEL, ITEM_LEVEL, COMBAT_POWER, ITEM_LEVEL_HISTORY, PVP_GRADE, STATS, IMG_URL
             ) VALUES (
-                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
             )
             ON DUPLICATE KEY UPDATE
                 SERVER = VALUES(SERVER),
@@ -48,6 +48,7 @@ const insertCharacterInfo = async (equipItems, gemItems, accessoryItems, cardIte
                 CHARACTER_LEVEL = VALUES(CHARACTER_LEVEL),
                 EXPEDITION_LEVEL = VALUES(EXPEDITION_LEVEL),
                 ITEM_LEVEL = VALUES(ITEM_LEVEL),
+                COMBAT_POWER = VALUES(COMBAT_POWER),
                 ITEM_LEVEL_HISTORY = VALUES(ITEM_LEVEL_HISTORY),
                 PVP_GRADE = VALUES(PVP_GRADE),
                 STATS = VALUES(STATS),
@@ -67,7 +68,8 @@ const insertCharacterInfo = async (equipItems, gemItems, accessoryItems, cardIte
         const pvpGrade = profile.PVP_GRADE;
         const stats = profile.STATS;
         const imgUrl = profile.IMG_URL;
-
+        const combatPower = parseFloat(profile.COMBAT_POWER.replace(/,/g, ''));
+        ;
         const [insertCharInfo] = await connection.execute(charInsertSql, [
             nickname,
             server,
@@ -77,6 +79,7 @@ const insertCharacterInfo = async (equipItems, gemItems, accessoryItems, cardIte
             level,
             expLevel,
             itemLevel,
+            combatPower,
             itemLeveHistory,
             pvpGrade,
             stats,
@@ -174,7 +177,8 @@ const insertCharacterInfo = async (equipItems, gemItems, accessoryItems, cardIte
         ]);
 
         // 스킬 
-        const kloaCharacter = `https://api.korlark.com/lostark/characters/${nickname}?blocking=true`;
+        // const kloaCharacter = `https://api.korlark.com/lostark/characters/${nickname}?renew=true&blocking=true`;
+        const kloaCharacter = `https://api.korlark.com/lostark/characters/${nickname}?renew=true`;
         const responseChar = await axios.get(kloaCharacter);
         const kloaCharacterData = responseChar.data; // 응답 데이터 저장
 
@@ -221,7 +225,7 @@ const insertCharacterInfo = async (equipItems, gemItems, accessoryItems, cardIte
         logger.error({
             method: method,
             url: url,
-            message: `Error inserting character info: ${error.message}`,
+            message: `Error inserting character info: ${error}`,
         });
         if (connection) {
             await connection.rollback();
