@@ -14,7 +14,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # 전체 히스토리 필요
+          fetch-depth: 0
+
+      - name: Save SSH Key
+        run: |
+          echo "${{ secrets.EC2_KEY }}" > key.pem
+          chmod 600 key.pem
+
+      # EC2에서 .last_deploy_commit 가져오기
+      - name: Download last deploy commit from EC2
+        run: |
+          scp -i key.pem -o StrictHostKeyChecking=no \
+            ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/GapBotApp/.last_deploy_commit \
+            .last_deploy_commit || echo "No existing commit file found"
 
       - name: Load last deploy commit
         id: last_commit
@@ -36,7 +48,6 @@ jobs:
             echo "No last deploy commit found, assume build and deploy needed."
             echo "client_changed=true" >> $GITHUB_OUTPUT
             echo "server_changed=true" >> $GITHUB_OUTPUT
-            echo "$(git rev-parse origin/master)" > .last_deploy_commit
           else
             CHANGED_FILES=$(git diff --name-only $LAST_COMMIT origin/master)
             echo "Changed files since last deploy commit:"
@@ -44,8 +55,6 @@ jobs:
 
             echo "$CHANGED_FILES" | grep -q "^next-app/" && echo "client_changed=true" >> $GITHUB_OUTPUT || echo "client_changed=false" >> $GITHUB_OUTPUT
             echo "$CHANGED_FILES" | grep -q "^server/" && echo "server_changed=true" >> $GITHUB_OUTPUT || echo "server_changed=false" >> $GITHUB_OUTPUT
-
-            echo "$(git rev-parse origin/master)" > .last_deploy_commit
           fi
 
       - name: Checkout master at latest commit
@@ -58,11 +67,6 @@ jobs:
           npm ci
           npm run build
           cd ..
-
-      - name: Save SSH Key
-        run: |
-          echo "${{ secrets.EC2_KEY }}" > key.pem
-          chmod 600 key.pem
 
       - name: Upload build to EC2 (if client changed)
         if: steps.detect_changes.outputs.client_changed == 'true'
@@ -96,3 +100,13 @@ jobs:
             echo "Restarting server process..."
             pm2 restart GapAppServer --update-env || pm2 start npm --name GapAppServer -- start
           EOF
+
+      # 최신 커밋을 EC2에 저장
+      - name: Upload new deploy commit to EC2
+        if: always()
+        run: |
+          COMMIT=$(git rev-parse origin/master)
+          echo "$COMMIT" > .last_deploy_commit
+          scp -i key.pem -o StrictHostKeyChecking=no \
+            .last_deploy_commit \
+            ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/GapBotApp/.last_deploy_commit
