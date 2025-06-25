@@ -146,6 +146,10 @@ const Character = ({nickName}) => {
                         <h1 className="character-name">Lv.{profile.CHARACTER_LEVEL}&nbsp;{profile.NICKNAME} {profile.IS_DONATE==="Y"?<img src={donatePng} alt={"후원"} className="arkPassive-image" />:""}</h1>
                         <ul className="character-info-list">
                             <li className="character-info-item">
+                                <p className="character-info radius">전투력</p>
+                                <span className="name">{profile.COMBAT_POWER}</span>
+                            </li>
+                            <li className="character-info-item">
                                 <p className="character-info radius">직업</p>
                                 <span className="name">{profile.JOB} {profile.SUBJOB !== "서폿" ? profile.SUBJOB : ""}</span>
                             </li>

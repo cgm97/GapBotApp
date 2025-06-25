@@ -177,46 +177,63 @@ const insertCharacterInfo = async (equipItems, gemItems, accessoryItems, cardIte
         ]);
 
         // 스킬 
-        // const kloaCharacter = `https://api.korlark.com/lostark/characters/${nickname}?renew=true&blocking=true`;
-        const kloaCharacter = `https://api.korlark.com/lostark/characters/${nickname}?renew=true`;
-        const responseChar = await axios.get(kloaCharacter);
-        const kloaCharacterData = responseChar.data; // 응답 데이터 저장
+        try {
+            // const kloaCharacter = `https://api.korlark.com/lostark/characters/${nickname}?renew=true&blocking=true`;
+            const kloaCharacter = `https://api.korlark.com/lostark/characters/${nickname}?renew=true`;
+            const responseChar = await axios.get(kloaCharacter, { timeout: 3000 });
+            const kloaCharacterData = responseChar.data; // 응답 데이터 저장
 
-        // 캐틱터 스킬 SQL
-        const characteSkillSql = `
-        INSERT INTO CHARACTER_SKILL (
-            NICKNAME,
-            SKILL_POINT,
-            SKILLS
-        ) VALUES (?, ?, ?)
-        ON DUPLICATE KEY UPDATE
-            SKILL_POINT = VALUES(SKILL_POINT),
-            SKILLS = VALUES(SKILLS)
-        `;
+            // 캐틱터 스킬 SQL
+            const characteSkillSql = `
+            INSERT INTO CHARACTER_SKILL (
+                NICKNAME,
+                SKILL_POINT,
+                SKILLS
+            ) VALUES (?, ?, ?)
+            ON DUPLICATE KEY UPDATE
+                SKILL_POINT = VALUES(SKILL_POINT),
+                SKILLS = VALUES(SKILLS)
+            `;
 
-        const [insertSkill] = await connection.execute(characteSkillSql, [
-            nickname, kloaCharacterData.skillPoint, kloaCharacterData.skills
-        ]);
+            const [insertSkill] = await connection.execute(characteSkillSql, [
+                nickname, kloaCharacterData.skillPoint, kloaCharacterData.skills
+            ]);
+        } catch (kloaErr) {
+            logger.warn({
+                method,
+                url,
+                message: `KLOA 스킬 처리 중 오류 발생: ${nickname }`,
+                error: kloaErr.message,
+            });
+        }
 
-        // 내실
-        const kloaCollectibles = `https://api.korlark.com/lostark/characters/${nickname}/collectibles`;
-        const responseCollect = await axios.get(kloaCollectibles);
-        const kloaCollectiblesData = responseCollect.data; // 응답 데이터 저장
+        try {
+            // 내실
+            const kloaCollectibles = `https://api.korlark.com/lostark/characters/${nickname}/collectibles`;
+            const responseCollect = await axios.get(kloaCollectibles,{ timeout: 2000 });
+            const kloaCollectiblesData = responseCollect.data; // 응답 데이터 저장
 
-        // 캐틱터 스킬 SQL
-        const characterCollectSql = `
-        INSERT INTO CHARACTER_COLLECTION (
-            NICKNAME,
-            COLLECTIBLES
-        ) VALUES (?, ?)
-        ON DUPLICATE KEY UPDATE
-            COLLECTIBLES = VALUES(COLLECTIBLES)
-        `;
+            // 캐틱터 스킬 SQL
+            const characterCollectSql = `
+            INSERT INTO CHARACTER_COLLECTION (
+                NICKNAME,
+                COLLECTIBLES
+            ) VALUES (?, ?)
+            ON DUPLICATE KEY UPDATE
+                COLLECTIBLES = VALUES(COLLECTIBLES)
+            `;
 
-        const [insertCollect] = await connection.execute(characterCollectSql, [
-            nickname, kloaCollectiblesData
-        ]);
-        
+            const [insertCollect] = await connection.execute(characterCollectSql, [
+                nickname, kloaCollectiblesData
+            ]);
+        } catch (kloaErr) {
+            logger.warn({
+                method,
+                url,
+                message: `KLOA 내실 처리 중 오류 발생: ${nickname}`,
+                error: kloaErr.message,
+            });
+        }
         // 트랜잭션 커밋
         await connection.commit();
 
