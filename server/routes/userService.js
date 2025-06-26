@@ -299,7 +299,7 @@ exports.saveUserInfo = async (req, res, next) => {
             const nickname = character.CharacterName;
             const job = character.CharacterClassName;
             const level = character.CharacterLevel;
-            const itemLevel = parseFloat(character.ItemMaxLevel.replace(/,/g, ''));
+            const itemLevel = parseFloat(character.ItemAvgLevel.replace(/,/g, ''));
 
             // 로깅
             logger.info({
