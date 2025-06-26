@@ -14,7 +14,9 @@ export default function BookClient({ booksPrice, bookLastUpdate }) {
   const [chartData, setChartData] = useState({});
   const [alert, setAlert] = useState(null);
   const alertTimeoutRef = useRef(null);
-  const [nextUpdateIn, setNextUpdateIn] = useState(60);
+  // const [nextUpdateIn, setNextUpdateIn] = useState(60);
+  const [loading, setLoading] = useState(false);
+  const [disabled, setDisabled] = useState(false);
 
   const { data, mutate } = useSWR(
     `${process.env.NEXT_PUBLIC_SERVER_URL}/price/book`,
@@ -31,23 +33,43 @@ export default function BookClient({ booksPrice, bookLastUpdate }) {
   const [changedItems, setChangedItems] = useState([]);
 
   // 1분마다 데이터 갱신 + 기준 시점 저장
-  useEffect(() => {
-    const interval = setInterval(() => {
-      mutate();
-      lastUpdateTimeRef.current = Date.now();
-    }, 61000);
-    return () => clearInterval(interval);
-  }, [mutate]);
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     mutate();
+  //     lastUpdateTimeRef.current = Date.now();
+  //   }, 61000);
+  //   return () => clearInterval(interval);
+  // }, [mutate]);
 
   // 1초마다 남은 시간 카운트
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const elapsed = Math.floor((Date.now() - lastUpdateTimeRef.current) / 1000);
-      const remaining = 60 - (elapsed % 60);
-      setNextUpdateIn(remaining);
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     const elapsed = Math.floor((Date.now() - lastUpdateTimeRef.current) / 1000);
+  //     const remaining = 60 - (elapsed % 60);
+  //     setNextUpdateIn(remaining);
+  //   }, 1000);
+  //   return () => clearInterval(interval);
+  // }, []);
+
+  const handleRefresh = () => {
+    if (disabled) return; // 이미 비활성화 상태면 무시
+
+    setLoading(true);
+    setDisabled(true);
+
+    // 2초 지연 후 mutate 호출
+    setTimeout(() => {
+      mutate()
+        .finally(() => {
+          setLoading(false);
+        });
+    }, 2000);
+
+    // 10초 후에 다시 활성화 (2초 딜레이 포함)
+    setTimeout(() => {
+      setDisabled(false);
+    }, 10000);
+  };
 
   // 변동 체크용
   useEffect(() => {
@@ -165,13 +187,70 @@ export default function BookClient({ booksPrice, bookLastUpdate }) {
                 <time dateTime={new Date(new Date().setDate(new Date().getDate() - 1)).toISOString().slice(0, 10)}>{new Date(new Date().setDate(new Date().getDate() - 1)).toISOString().slice(0, 10)}</time>
               </p>
               <p className="text-sm my-2 text-gray-400">
-                1분마다 자동 갱신 / 다음 갱신까지{' '}
-                <b className="text-red-500">{nextUpdateIn}초</b> 남음
-                <br />
-                (갱신 시 1분 대비 가격 변동이 약 50초간 표시됩니다.)
+                갱신 시 1분 대비 가격 변동이 약 50초간 표시됩니다.
               </p>
-              <p className="text-sm my-2">
-                <strong>마지막 업데이트:</strong> <span className="font-semibold">{lastUpdate}</span>
+              <p className="text-sm my-2 text-center text-gray-700 flex items-center justify-center">
+                <strong>마지막 업데이트:</strong>{' '}
+                <span className="font-semibold ml-1">{lastUpdate}</span>
+                <button
+                  onClick={handleRefresh}
+                  aria-label="데이터 갱신"
+                  title="데이터 갱신"
+                  disabled={disabled}
+                  className={`
+                    ml-3 inline-flex items-center justify-center
+                    bg-gray-100 hover:bg-gray-200
+                    text-gray-600 hover:text-gray-800
+                    rounded px-2 py-1
+                    select-none
+                    focus:outline-none focus:ring-2 focus:ring-blue-300
+                    transition duration-150 ease-in-out
+                    cursor-pointer
+                    h-6
+                    ${loading ? 'cursor-wait opacity-70' : ''}
+                    ${disabled && !loading ? 'cursor-not-allowed opacity-40 hover:bg-gray-100 hover:text-gray-600' : ''}
+                  `}
+                  >
+                  {loading ? (
+                    <svg
+                      className="h-3.5 w-3.5 animate-spin text-gray-600"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                      />
+                    </svg>
+                  ) : (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-3.5 w-3.5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M4 4v5h.582M20 20v-5h-.581M4 9a8 8 0 0112.707-4.293M20 15a8 8 0 01-12.707 4.293"
+                      />
+                    </svg>
+                  )}
+                </button>
               </p>
             </section>
           </main>
