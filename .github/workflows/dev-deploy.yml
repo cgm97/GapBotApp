@@ -1,10 +1,11 @@
-name: Deploy Dev to EC2 (Build on Actions)
+name: Deploy to EC2 with Conditional Build (Client build, Server pull)
 
 on:
   push:
     branches:
       - dev
-  workflow_dispatch: # 수동 실행 버튼 추가
+  workflow_dispatch:
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -12,20 +13,63 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Install dependencies & build
-        run: |
-          cd next-app
-          npm ci
-          npm run build
-          cd ..
+        with:
+          fetch-depth: 0
 
       - name: Save SSH Key
         run: |
           echo "${{ secrets.EC2_KEY }}" > key.pem
           chmod 600 key.pem
 
-      - name: Upload build to EC2
+      # EC2에서 .last_deploy_commit 가져오기
+      - name: Download last deploy commit from EC2
+        run: |
+          scp -i key.pem -o StrictHostKeyChecking=no \
+            ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/GapBotApp-dev/.last_deploy_commit \
+            .last_deploy_commit || echo "No existing commit file found"
+
+      - name: Load last deploy commit
+        id: last_commit
+        run: |
+          if [ -f .last_deploy_commit ]; then
+            echo "last_commit=$(cat .last_deploy_commit)" >> $GITHUB_OUTPUT
+          else
+            echo "last_commit=" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Fetch latest origin/dev
+        run: git fetch origin dev
+
+      - name: Detect changed files
+        id: detect_changes
+        run: |
+          LAST_COMMIT=${{ steps.last_commit.outputs.last_commit }}
+          if [ -z "$LAST_COMMIT" ]; then
+            echo "No last deploy commit found, assume build and deploy needed."
+            echo "client_changed=true" >> $GITHUB_OUTPUT
+            echo "server_changed=true" >> $GITHUB_OUTPUT
+          else
+            CHANGED_FILES=$(git diff --name-only $LAST_COMMIT origin/dev)
+            echo "Changed files since last deploy commit:"
+            echo "$CHANGED_FILES"
+
+            echo "$CHANGED_FILES" | grep -q "^next-app/" && echo "client_changed=true" >> $GITHUB_OUTPUT || echo "client_changed=false" >> $GITHUB_OUTPUT
+            echo "$CHANGED_FILES" | grep -q "^server/" && echo "server_changed=true" >> $GITHUB_OUTPUT || echo "server_changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Checkout dev at latest commit
+        run: git checkout origin/dev
+
+      - name: Build next-app (if changed)
+        if: steps.detect_changes.outputs.client_changed == 'true'
+        run: |
+          cd next-app
+          npm ci
+          npm run build
+          cd ..
+
+      - name: Upload build to EC2 (if client changed)
+        if: steps.detect_changes.outputs.client_changed == 'true'
         run: |
           rsync -avz -e "ssh -i key.pem -o StrictHostKeyChecking=no" \
             ./next-app/.next \
@@ -35,9 +79,34 @@ jobs:
             ./next-app/node_modules \
             ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/GapBotApp-dev/next-app
 
-      - name: Restart PM2 on EC2
+      # - name: Restart PM2 Client and nginx (if client changed)
+      #   if: steps.detect_changes.outputs.client_changed == 'true'
+      #   run: |
+      #     ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+      #       cd /home/ubuntu/GapBotApp-dev/next-app
+      #       pm2 restart GapAppClient-dev --update-env || pm2 start npm --name GapAppClient-dev -- start
+      #       sudo systemctl restart nginx
+      #     EOF
+
+      # - name: Pull & restart server on EC2 (if server changed)
+      #   if: steps.detect_changes.outputs.server_changed == 'true'
+      #   run: |
+      #     ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+      #       cd /home/ubuntu/GapBotApp
+      #       echo "Fetching latest server code..."
+      #       git fetch origin master
+      #       git reset --hard origin/master
+
+      #       echo "Restarting server process..."
+      #       pm2 restart GapAppServer --update-env || pm2 start npm --name GapAppServer -- start
+      #     EOF
+
+      # 최신 커밋을 EC2에 저장
+      - name: Upload new deploy commit to EC2
+        if: always()
         run: |
-          ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-            cd /home/ubuntu/GapBotApp-dev/next-app
-            # pm2 restart GapAppClient-dev --update-env || pm2 start npm --name GapAppClient-dev -- start -- --port 3001
-          EOF
+          COMMIT=$(git rev-parse origin/dev)
+          echo "$COMMIT" > .last_deploy_commit
+          scp -i key.pem -o StrictHostKeyChecking=no \
+            .last_deploy_commit \
+            ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/GapBotApp-dev/.last_deploy_commit
