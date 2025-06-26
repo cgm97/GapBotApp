@@ -42,7 +42,7 @@ export default function CandleChart({ chartData }) {
         // 9시간 보정 - 힌국시간으로 하기위함.
         const correctedData = rawData.map(d => ({
             ...d,
-            time: d.time + 21 * 60 * 60,
+            time: d.time + 9 * 60 * 60,
         }));
 
         const SOME_THRESHOLD = 500;
