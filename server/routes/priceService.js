@@ -559,6 +559,7 @@ exports.getAccessoryChart = async (req, res, next) => {
             OR
             (? = 0 AND OPTION2 = ?)
             )
+            AND PRICE > 0
             AND DL_YN = 'N'
         GROUP BY 
             DATE(FST_DTTI), FLOOR(HOUR(FST_DTTI) / 4)
