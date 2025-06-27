@@ -6,7 +6,7 @@ import sampleData from './data.json';
 async function getAccessoryPriceData() {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/price/accessory`, {
-      next: { revalidate: 1800 },
+      next: { revalidate: 60 },
     });
 
     if (!res.ok) throw new Error('Response not OK');

@@ -3,7 +3,7 @@ import AdSense from '@/components/Adsense';
 
 async function getBooksPriceData() {
   const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/price/book`, {
-    next: { revalidate: 600 }, // ISR or SSR
+    next: { revalidate: 60 }, // ISR or SSR
   });
   if (!res.ok) throw new Error("Failed to fetch");
   const data = await res.json();
