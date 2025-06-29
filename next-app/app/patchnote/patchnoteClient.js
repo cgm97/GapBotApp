@@ -14,7 +14,7 @@ const PatchNote = () => {
   }, []);
 
   return (
-    <div className="container-patch">
+    <div className="container-patch bg-background text-foreground min-h-screen">
       <h2>빈틈봇 패치노트</h2>
       {patchNote.map(({ TITLE, CONTENTS }, index) => (
         <div className="release" key={index}>

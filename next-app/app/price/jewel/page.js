@@ -33,12 +33,14 @@ export default async function Page() {
   const { jewelsPrice, jewelPriceLastUpdate } = await getJewelsPriceData();
 
   return (
-    <div className="container-patch">
-      <h2>보석시세 / 보석차트</h2>
-      <div>
-        <AdSense adSlot="1488834693" />
+    <div className="bg-background text-foreground min-h-screen">
+      <div className="container-patch">
+        <h2 className="dark:text-gray-300">보석시세 / 보석차트</h2>
+        <div>
+          <AdSense adSlot="1488834693" />
+        </div>
+        <JewelPage jewelsPrice={jewelsPrice} jewelPriceLastUpdate={jewelPriceLastUpdate} />
       </div>
-      <JewelPage jewelsPrice={jewelsPrice} jewelPriceLastUpdate={jewelPriceLastUpdate} />
     </div>
   );
 }

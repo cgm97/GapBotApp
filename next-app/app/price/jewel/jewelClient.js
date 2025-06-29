@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 // import { Line } from 'react-chartjs-2';
 import "@/css/BookPrice.css";
+import '@/css/Character.css';
 import LineChart from '@/components/LineChart';
 import useSWR from 'swr';
 
@@ -245,14 +246,43 @@ export default function JewelClient({ jewelsPrice, jewelPriceLastUpdate }) {
   //   new Set(selectedItems.flatMap(item => chartData[item]?.map(d => d.date) || []))
   // ).sort();
 
+  // 등급에 따른 CSS 클래스 반환
+  const getGradeClass = (grade) => {
+    switch (grade) {
+      case '고대': return 'ancient';
+      case '유물': return 'relic';
+      case '전설': return 'legend';
+      case '영웅': return 'heroic';
+      case '희귀': return 'rare';
+      default: return '';
+    }
+  };
+
   return (
     <>
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', margin: '1rem 0' }}>
-        <button onClick={() => setActiveTab('price')} className={activeTab === 'price' ? 'active' : ''}>시세</button>
+      <div className="flex justify-center gap-4 my-4">
+        <button
+          onClick={() => setActiveTab('price')}
+          className={`
+      px-4 py-2 rounded
+      ${activeTab === 'price'
+              ? 'bg-blue-600 text-white dark:bg-blue-800  dark:text-black'
+              : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-100'}
+    `}
+        >
+          시세
+        </button>
+
         <button
           onClick={() => setActiveTab('chart')}
-          className={activeTab === 'chart' ? 'active' : ''}
           disabled={selectedItems.length === 0}
+          className={`
+      px-4 py-2 rounded
+      ${activeTab === 'chart'
+              ? 'bg-blue-600 text-white dark:bg-blue-800  dark:text-black'
+              : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-100'}
+      ${selectedItems.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}
+    `}
         >
           차트
         </button>
@@ -265,20 +295,20 @@ export default function JewelClient({ jewelsPrice, jewelPriceLastUpdate }) {
               className="text-center mb-6 text-gray-700"
               aria-labelledby="jewel-price-guide"
             >
-              <h1 id="jewel-price-guide" className="text-xl font-bold my-2">
+              <h1 id="jewel-price-guide" className="text-xl font-bold my-2 dark:text-gray-300">
                 로스트아크 보석 실시간 시세 조회
               </h1>
-              <p className="text-sm my-2">
+              <p className="text-sm my-2 dark:text-gray-300">
                 변동가격은 기준일자 0시 기준으로 계산된 값이며, 차트를 추가하거나 제거할 수 있습니다.
               </p>
-              <p className="text-sm my-2">
+              <p className="text-sm my-2 dark:text-gray-300">
                 <strong>기준일자:</strong>{' '}
                 <time dateTime={new Date(new Date().setDate(new Date().getDate() - 1)).toISOString().slice(0, 10)}>{new Date(new Date().setDate(new Date().getDate() - 1)).toISOString().slice(0, 10)}</time>
               </p>
-              <p className="text-sm my-2 text-gray-400">
+              <p className="text-sm my-2 text-gray-300">
                 갱신 시 1분 대비 가격 변동이 약 50초간 표시됩니다.
               </p>
-              <p className="text-sm my-2 text-center text-gray-700 flex items-center justify-center">
+              <p className="text-sm my-2 text-center text-gray-700 flex items-center justify-center dark:text-gray-300">
                 <strong>마지막 업데이트:</strong>{' '}
                 <span className="font-semibold ml-1">{lastUpdate}</span>
                 <button
@@ -296,10 +326,11 @@ export default function JewelClient({ jewelsPrice, jewelPriceLastUpdate }) {
                     transition duration-150 ease-in-out
                     cursor-pointer
                     h-6
+                    dark:bg-gray-300
                     ${loading ? 'cursor-wait opacity-70' : ''}
                     ${disabled && !loading ? 'cursor-not-allowed opacity-40 hover:bg-gray-100 hover:text-gray-600' : ''}
                   `}
-                  >
+                >
                   {loading ? (
                     <svg
                       className="h-3.5 w-3.5 animate-spin text-gray-600"
@@ -343,56 +374,76 @@ export default function JewelClient({ jewelsPrice, jewelPriceLastUpdate }) {
               </p>
             </section>
           </main>
-          <table className="price-table">
+          <table className="price-table w-full border-collapse text-sm dark:text-gray-200">
             <thead>
-              <tr>
-                <th className='p-2 border w-[300px]'>보석</th>
-                <th className="p-2 border w-[200px] text-left">
+              <tr className="dark:bg-blue-900 dark:text-gray-300">
+                <th className="dark:border-gray-600">보석</th>
+                <th className="dark:border-gray-600">
                   현재 가격 <span className="ml-1 text-xs text-gray-300">(1분 대비)</span>
                 </th>
-                <th className='p-2 border w-[200px]'>
-                  변동 가격 <span className="ml-1 text-xs text-gray-300">(기준일자 대비)</span>
-                </th>
-                <th className='p-2 border w-[50px]'>차트</th>
+                <th className="dark:border-gray-600">변동가격 <span className="ml-1 text-xs text-gray-300">(기준일자 대비)</span></th>
+                <th className="dark:border-gray-600">차트</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="dark:bg-background dark:text-gray-300">
               {Object.values(currentPrice).map(item => {
                 const isSelected = selectedItems.includes(item.name);
                 const changedInfo = changedItems.find(ci => ci.name === item.name);
                 const isChanged = !!changedInfo;
                 const changeInfo = changedItems.find(ci => ci.name === item.name);
                 return (
-                  <tr
-                    key={item.name}
-                    className={isChanged ? "animate-price-change" : ""}
-                  >
-                    <td><img src={item.icon} alt={item.name} className="icon" /> {item.name}</td>
-                    <td>
+                  <tr key={item.name} className={`border-t dark:border-gray-600 ${changedItems.find(ci => ci.name === item.name) ? "animate-price-change" : ""}`}>
+                    <td className="p-2 dark:border-gray-600"><div
+                      className={`gem-box ${getGradeClass(item.grade)} inline-flex items-center justify-center rounded p-0`}
+                      style={{ width: '38px', height: '38px' }} // 직접 고정
+                    >
+                      <img
+                        src={item.icon}
+                        alt={item.name}
+                        className="w-4 h-4 object-contain"
+                      />
+                    </div><span style={{ position: 'relative', top: '-10px' }}>{item.name}</span></td>
+
+                    <td className="p-2 dark:border-gray-600">
                       {item.price.toLocaleString()}
                       {changeInfo && (
-                        <span className={` ml-2 text-sm font-medium ${changeInfo.diff > 0 ? 'text-green-600' : changeInfo.diff < 0 ? 'text-red-500' : 'text-gray-500'}`}>
-                          {/* 이전 대비 차액 */}
+                        <span
+                          className={`
+                            ml-2 text-sm font-medium
+                            ${changeInfo.diff > 0
+                              ? 'text-green-600'
+                              : changeInfo.diff < 0
+                                ? 'text-red-500'
+                                : 'text-gray-500'}
+                           `}
+                        > {/* 이전 대비 차액 */}
                           {'('}{changeInfo.diff > 0 ? '+' : ''}
                           {changeInfo.diff.toLocaleString()}{')'}
                         </span>
                       )}
                     </td>
-                    <td style={{ color: item.diffPrice > 0 ? 'green' : item.diffPrice < 0 ? 'red' : 'gray' }}>
+                    <td
+                      className={`
+                        p-2 dark:border-gray-600
+                        ${item.diffPrice > 0
+                          ? 'text-green-600'
+                          : item.diffPrice < 0
+                            ? 'text-red-500'
+                            : 'text-gray-500'}
+                      `}
+                    >
                       {item.diffPrice > 0 ? '▲' : item.diffPrice < 0 ? '▼' : '—'}{' '}
                       {Math.abs(item.diffPrice).toLocaleString()} ({item.percent}%)
                     </td>
-                    <td>
+                    <td className="dark:border-gray-600">
                       <button
                         onClick={(e) => handleItemToggle(item.name, e)}
-                        style={{
-                          border: '1px solid',
-                          borderColor: isSelected ? 'green' : 'gray',
-                          color: isSelected ? 'green' : 'gray',
-                          borderRadius: 4,
-                          padding: '4px 8px',
-                          cursor: 'pointer',
-                        }}
+                        className={`
+                          border rounded px-2 py-1 text-sm transition dark:bg-gray-600
+                          ${isSelected
+                            ? 'border-green-500 text-green-500 hover:bg-green-100 dark:hover:bg-green-700'
+                            : 'border-gray-400 text-gray-500 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700'}
+                        `}
                       >
                         {isSelected ? '−' : '+'}
                       </button>

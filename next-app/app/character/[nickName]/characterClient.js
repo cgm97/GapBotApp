@@ -142,49 +142,49 @@ const Character = ({nickName}) => {
                     <img className="character-img" src={profile.IMG_URL} alt="캐릭터 이미지" />
                     <button className="renew-button" onClick={handleRenew}>갱신하기</button>
                     <div className="character-info">
-                        <p className="character-name">{profile.TITLE !== "없음" ? profile.TITLE : ""}</p>
-                        <h1 className="character-name">Lv.{profile.CHARACTER_LEVEL}&nbsp;{profile.NICKNAME} {profile.IS_DONATE==="Y"?<img src={donatePng} alt={"후원"} className="arkPassive-image" />:""}</h1>
+                        <p className="character-name dark:text-gray-300">{profile.TITLE !== "없음" ? profile.TITLE : ""}</p>
+                        <h1 className="character-name dark:text-gray-300">Lv.{profile.CHARACTER_LEVEL}&nbsp;{profile.NICKNAME} {profile.IS_DONATE==="Y"?<img src={donatePng} alt={"후원"} className="inline-block align-middle w-5 h-5 ml-1" />:""}</h1>
                         <ul className="character-info-list">
                             <li className="character-info-item">
-                                <p className="character-info radius">전투력</p>
-                                <span className="name">{profile.COMBAT_POWER}</span>
+                                <p className="character-info radius dark:bg-gray-300">전투력</p>
+                                <span className="name dark:bg-gray-300">{profile.COMBAT_POWER}</span>
                             </li>
                             <li className="character-info-item">
-                                <p className="character-info radius">직업</p>
-                                <span className="name">{profile.JOB} {profile.SUBJOB !== "서폿" ? profile.SUBJOB : ""}</span>
+                                <p className="character-info radius dark:bg-gray-300">직업</p>
+                                <span className="name dark:bg-gray-300">{profile.JOB} {profile.SUBJOB !== "서폿" ? profile.SUBJOB : ""}</span>
                             </li>
                             <li className="character-info-item">
-                                <p className="character-info radius">서버</p>
-                                <span className="name">{profile.SERVER}</span>
+                                <p className="character-info radius dark:bg-gray-300">서버</p>
+                                <span className="name dark:bg-gray-300">{profile.SERVER}</span>
                             </li>
                             <li className="character-info-item">
-                                <p className="character-info radius">레벨</p>
-                                <span className="name">{profile.ITEM_LEVEL} / {profile.EXPEDITION_LEVEL}</span>
+                                <p className="character-info radius dark:bg-gray-300">레벨</p>
+                                <span className="name dark:bg-gray-300">{profile.ITEM_LEVEL} / {profile.EXPEDITION_LEVEL}</span>
                             </li>
                             <li className="character-info-item">
-                                <p className="character-info radius">길드</p>
-                                <span className="name">{Boolean(guild.IS_OWNER) && <img className="guild" src={guildImg} alt="길드장" />}{guild.NAME}</span>
+                                <p className="character-info radius dark:bg-gray-300">길드</p>
+                                <span className="name dark:bg-gray-300">{Boolean(guild.IS_OWNER) && <img className="guild" src={guildImg} alt="길드장" />}{guild.NAME}</span>
                             </li>
                             <li className="character-info-item">
-                                <p className="character-info radius">영지</p>
-                                <span className="name">Lv.{wisdom.LEVEL}&nbsp;{wisdom.NAME}</span>
+                                <p className="character-info radius dark:bg-gray-300">영지</p>
+                                <span className="name dark:bg-gray-300">Lv.{wisdom.LEVEL}&nbsp;{wisdom.NAME}</span>
                             </li>
                         </ul>
                     </div>
                 </div>
 
                 {/* 각인 정보 영역 */}
-                <div className="engraving">
+                <div className="engraving dark:bg-background">
                     {engravings.map((item, index) => (
                         <div key={index}>
                             <img className="engraving-img" src={item.imgSrc} alt={item.name} />
                             <div className={`engraving-ico ${item.color}`}></div>
-                            <p className="name">X{item.grade}</p>
-                            <p className="name">{item.name}</p>
+                            <p className="name dark:text-gray-300">X{item.grade}</p>
+                            <p className="name dark:text-gray-300">{item.name}</p>
                             {item.abilityLevel && (
                                 <div>
                                     <div className="engraving-ico level" />
-                                    <p className="name">{item.abilityLevel}</p>
+                                    <p className="name dark:text-gray-300">{item.abilityLevel}</p>
                                 </div>
                             )}
                         </div>
@@ -192,7 +192,7 @@ const Character = ({nickName}) => {
                 </div>
 
                 {/* 광고 영역 */}
-                <div className="engraving">
+                <div className="engraving dark:bg-background">
                     {/* <KakaoAdFit unit="DAN-KjllsdstWjrHOWe6" width={250} height={250} disabled={true} /> */}
                      <AdSense adSlot="1488834693" />
                 </div>
@@ -201,7 +201,7 @@ const Character = ({nickName}) => {
             {/* 장비 및 액세서리 영역 */}
             <div className="group-equip">
                 <div className="armor-wrap">
-                    <div className="armor-area">
+                    <div className="armor-area dark:bg-background">
                         <ul className="equipment-list">
                             {equipItems.map((item, index) => (
                                 <li key={index} className="equipment-item">
@@ -213,16 +213,16 @@ const Character = ({nickName}) => {
                                                     <span className="item-progress yellow">{item.elixirSum}</span>
                                                 </div>
                                                 <div>
-                                                    <p className="average-elixir-ability">{item.elixirAbility}</p>
-                                                    <p className="average-value">{item.elixirValue !== 0 ? `${item.elixirValue}%` : ''}</p>
+                                                    <p className="average-elixir-ability dark:text-gray-300">{item.elixirAbility}</p>
+                                                    <p className="average-value dark:text-gray-300">{item.elixirValue !== 0 ? `${item.elixirValue}%` : ''}</p>
                                                 </div>
                                                 <div className="item-image-wrapper ancient">
                                                     <img src={hyperImg} alt="초월 이미지" className="item-image" />
                                                     <span className="item-progress yellow">{item.hyperSum}</span>
                                                 </div>
                                                 <div>
-                                                    <p className="average-elixir-ability">{item.hyperAvg}</p>
-                                                    <p className="average-elixir-ability">
+                                                    <p className="average-elixir-ability dark:text-gray-300 w-12">{item.hyperAvg}</p>
+                                                    <p className="average-elixir-ability dark:text-gray-300 w-12">
                                                         {item.hyperValue !== 0 ? `${item.hyperValue}%` : `낙인력 ${item.stigmaticValue}%`}
                                                     </p>
                                                 </div>
@@ -244,13 +244,13 @@ const Character = ({nickName}) => {
                                                             alt="초월 아이콘"
                                                         />
                                                         <p className="hyperWarp1">{item.hyper}</p>
-                                                        <p className="hyperWarp2">{item.hyperLevel}</p>
+                                                        <p className="hyperWarp2 dark:text-gray-300">{item.hyperLevel}</p>
                                                     </div>
                                                 )}
-                                                <p className="name">{item.name}</p>
+                                                <p className="name dark:text-gray-300">{item.name}</p>
                                                 <ul className="attributes">
                                                     {(item.elixirs || []).map((elixir, index) => (
-                                                        <li key={index} className="attribute-item">{elixir}</li>
+                                                        <li key={index} className="attribute-item dark:text-gray-300">{elixir}</li>
                                                     ))}
                                                 </ul>
                                             </div>
@@ -261,8 +261,8 @@ const Character = ({nickName}) => {
                         </ul>
                     </div>
 
-                    {/* 액세서리 영역 */}
-                    <div className="accessory-area">
+                    {/* 악세서리 영역 */}
+                    <div className="accessory-area dark:bg-background">
                         <ul className="accessory-list">
                             {accessoryItems.map((accessory, index) => (
                                 <li key={index} className="equipment-item">
@@ -283,13 +283,13 @@ const Character = ({nickName}) => {
                                                 {option.grade ? (
                                                     <ul>
                                                         <li className="attribute-item">
-                                                            <span className={`option-${option.grade}`}>{option.grade}</span>&nbsp;
-                                                            <span className="optionName"> {option.optionName} </span>
+                                                            <span className={`option-${option.grade} dark:text-black`}>{option.grade}</span>&nbsp;
+                                                            <span className="optionName dark:text-gray-300"> {option.optionName} </span>
                                                         </li>
                                                     </ul>
                                                 ) : (
                                                     <div className="attribute-item">
-                                                        <span className="optionName">{option.optionName}</span>
+                                                        <span className="optionName dark:text-gray-300">{option.optionName}</span>
                                                     </div>
                                                 )}
                                             </div>
@@ -302,7 +302,7 @@ const Character = ({nickName}) => {
                 </div>
 
                 {/* 보석 영역 */}
-                <div className="gem-area">
+                <div className="gem-area dark:bg-background">
                     {gemItems.map((gem, index) => (
                         <div key={index} className={`gem-box ${getGradeClass(gem.grade)}`}>
                             <img src={gem.imgSrc} alt={gem.name} />
@@ -313,22 +313,22 @@ const Character = ({nickName}) => {
                 </div>
 
                 {/* 아크패시브 영역 */}
-                <div className="arkPassive-area">
+                <div className="arkPassive-area dark:bg-background">
                     {['evolution', 'enlightenment', 'leap'].map((key) => (
                         <div key={key} className="arkPassive-column">
                             <div className="arkPassive-header">
                                 <span className={`arkPassive-name ${key}`}>
                                     {key === "evolution" ? "진화" : key === "enlightenment" ? "깨달음" : "도약"}
                                 </span>
-                                <span className="arkPassive-point">{arkItems[key].point}</span>
+                                <span className="arkPassive-point dark:text-gray-300">{arkItems[key].point}</span>
                             </div>
                             <ul className="arkPassive-list">
                                 {arkItems[key].items.map((arkPassive, index) => (
                                     <li key={index} className="arkPassive-item">
                                         <img src={arkPassive.imgSrc} alt={arkPassive.name} className="arkPassive-image" />
                                         <div className="arkPassive-info">
-                                            <span className="arkPassive-tier">{arkPassive.tier}티어</span>
-                                            <span className="arkPassive-name">{arkPassive.name}</span>
+                                            <span className="arkPassive-tier dark:text-gray-300">{arkPassive.tier}티어</span>
+                                            <span className="arkPassive-name dark:text-gray-300">{arkPassive.name}</span>
                                         </div>
                                     </li>
                                 ))}

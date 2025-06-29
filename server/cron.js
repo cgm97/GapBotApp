@@ -683,12 +683,12 @@ cron.schedule('*/60 * * * *', async () => { // async로 변경
     const hours = now.getHours();
     const minutes = now.getMinutes();
 
-    if (hours === 0) {
+    if (hours === 0 || process.env.NODE_ENV != "PROD") {
         // 00시일 때는 실행하지 않음
         logger.info({
             method: method,
             url: url,  // 요청 URL
-            message: '악세서리 조회 시작 END 0시 Pass'
+            message: `악세서리 조회 시작 END 0시 Pass.. env:${process.env.NODE_ENV}`
         });
         return;
     }

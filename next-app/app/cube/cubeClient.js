@@ -244,17 +244,17 @@ const Cube = ({ characterTemp, cubeTemp }) => {
   }
 
   return (
-    <div>
-      <div className="total-rewards">
-        <h2>큐브 계산기</h2>
-        <p>내정보에서 대표 캐릭터 등록시에 원정대 단위로 큐브목록을 관리할 수 있습니다. (골드 계산 및 저장은 로그인 후 이용 가능)</p><br />
-        <h3>큐브 계산 결과</h3>
+    <div className="bg-background text-foreground min-h-screen">
+      <div className="total-rewards dark:bg-background">
+        <h2 className="dark:text-gray-300">큐브 계산기</h2>
+        <p className="dark:text-gray-300">내정보에서 대표 캐릭터 등록시에 원정대 단위로 큐브목록을 관리할 수 있습니다. (골드 계산 및 저장은 로그인 후 이용 가능)</p><br />
+        <h3 className="dark:text-gray-300">큐브 계산 결과</h3>
         {characterInfo && Array.isArray(characterInfo) && (
           <div className="reward-summary">
             {/* 총 골드 */}
             <div className="reward-item">
               <img src={goldIcon} alt="골드" className="icon_gold" />
-              <span className="value">
+              <span className="value dark:text-white">
                 {new Intl.NumberFormat("ko-KR").format(calculateTotalRewards(characterInfo).gold)}
               </span>
             </div>
@@ -262,7 +262,7 @@ const Cube = ({ characterTemp, cubeTemp }) => {
             {/* 총 실링 */}
             <div className="reward-item">
               <img src={silingIcon} alt="실링" className="icon" />
-              <span className="value">
+              <span className="value dark:text-white">
                 {new Intl.NumberFormat("ko-KR").format(calculateTotalRewards(characterInfo).siling)}
               </span>
             </div>
@@ -270,7 +270,7 @@ const Cube = ({ characterTemp, cubeTemp }) => {
             {/* 총 카드 EXP */}
             <div className="reward-item">
               <img src={cardIcon} alt="카드 EXP" className="icon" />
-              <span className="value">
+              <span className="value dark:text-white">
                 {new Intl.NumberFormat("ko-KR").format(calculateTotalRewards(characterInfo).cardExp)}
               </span>
             </div>
@@ -278,7 +278,7 @@ const Cube = ({ characterTemp, cubeTemp }) => {
             {/* 금제(3티어) 보석 */}
             <div className="reward-item">
               <img src={jewellery3Icon} alt="금제 보석" />
-              <span className="value">
+              <span className="value dark:text-white">
                 {calculatejewelryGrad(calculateTotalRewards(characterInfo).jewelry3Tier).map((jewel) => (
                   <span key={jewel.level} className="jewel-info">
                     {jewel.level}레벨: {jewel.count}개
@@ -290,7 +290,7 @@ const Cube = ({ characterTemp, cubeTemp }) => {
             {/* 해금(4티어) 보석 */}
             <div className="reward-item">
               <img src={jewellery4Icon} alt="해금 보석" />
-              <span className="value">
+              <span className="value dark:text-white">
                 {calculatejewelryGrad(calculateTotalRewards(characterInfo).jewelry4Tier).map((jewel) => (
                   <span key={jewel.level} className="jewel-info">
                     {jewel.level}레벨: {jewel.count}개
@@ -306,14 +306,14 @@ const Cube = ({ characterTemp, cubeTemp }) => {
         {characterInfo &&
           Array.isArray(characterInfo) &&
           characterInfo.map(({ SERVER, NICKNAME, JOB, ITEM_LEVEL, CUBES, isSaveEnabled }, characterIndex) => (
-            <div className="content" key={NICKNAME}>
+            <div className="content dark:bg-gray-300" key={NICKNAME}>
               <span className="title">{NICKNAME}</span>
               <span className="sub-title">
                 [{SERVER}] Lv.{ITEM_LEVEL} {JOB}
               </span>
 
               {/* 3티어 섹션 */}
-              <div className="tier-section">
+              <div className="tier-section ">
                 <h3 className="tier-title">3티어</h3>
                 <ul className="tier-list">
                   {["1금제", "2금제", "3금제", "4금제", "5금제"].map((tierName, index) => {
@@ -335,16 +335,12 @@ const Cube = ({ characterTemp, cubeTemp }) => {
 
                             return (
                               <div
-                                className={`grid-item ${shouldColor ? "t3" : ""}`}
+                                className={`grid-item ${shouldColor ? "t3" : ""} `}
                                 key={idx}
                               ></div>
                             );
                           })}
                         </div>
-
-
-
-
                         <span className="tier-name">{tierName}</span>
                         <input
                           type="number"
@@ -352,7 +348,7 @@ const Cube = ({ characterTemp, cubeTemp }) => {
                           max="999"
                           value={cube.count}
                           placeholder="수량"
-                          className="quantity-input"
+                          className="quantity-input dark:bg-gray-200"
                           onChange={(e) => handleCountChange(characterIndex, tierName, parseInt(e.target.value, 10) || 0)} // 0으로 fallback
                           onInput={(e) => {
                             // 입력된 값의 숫자화 처리
@@ -421,7 +417,7 @@ const Cube = ({ characterTemp, cubeTemp }) => {
                           max="999"
                           value={cube.count}
                           placeholder="수량"
-                          className="quantity-input"
+                          className="quantity-input dark:bg-gray-200"
                           onChange={(e) => handleCountChange(characterIndex, tierName, parseInt(e.target.value, 10) || 0)} // 0으로 fallback
                           onInput={(e) => {
                             // 입력된 값의 숫자화 처리
@@ -498,9 +494,9 @@ const Cube = ({ characterTemp, cubeTemp }) => {
               </div>
 
               {/* 보석 아이템 섹션 */}
-              <div className="jewellery-contains">
+              <div className="jewellery-contains ">
                 {["금제", "해금"].map((name, index) => (
-                  <div className="content" key={index}>
+                  <div className="content dark:bg-gray-200" key={index}>
                     {/* 보석 아이템 */}
                     <div className="rewardSpan">
                       <span className="rewardSpan" key={`${name}T`}>
@@ -550,7 +546,7 @@ const Cube = ({ characterTemp, cubeTemp }) => {
               {/* 아이템 섹션 */}
               <div className="item-contains">
                 {["금제", "해금"].map((name, index) => (
-                  <div className="content" key={index}>
+                  <div className="content dark:bg-gray-200" key={index}>
                     {/* 아이템 그룹 */}
                     <div className="rewardSpan">
                       {name === "금제" ? (

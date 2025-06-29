@@ -20,11 +20,11 @@ export const metadata = {
     url: 'https://loagap.com/price/book',
     type: 'website',
     images: [
-        {
-          url: 'https://loagap.com/img/logo.png',
-          alt: `빈틈 이미지`
-        }
-      ]
+      {
+        url: 'https://loagap.com/img/logo.png',
+        alt: `빈틈 이미지`
+      }
+    ]
   },
 };
 
@@ -32,12 +32,14 @@ export default async function Page() {
   const { booksPrice, bookPriceLastUpdate } = await getBooksPriceData();
 
   return (
-    <div className="container-patch">
-      <h2>유각시세 / 유각차트</h2>
-      <div>
-        <AdSense adSlot="1488834693" />
+    <div className="bg-background text-foreground min-h-screen">
+      <div className="container-patch">
+        <h2 className="dark:text-gray-300">유각시세 / 유각차트</h2>
+        <div>
+          <AdSense adSlot="1488834693" />
+        </div>
+        <BookPage booksPrice={booksPrice} bookLastUpdate={bookPriceLastUpdate} />
       </div>
-      <BookPage booksPrice={booksPrice} bookLastUpdate={bookPriceLastUpdate} />
     </div>
   );
 }

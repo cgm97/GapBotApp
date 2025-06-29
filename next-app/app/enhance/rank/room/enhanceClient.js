@@ -83,59 +83,59 @@ const Rank = ({ roomId }) => {
 
   // page 변경시 데이터 추가로 불러오기
   useEffect(() => {
-    if (page === 1 ) return;
+    if (page === 1) return;
     fetchRanking(page);
   }, [page]);
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h2 className="text-2xl font-bold mb-2">
+    <div className="container mx-auto px-4 py-8 bg-background text-foreground min-h-screen">
+      <h2 className="text-2xl font-bold mb-2 dark:text-gray-300">
         🏆 빈틈봇 {roomCode && rankingList.length > 0 ? (
           <span className="text-blue-600 font-medium">[{rankingList[0].ROOM_NAME}]</span>
         ) : (
           <span className="text-blue-600 font-medium">[톡방]</span>
         )} 재련 랭킹
       </h2>
-        <AdSense adSlot="1488834693" />
-      <p className="text-gray-600 mb-2">최종 재련 달성 순으로 정렬된 전체 유저 랭킹입니다.</p>
+      <AdSense adSlot="1488834693" />
+      <p className="text-gray-600 mb-2 dark:text-gray-300">최종 재련 달성 순으로 정렬된 전체 유저 랭킹입니다.</p>
       {!roomCode && (
         <div>
-          <p className="text-red-600">비 로그인시 전체 랭킹이 표시됩니다.</p>
+          <p className="text-red-600 dark:text-red-400">비 로그인시 전체 랭킹이 표시됩니다.</p>
         </div>
       )}
 
       {myRank && (
         <div className="overflow-x-auto pr-4">
-          <div className="mb-2 p-2 bg-blue-50 border rounded-xl shadow-sm">
-            <h4 className="text-blue-800 font-semibold text-lg mb-1">🎯 내 랭킹</h4>
-            <p>👤 닉네임: {myRank.USER_NAME}</p>
-            <p>👤 대표 캐릭터: {myRank.NICKNAME}</p>
-            <p>🏅 순위: {myRank.RANKING}위</p>
-            <p>🔨 단계: {myRank.STEP}단계</p>
+          <div className="mb-2 p-2 bg-blue-50 dark:bg-gray-500 border dark:border-gray-600 rounded-xl shadow-sm">
+            <h4 className="text-blue-800 dark:text-blue-200 font-semibold text-lg mb-1">🎯 내 랭킹</h4>
+            <p className="text-gray-800 dark:text-gray-100">👤 닉네임: {myRank.USER_NAME}</p>
+            <p className="text-gray-800 dark:text-gray-100">👤 대표 캐릭터: {myRank.NICKNAME}</p>
+            <p className="text-gray-800 dark:text-gray-100">🏅 순위: {myRank.RANKING}위</p>
+            <p className="text-gray-800 dark:text-gray-100">🔨 단계: {myRank.STEP}단계</p>
           </div>
         </div>
       )}
 
       <div className="overflow-x-auto pr-4">
-        <table className="w-full table-auto border-collapse border border-gray-200">
-          <thead className="bg-gray-100">
+        <table className="w-full table-auto border-collapse border border-gray-200 dark:border-gray-600">
+          <thead className="bg-gray-100 dark:bg-blue-900">
             <tr>
-              <th className="p-2 border w-[60px]">순위</th>
-              <th className="p-2 border w-[80px]">재련</th>
-              <th className="p-2 border w-[250px]">닉네임</th>
-              <th className="p-2 border w-[250px]">대표 캐릭터</th>
-              <th className="p-2 border w-[150px]">직업</th>
-              <th className="p-2 border w-[250px]">최종 달성 일시</th>
+              <th className="p-2 border dark:border-gray-600 w-[60px]">순위</th>
+              <th className="p-2 border dark:border-gray-600 w-[80px]">재련</th>
+              <th className="p-2 border dark:border-gray-600 w-[250px]">닉네임</th>
+              <th className="p-2 border dark:border-gray-600 w-[250px]">대표 캐릭터</th>
+              <th className="p-2 border dark:border-gray-600 w-[150px]">직업</th>
+              <th className="p-2 border dark:border-gray-600 w-[250px]">최종 달성 일시</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className='dark:bg-gray-800'>
             {rankingList.map((user) => (
               <tr
                 key={user.USER_ID}
                 className={
                   user.USER_ID === userCode
-                    ? 'bg-yellow-100 font-bold'
-                    : 'hover:bg-gray-50'
+                    ? 'bg-yellow-100 dark:bg-yellow-900 font-bold'
+                    : 'hover:bg-gray-50 dark:hover:bg-gray-800'
                 }
               >
                 <td
@@ -145,7 +145,7 @@ const Rank = ({ roomId }) => {
                       ? 'text-gray-500'
                       : user.RANKING == 3
                         ? 'text-orange-400'
-                        : 'text-black'
+                        : 'text-black dark:text-gray-300'
                     }`}
                 >
                   {user.RANKING == 1
@@ -156,21 +156,18 @@ const Rank = ({ roomId }) => {
                         ? '🥉'
                         : `${user.RANKING}위`}
                 </td>
-                <td className="text-center border p-2">{user.STEP}단계</td>
-                <td className="text-left border p-2">{user.USER_NAME}</td>
-                <td className="text-center border p-2">
+                <td className="text-center border p-2 dark:border-gray-600 dark:text-gray-200">{user.STEP}단계</td>
+                <td className="text-left border p-2 dark:border-gray-600 dark:text-gray-200">{user.USER_NAME}</td>
+                <td className="text-center border p-2 dark:border-gray-600 dark:text-gray-200">
                   {user.NICKNAME && user.NICKNAME !== 'UNKNOWN' ? (
-                    <Link
-                      href={`/character/${user.NICKNAME}`}
-                      className="text-blue-600 hover:underline"
-                    >
+                    <Link href={`/character/${user.NICKNAME}`} className="text-blue-600 dark:text-blue-400 hover:underline">
                       {user.NICKNAME}
                     </Link>
                   ) : (
-                    user.NICKNAME
+                    '미연동'
                   )}
                 </td>
-                <td className="text-center">
+                <td className="text-center dark:text-gray-200">
                   {user.NICKNAME && user.NICKNAME !== 'UNKNOWN' ? (
                     <>
                       {user.JOB} {user.SUBJOB}<br />{user.ITEM_LEVEL.toFixed(2)}
@@ -179,14 +176,13 @@ const Rank = ({ roomId }) => {
                     ''
                   )}
                 </td>
-                <td className="text-center border p-2">{user.ACHIEVE_DTTI}</td>
+                <td className="text-center border p-2 dark:border-gray-600 dark:text-gray-300">{user.ACHIEVE_DTTI}</td>
               </tr>
             ))}
           </tbody>
-
         </table>
         {!hasMore && (
-          <p className="text-center mt-4 text-gray-500">더 이상 데이터가 없습니다.</p>
+          <p className="text-center mt-4 text-gray-500 dark:text-gray-400">더 이상 데이터가 없습니다.</p>
         )}
       </div>
     </div>

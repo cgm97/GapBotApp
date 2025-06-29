@@ -218,7 +218,8 @@ exports.getJewelPrice = async (req, res, next) => {
                         price: todayJewelPrice.price,
                         diffPrice: diffPrice,
                         icon: todayJewelPrice.icon,
-                        percent: percentChange
+                        percent: percentChange,
+                        grade: todayJewelPrice.grade
                     })
                 }
             });

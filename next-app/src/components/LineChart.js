@@ -48,6 +48,20 @@ export default function LineChart({ rawData }) {
             height: 300,
         });
 
+        // 다크모드 감지
+        const isDark = document.documentElement.classList.contains('dark');
+
+        chart.applyOptions({
+            layout: {
+                background: { color: isDark ? '#1e1e1e' : '#FFFFFF' },
+                textColor: isDark ? '#D1D5DB' : '#000000',
+            },
+            grid: {
+                vertLines: { color: isDark ? '#2e2e2e' : '#e1e1e1' },
+                horzLines: { color: isDark ? '#2e2e2e' : '#e1e1e1' },
+            },
+        });
+
         const refs = seriesData.map(({ color, data }) => {
             const series = chart.addSeries(LineSeries, {
                 color,
