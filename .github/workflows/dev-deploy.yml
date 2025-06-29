@@ -1,4 +1,4 @@
-name: Deploy to EC2 with Conditional Build (Client build, Server pull)
+name: Build TEST
 
 on:
   push:
@@ -68,16 +68,16 @@ jobs:
           npm run build
           cd ..
 
-      - name: Upload build to EC2 (if client changed)
-        if: steps.detect_changes.outputs.client_changed == 'true'
-        run: |
-          rsync -avz -e "ssh -i key.pem -o StrictHostKeyChecking=no" \
-            ./next-app/.next \
-            ./next-app/package.json \
-            ./next-app/package-lock.json \
-            ./next-app/public \
-            ./next-app/node_modules \
-            ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/GapBotApp-dev/next-app
+      # - name: Upload build to EC2 (if client changed)
+      #   if: steps.detect_changes.outputs.client_changed == 'true'
+      #   run: |
+      #     rsync -avz -e "ssh -i key.pem -o StrictHostKeyChecking=no" \
+      #       ./next-app/.next \
+      #       ./next-app/package.json \
+      #       ./next-app/package-lock.json \
+      #       ./next-app/public \
+      #       ./next-app/node_modules \
+      #       ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/GapBotApp-dev/next-app
 
       # - name: Restart PM2 Client and nginx (if client changed)
       #   if: steps.detect_changes.outputs.client_changed == 'true'

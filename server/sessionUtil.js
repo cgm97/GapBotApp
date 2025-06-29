@@ -178,6 +178,7 @@ const getJewelPrice = async () => {
                 name: item.Name,
                 price: item.AuctionInfo.BuyPrice,
                 icon: item.Icon,
+                grade: item.Grade
             });
         }
     }

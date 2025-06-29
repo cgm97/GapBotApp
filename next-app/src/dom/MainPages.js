@@ -62,13 +62,13 @@ const MainPages = () => {
     <>
       <Island />
 
-      <div className="ad-content">
+      <div className="ad-content dark:bg-gray-500">
         {/* <KakaoAdFit unit="DAN-lOG6HPbp08gmb26g" width={728} height={90} disabled={true} /> */}
         <AdSense adSlot="1488834693" />
       </div>
 
       <div className="notice">
-        <div className="content">
+        <div className="content dark:bg-gray-500">
           <h4>로스트아크 공지사항</h4>
           <ul>
             {noticeData?.slice(0, 20).map((notice, idx) => (
@@ -81,7 +81,7 @@ const MainPages = () => {
           </ul>
         </div>
 
-        <div className="content">
+        <div className="content dark:bg-gray-500">
           <h4>빈틈봇 패치노트</h4>
           <ul>
             {patchNoteData?.slice(0, 20).map((patchNote) => (
@@ -94,7 +94,7 @@ const MainPages = () => {
           </ul>
         </div>
 
-        <div className="content">
+        <div className="content dark:bg-gray-500">
           <h4>로스트아크 이벤트</h4>
           <ul>
             {eventData?.map((event, idx) => (

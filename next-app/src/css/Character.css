@@ -223,7 +223,10 @@
 .item-image-wrapper.heroic {
   background: linear-gradient(135deg, #27013d, #6e00aa);
 }
-
+.gem-box.rare,
+.item-image-wrapper.rare {
+  background: linear-gradient(135deg, #1e2a38, #3f88c5);
+}
 
 .gem-box img {
   width: 100%;

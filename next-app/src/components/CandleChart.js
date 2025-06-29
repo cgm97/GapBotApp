@@ -12,16 +12,20 @@ export default function CandleChart({ chartData }) {
     const rawData = chartData;
 
     useEffect(() => {
+
+        // 다크모드 감지
+        const isDark = document.documentElement.classList.contains('dark');
+
         const chart = createChart(chartContainerRef.current, {
             width: chartContainerRef.current.clientWidth,
             height: 400,
             layout: {
-                background: { color: '#fff' },
-                textColor: '#333',
+                background: { color: isDark ? '#1e1e1e' : '#FFFFFF' },
+                textColor: isDark ? '#D1D5DB' : '#000000',
             },
             grid: {
-                vertLines: { color: '#eee' },
-                horzLines: { color: '#eee' },
+                vertLines: { color: isDark ? '#2e2e2e' : '#e1e1e1' },
+                horzLines: { color: isDark ? '#2e2e2e' : '#e1e1e1' },
             },
             timeScale: {
                 timeVisible: true,

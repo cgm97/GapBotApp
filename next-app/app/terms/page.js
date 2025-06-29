@@ -6,7 +6,7 @@ export const metadata = {
 
 export default function TermsPage() {
   return (
-    <div className="max-w-3xl mx-auto px-4 py-10 text-sm text-gray-800 leading-6">
+    <div className="max-w-3xl mx-auto px-4 py-10 text-sm text-gray-800 leading-6 dark:text-gray-200">
       <h1 className="text-2xl font-semibold mb-6">이용약관</h1>
 
       <p>
@@ -52,7 +52,7 @@ export default function TermsPage() {
         이메일: <a href="mailto:loagapteam@gmail.com" className="text-blue-600 hover:underline">loagapteam@gmail.com</a>
       </p>
 
-      <p className="text-xs text-gray-500 mt-10">
+      <p className="text-xs text-gray-500 mt-10 dark:text-gray-400">
         본 약관은 2025년 6월 12일부터 적용됩니다.
       </p>
     </div>

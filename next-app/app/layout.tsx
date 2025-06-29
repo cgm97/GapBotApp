@@ -20,10 +20,6 @@ export default function RootLayout({
     <html lang="ko">
       <head>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
-        <meta
-          name="robots"
-          content={process.env.NEXT_PUBLIC_ENV === 'dev' ? 'noindex, nofollow' : 'index, follow'}
-        />
         {/* Google Analytics */}
         <Script
           strategy="afterInteractive"
@@ -60,17 +56,18 @@ export default function RootLayout({
         />
       </head>
       <body>
+        <div className="bg-background text-foreground min-h-screen">
         <UserProvider>
           <div className="wrapper">
             <div className="advertise left">
               {/* <KakaoAdFit unit="DAN-Qnq0ez9rvfuNOCVh" width={160} height={600} disabled={true} /> */}
             </div>
 
-            <div className="content">
+            <div className="content dark:bg-background">
               <Top />
               <Header />
               {children} {/* 페이지 컴포넌트들이 여기에 렌더링됨 */}
-              <Footer />
+              <Footer /> 
             </div>
 
             <div className="advertise right">
@@ -78,6 +75,7 @@ export default function RootLayout({
             </div>
           </div>
         </UserProvider>
+        </div>
       </body>
     </html>
   );

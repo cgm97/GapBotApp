@@ -89,14 +89,14 @@ const Island = () => {
 
   return (
     <div className="calendar">
-      <div className="calendar-days">
+      <div className="calendar-days dark:bg-gray-500">
         {daysWithDate.map(({ day, date }) => (
           <div
             key={date}
             className={`day ${activeDay === date ? "active" : ""}`}
             onClick={() => setActiveDay(date)}
           >
-            <div className={`day-date ${day === "토" || day === "일" ? "holiday" : ""}`}>
+            <div className={`day-date ${day === "토" || day === "일" ? "holiday" : ""} `}>
               {date}
             </div>
             <div className={`day-name ${day === "토" || day === "일" ? "holiday" : ""}`}>
@@ -105,7 +105,7 @@ const Island = () => {
           </div>
         ))}
       </div>
-      <div className="islandContent">
+      <div className="islandContent dark:bg-gray-500">
         {activeDay &&
           Object.entries(
             content[activeDay].reduce((groups, island) => {
@@ -135,7 +135,7 @@ const Island = () => {
               <div className="time-group" key={timeType}>
                 <h3 className="time-header">
                   {uniqueStartTimes.map((time, index) => (
-                    <div key={index} className="time-box">
+                    <div key={index} className="time-box dark:bg-gray-400">
                       {time}
                     </div>
                   ))}
@@ -143,7 +143,7 @@ const Island = () => {
 
                 <div className="island-list">
                   {islands.map((island, index) => (
-                    <div className="list-item" key={index}>
+                    <div className="list-item dark:bg-gray-400" key={index}>
                       <img src={island.IMG_URL} alt={island.NAME} className="image" />
                       <p className="name">
                         [{island.BONUS_REWARD_TYPE}] {island.NAME}

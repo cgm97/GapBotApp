@@ -40,12 +40,14 @@ export const metadata = {
 export default async function Page() {
   const { accessorysPrice, accessoryPriceLastUpdate } = await getAccessoryPriceData();
   return (
+    <div className="bg-background text-foreground min-h-screen">
     <div className="container-patch">
-      <h2>악세시세 / 악세차트</h2>
+      <h2 className="dark:text-gray-300">악세시세 / 악세차트</h2>
       <div>
         <AdSense adSlot="1488834693" />
       </div>
       <AccessoryPage accessorysPrice={accessorysPrice} accessoryLastUpdate={accessoryPriceLastUpdate} />
+    </div>
     </div>
   );
 }

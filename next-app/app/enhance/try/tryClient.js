@@ -45,7 +45,7 @@ const EnhanceTry = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-xl shadow-md">
+    <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-xl shadow-md dark:bg-gray-300">
       {/* 제목 + 툴팁 */}
       <div className="flex items-center gap-2 mb-4">
         <h2 className="text-xl font-semibold">재련 시뮬레이터</h2>
@@ -72,7 +72,7 @@ const EnhanceTry = () => {
           type="text"
           value={userId || ""}
           onChange={(e) => setUserId(e.target.value)}
-          className="w-full border rounded px-3 py-2 text-sm"
+          className="w-full border rounded px-3 py-2 text-sm dark:bg-gray-200"
           placeholder="빈틈봇이 발급한 유저 코드 (예: test)"
         />
       </div>
@@ -85,7 +85,7 @@ const EnhanceTry = () => {
           type="text"
           value={roomId || ""}
           onChange={(e) => setRoomId(e.target.value)}
-          className="w-full border rounded px-3 py-2 text-sm"
+          className="w-full border rounded px-3 py-2 text-sm dark:bg-gray-200"
           placeholder="빈틈봇이 발급한 채팅방 코드 (예: test)"
         />
       </div>
@@ -106,11 +106,11 @@ const EnhanceTry = () => {
           readOnly
           value={result}
           rows={8}
-          className="w-full border rounded  pr-3 text-sm bg-gray-100 resize-none"
+          className="w-full border rounded  pr-3 text-sm bg-gray-100 resize-none dark:bg-gray-200"
         />
       </div>
       {/* 재련 확률 안내 (하단) */}
-      <div className="mt-8 p-4 bg-gray-100 rounded-lg text-sm text-gray-700 max-w-md mx-auto">
+      <div className="mt-8 p-4 bg-gray-100 rounded-lg text-sm text-gray-700 max-w-md mx-auto dark:bg-gray-200">
         <h3 className="font-semibold mb-2">재련 확률</h3>
         <ul className="list-disc list-inside space-y-1 max-h-60 overflow-auto">
           {rates.map(({ step, chance, bonusChance }) => (

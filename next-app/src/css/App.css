@@ -3,12 +3,23 @@
 @tailwind utilities;
 
 @keyframes highlightFade {
-  0%   { background-color: rgba(255, 230, 128, 0.8); }
-  50%  { background-color: rgba(255, 230, 128, 0.4); }
+  0%   { background-color: rgba(129, 236, 170, 0.4); }
+  50%  { background-color: rgba(129, 236, 170, 0.2); }
   100% { background-color: transparent; }
 }
+
+:root {
+  --background: #ffffff;  /* 아주 밝은 회색 (gray-50) */
+  --foreground: #121212;  /* 짙은 회색 (gray-800) */
+}
+
+.dark {
+  --background: #121212;  /* 부드러운 네이비 느낌 (slate-800) */
+  --foreground: #ffffff;  /* 연한 하늘색 (slate-200) */
+}
+
 .animate-price-change {
-  animation: highlightFade 10s ease forwards;
+  animation: highlightFade 5s ease forwards;
 }
 
 /* 기본 스타일 */
