@@ -55,7 +55,7 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
       </head>
-      <body>
+      <body className="dark:bg-background">
         <div className="bg-background text-foreground min-h-screen">
         <UserProvider>
           <div className="wrapper">
