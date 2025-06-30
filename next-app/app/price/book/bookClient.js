@@ -125,7 +125,7 @@ export default function BookClient({ booksPrice, bookLastUpdate }) {
   };
 
   const currentPrice = data?.booksPrice || booksPrice;
-  const lastUpdate = data?.bookLastUpdate || bookLastUpdate;
+  const lastUpdate = data?.bookPriceLastUpdate || bookLastUpdate;
 
   return (
     <>
