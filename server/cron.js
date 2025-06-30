@@ -424,6 +424,16 @@ cron.schedule('30 0 * * *', async () => { // async로 변경
         message: '보석 저장 시작 START'
     });
 
+    if (process.env.NODE_ENV != "PROD") {
+        // 00시일 때는 실행하지 않음
+        logger.info({
+            method: method,
+            url: url,  // 요청 URL
+            message: `보석 조회 시작 END env:${process.env.NODE_ENV}`
+        });
+        return;
+    }
+
     // 여기에 실제로 실행할 작업 코드 작성
     const connection = await pool.getConnection();
 
@@ -498,6 +508,17 @@ cron.schedule('30 0 * * *', async () => { // async로 변경
         message: '각인서 저장 시작 START'
     });
 
+
+    if (process.env.NODE_ENV != "PROD") {
+        // 00시일 때는 실행하지 않음
+        logger.info({
+            method: method,
+            url: url,  // 요청 URL
+            message: `각인서 조회 시작 END env:${process.env.NODE_ENV}`
+        });
+        return;
+    }
+
     // 여기에 실제로 실행할 작업 코드 작성
     const connection = await pool.getConnection();
     try {
@@ -562,6 +583,16 @@ cron.schedule('0 0 * * *', async () => { // async로 변경
         url: url,  // 요청 URL
         message: '악세서리 저장 시작 START'
     });
+
+    if (process.env.NODE_ENV != "PROD") {
+        // 00시일 때는 실행하지 않음
+        logger.info({
+            method: method,
+            url: url,  // 요청 URL
+            message: `악세서리 조회 시작 END env:${process.env.NODE_ENV}`
+        });
+        return;
+    }
 
     // 여기에 실제로 실행할 작업 코드 작성
     const connection = await pool.getConnection();
