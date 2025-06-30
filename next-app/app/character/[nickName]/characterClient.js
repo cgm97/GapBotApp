@@ -307,7 +307,7 @@ const Character = ({nickName}) => {
                         <div key={index} className={`gem-box ${getGradeClass(gem.grade)}`}>
                             <img src={gem.imgSrc} alt={gem.name} />
                             <p className="level">{gem.level}</p>
-                            <div className="detail">{gem.name} {gem.option}</div>
+                            <div className="detail">{gem.name} {gem.option}<br />{gem.desc}</div>
                         </div>
                     ))}
                 </div>
