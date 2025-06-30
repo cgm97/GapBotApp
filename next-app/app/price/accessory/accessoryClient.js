@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import CandleChart from '@/components/CandleChart';
+import '@/css/Character.css';
 import axios from 'axios';
 
 export default function AccessoryClient({ accessorysPrice, accessoryLastUpdate }) {
@@ -220,10 +221,10 @@ export default function AccessoryClient({ accessorysPrice, accessoryLastUpdate }
                               className={`border px-3 py-1 font-medium ${item.price === 0
                                 ? 'text-gray-400'
                                 : item.priceDiff > 0
-                                  ? 'text-green-600 dark:text-green-400'
+                                  ?  'text-red-600 dark:text-red-500'
                                   : item.priceDiff < 0
-                                    ? 'text-red-600 dark:text-red-400'
-                                    : 'text-gray-500 dark:text-gray-400'
+                                    ? 'text-blue-500 dark:text-blue-500'
+                                    : 'text-gray-500'
                                 }`}
                             >
                               {item.price === 0
