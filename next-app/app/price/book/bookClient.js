@@ -283,15 +283,18 @@ export default function BookClient({ booksPrice, bookLastUpdate }) {
                     <td className="p-2 dark:border-gray-600">
                       {item.price.toLocaleString()}
                       {changeInfo && (
-                        <span
-                          className={`ml-2 text-sm font-medium ${
-                            changeInfo.diff > 0
-                              ? "text-green-600 dark:text-green-400"
-                              : "text-red-500 dark:text-red-400"
-                          }`}
-                        >
-                          ({changeInfo.diff > 0 ? "+" : ""}
-                          {changeInfo.diff.toLocaleString()})
+<span
+                          className={`
+                            ml-2 text-sm font-medium
+                            ${changeInfo.diff > 0
+                              ? 'text-red-600 dark:text-red-500'
+                              : changeInfo.diff < 0
+                                ? 'text-blue-500 dark:text-blue-500'
+                                : 'text-gray-500'}
+                           `}
+                        > {/* 이전 대비 차액 */}
+                          {'('}{changeInfo.diff > 0 ? '+' : ''}
+                          {changeInfo.diff.toLocaleString()}{')'}
                         </span>
                       )}
                     </td>
@@ -307,13 +310,14 @@ export default function BookClient({ booksPrice, bookLastUpdate }) {
                       </details>
                     </td>
                     <td
-                      className={`p-2 border dark:border-gray-600 ${
-                        item.diffPrice > 0
-                          ? "text-green-600 dark:text-green-400"
+                      className={`
+                        p-2 dark:border-gray-600
+                        ${item.diffPrice > 0
+                          ? 'text-red-700 dark:text-red-500'
                           : item.diffPrice < 0
-                          ? "text-red-500 dark:text-red-400"
-                          : "text-gray-500 dark:text-gray-400"
-                      }`}
+                            ? 'text-blue-700 dark:text-blue-500'
+                            : 'text-gray-500'}
+                      `}
                     >
                       {item.diffPrice > 0 ? "▲" : item.diffPrice < 0 ? "▼" : "—"}{" "}
                       {Math.abs(item.diffPrice).toLocaleString()} ({item.percent}%)
