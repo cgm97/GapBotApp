@@ -287,9 +287,9 @@ export default function BookClient({ booksPrice, bookLastUpdate }) {
                           className={`
                             ml-2 text-sm font-medium
                             ${changeInfo.diff > 0
-                              ? 'text-red-600 dark:text-red-500'
+                              ? 'text-red-500 dark:text-red-600'
                               : changeInfo.diff < 0
-                                ? 'text-blue-500 dark:text-blue-500'
+                                ? 'text-blue-500 dark:text-blue-600'
                                 : 'text-gray-500'}
                            `}
                         > {/* 이전 대비 차액 */}
@@ -313,9 +313,9 @@ export default function BookClient({ booksPrice, bookLastUpdate }) {
                       className={`
                         p-2 dark:border-gray-600
                         ${item.diffPrice > 0
-                          ? 'text-red-700 dark:text-red-500'
+                          ? 'text-red-500 dark:text-red-600'
                           : item.diffPrice < 0
-                            ? 'text-blue-700 dark:text-blue-500'
+                            ? 'text-blue-500 dark:text-blue-600'
                             : 'text-gray-500'}
                       `}
                     >

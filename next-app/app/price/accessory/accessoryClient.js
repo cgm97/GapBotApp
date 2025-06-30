@@ -221,9 +221,9 @@ export default function AccessoryClient({ accessorysPrice, accessoryLastUpdate }
                               className={`border px-3 py-1 font-medium ${item.price === 0
                                 ? 'text-gray-400'
                                 : item.priceDiff > 0
-                                  ?  'text-red-600 dark:text-red-500'
+                                  ?  'text-red-500 dark:text-red-600'
                                   : item.priceDiff < 0
-                                    ? 'text-blue-500 dark:text-blue-500'
+                                    ? 'text-blue-500 dark:text-blue-600'
                                     : 'text-gray-500'
                                 }`}
                             >
