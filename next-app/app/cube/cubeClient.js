@@ -196,6 +196,23 @@ const Cube = ({ characterTemp, cubeTemp }) => {
     });
   };
 
+  // 수량 초기화 캐릭별로
+  const handleCountReset = (characterIndex) => {
+    setCharacterInfo((prevState) => {
+      const newCharacterInfo = [...prevState];
+      const character = newCharacterInfo[characterIndex];
+      // 모든 큐브 count 초기화
+      character.CUBES = character.CUBES.map((cube) => ({
+        ...cube,
+        count: 0,
+      }));
+      if (sessionStorage.getItem("token")) {
+        character.isSaveEnabled = false; // 수정 시 무조건 저장 버튼 활성화
+      }
+      return newCharacterInfo;
+    });
+  };
+
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
@@ -449,16 +466,29 @@ const Cube = ({ characterTemp, cubeTemp }) => {
                   })}
                 </ul>
               </div>
-              {/* 저장 버튼 */}
-              <button
-                type="submit"
-                className={`save-button ${isSaveEnabled ? 'disabled' : ''}`} // CSS 클래스 추가
-                onClick={() => handleSave(characterIndex)} // 함수 참조 전달
-                disabled={isSaveEnabled} // 상태 값에 따라 활성화/비활성화 설정
-              >
-                저장
-              </button>
+              <div className="flex w-full mt-2 space-x-2">
+                {/* 초기화 버튼 */}
+                <button
+                  type="button"
+                  onClick={() => handleCountReset(characterIndex)}
+                  className="w-1/2 px-4 py-2 rounded-md bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold transition"
+                >
+                  🔄 초기화
+                </button>
 
+                {/* 저장 버튼 */}
+                <button
+                  type="button"
+                  onClick={() => handleSave(characterIndex)}
+                  disabled={isSaveEnabled}
+                  className={`w-1/2 px-4 py-2 rounded-md font-semibold transition ${isSaveEnabled
+                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      : 'bg-blue-600 hover:bg-blue-700 text-white'
+                    }`}
+                >
+                  💾 저장
+                </button>
+              </div>
               {/* 총 수급 아이템 섹션 */}
               <div className="tier-section">
                 <h3 className="tier-title">
