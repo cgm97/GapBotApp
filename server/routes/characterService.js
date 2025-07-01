@@ -54,6 +54,7 @@ exports.getCharacterInfo = async (req, res, next) => {
                             'profile',JSON_OBJECT(
                                 'CHARACTER_LEVEL', CI.CHARACTER_LEVEL,
                                 'EXPEDITION_LEVEL', CI.EXPEDITION_LEVEL,
+                                'EXPEDITION_CHARACTER', CI.EXPEDITION_CHARACTER,
                                 'IMG_URL', CI.IMG_URL,
                                 'ITEM_LEVEL', ROUND(CI.ITEM_LEVEL, 2),
                                 'COMBAT_POWER', ROUND(CI.COMBAT_POWER, 2),

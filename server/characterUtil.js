@@ -36,9 +36,9 @@ const insertCharacterInfo = async (equipItems, gemItems, accessoryItems, cardIte
         // 캐릭터 정보 삽입 SQL
         const charInsertSql = `
             INSERT INTO CHARACTER_INFO (
-                NICKNAME, SERVER, JOB, SUBJOB, TITLE, CHARACTER_LEVEL, EXPEDITION_LEVEL, ITEM_LEVEL, COMBAT_POWER, ITEM_LEVEL_HISTORY, PVP_GRADE, STATS, IMG_URL
+                NICKNAME, SERVER, JOB, SUBJOB, TITLE, CHARACTER_LEVEL, EXPEDITION_LEVEL, EXPEDITION_CHARACTER, ITEM_LEVEL, COMBAT_POWER, ITEM_LEVEL_HISTORY, PVP_GRADE, STATS, IMG_URL
             ) VALUES (
-                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
             )
             ON DUPLICATE KEY UPDATE
                 SERVER = VALUES(SERVER),
@@ -47,6 +47,7 @@ const insertCharacterInfo = async (equipItems, gemItems, accessoryItems, cardIte
                 TITLE = VALUES(TITLE),
                 CHARACTER_LEVEL = VALUES(CHARACTER_LEVEL),
                 EXPEDITION_LEVEL = VALUES(EXPEDITION_LEVEL),
+                EXPEDITION_CHARACTER = VALUES(EXPEDITION_CHARACTER),
                 ITEM_LEVEL = VALUES(ITEM_LEVEL),
                 COMBAT_POWER = VALUES(COMBAT_POWER),
                 ITEM_LEVEL_HISTORY = VALUES(ITEM_LEVEL_HISTORY),
@@ -63,6 +64,7 @@ const insertCharacterInfo = async (equipItems, gemItems, accessoryItems, cardIte
         const title = profile.TITLE;
         const level = profile.CHARACTER_LEVEL;
         const expLevel = profile.EXPEDITION_LEVEL;
+        const expCharacter = profile.EXPEDITION_CHARACTER;
         const itemLevel = parseFloat(profile.ITEM_LEVEL.replace(/,/g, ''));
         const itemLeveHistory = profile.ITEM_LEVEL_HISTORY;
         const pvpGrade = profile.PVP_GRADE;
@@ -78,6 +80,7 @@ const insertCharacterInfo = async (equipItems, gemItems, accessoryItems, cardIte
             title,
             level,
             expLevel,
+            expCharacter,
             itemLevel,
             combatPower,
             itemLeveHistory,
@@ -180,7 +183,7 @@ const insertCharacterInfo = async (equipItems, gemItems, accessoryItems, cardIte
         try {
             // const kloaCharacter = `https://api.korlark.com/lostark/characters/${nickname}?renew=true&blocking=true`;
             const kloaCharacter = `https://api.korlark.com/lostark/characters/${nickname}?renew=true`;
-            const responseChar = await axios.get(kloaCharacter, { timeout: 3000 });
+            const responseChar = await axios.get(kloaCharacter, { timeout: 5000 });
             const kloaCharacterData = responseChar.data; // 응답 데이터 저장
 
             // 캐틱터 스킬 SQL
