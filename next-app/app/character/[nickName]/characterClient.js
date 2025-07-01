@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import axios from 'axios';
+import Link from 'next/link'
 import KakaoAdFit from "@/components/KakaoAdFit";
 import AdSense from '@/components/Adsense';
 import '@/css/Character.css';
@@ -10,7 +11,7 @@ const hyperImg = '/img/hyper.png';
 const guildImg = '/img/guild.png';
 const donatePng = '/img/donate/donation.png';
 
-const Character = ({nickName}) => {
+const Character = ({ nickName }) => {
     // const { nickName } = searchName;
     const [profile, setProfile] = useState({});
     const [guild, setGuild] = useState({});
@@ -23,6 +24,8 @@ const Character = ({nickName}) => {
     const [isLoading, setIsLoading] = useState(false);
     const [isRenewing, setIsRenewing] = useState(false); // 갱신 중 상태 추가
     const [error, setError] = useState(null);
+
+    const [selectedTab, setSelectedTab] = useState('정보');
 
     // 데이터 불러오기 함수
     const fetchCharacterData = useCallback(async () => {
@@ -133,211 +136,306 @@ const Character = ({nickName}) => {
         return 'other';
     };
 
+
+    // 서버별 그룹화
+    const charactersByServer = (profile.EXPEDITION_CHARACTER || []).reduce((acc, char) => {
+        const server = char.SERVER || '알수없음';
+        if (!acc[server]) acc[server] = [];
+        acc[server].push(char);
+        return acc;
+    }, {});
+
+    // 서버별 캐릭터 레벨 내림차순 정렬
+    Object.keys(charactersByServer).forEach(server => {
+        charactersByServer[server].sort((a, b) => b.ITEM_LEVEL - a.ITEM_LEVEL);
+    });
+    // 현재 캐릭터의 서버가 우선순위
+    const currentServer = profile.CURRENT_CHARACTER_SERVER;
+    // 서버 이름 배열 (currentServer가 우선)
+    const serverOrder = Object.keys(charactersByServer).sort((a, b) => {
+        if (a === currentServer) return -1;
+        if (b === currentServer) return 1;
+        return a.localeCompare(b);
+    });
+
+
     return (
         <div className="character-container">
-        <div className="group">
-            {/* 캐릭터 정보 영역 */}
-            <div className="group-info">
-                <div className="character">
-                    <img className="character-img" src={profile.IMG_URL} alt="캐릭터 이미지" />
-                    <button className="renew-button" onClick={handleRenew}>갱신하기</button>
-                    <div className="character-info">
-                        <p className="character-name dark:text-gray-300">{profile.TITLE !== "없음" ? profile.TITLE : ""}</p>
-                        <h1 className="character-name dark:text-gray-300">Lv.{profile.CHARACTER_LEVEL}&nbsp;{profile.NICKNAME} {profile.IS_DONATE==="Y"?<img src={donatePng} alt={"후원"} className="inline-block align-middle w-5 h-5 ml-1" />:""}</h1>
-                        <ul className="character-info-list">
-                            <li className="character-info-item">
-                                <p className="character-info radius dark:bg-gray-300">전투력</p>
-                                <span className="name dark:bg-gray-300">{profile.COMBAT_POWER}</span>
-                            </li>
-                            <li className="character-info-item">
-                                <p className="character-info radius dark:bg-gray-300">직업</p>
-                                <span className="name dark:bg-gray-300">{profile.JOB} {profile.SUBJOB !== "서폿" ? profile.SUBJOB : ""}</span>
-                            </li>
-                            <li className="character-info-item">
-                                <p className="character-info radius dark:bg-gray-300">서버</p>
-                                <span className="name dark:bg-gray-300">{profile.SERVER}</span>
-                            </li>
-                            <li className="character-info-item">
-                                <p className="character-info radius dark:bg-gray-300">레벨</p>
-                                <span className="name dark:bg-gray-300">{profile.ITEM_LEVEL} / {profile.EXPEDITION_LEVEL}</span>
-                            </li>
-                            <li className="character-info-item">
-                                <p className="character-info radius dark:bg-gray-300">길드</p>
-                                <span className="name dark:bg-gray-300">{Boolean(guild.IS_OWNER) && <img className="guild" src={guildImg} alt="길드장" />}{guild.NAME}</span>
-                            </li>
-                            <li className="character-info-item">
-                                <p className="character-info radius dark:bg-gray-300">영지</p>
-                                <span className="name dark:bg-gray-300">Lv.{wisdom.LEVEL}&nbsp;{wisdom.NAME}</span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
-                {/* 각인 정보 영역 */}
-                <div className="engraving dark:bg-background">
-                    {engravings.map((item, index) => (
-                        <div key={index}>
-                            <img className="engraving-img" src={item.imgSrc} alt={item.name} />
-                            <div className={`engraving-ico ${item.color}`}></div>
-                            <p className="name dark:text-gray-300">X{item.grade}</p>
-                            <p className="name dark:text-gray-300">{item.name}</p>
-                            {item.abilityLevel && (
-                                <div>
-                                    <div className="engraving-ico level" />
-                                    <p className="name dark:text-gray-300">{item.abilityLevel}</p>
-                                </div>
-                            )}
-                        </div>
-                    ))}
-                </div>
-
-                {/* 광고 영역 */}
-                <div className="engraving dark:bg-background">
-                    {/* <KakaoAdFit unit="DAN-KjllsdstWjrHOWe6" width={250} height={250} disabled={true} /> */}
-                     <AdSense adSlot="1488834693" />
-                </div>
-            </div>
-
-            {/* 장비 및 액세서리 영역 */}
-            <div className="group-equip">
-                <div className="armor-wrap">
-                    <div className="armor-area dark:bg-background">
-                        <ul className="equipment-list">
-                            {equipItems.map((item, index) => (
-                                <li key={index} className="equipment-item">
-                                    {item.name === "평균" ? (
-                                        <div className="average-item">
-                                            <ul className="avgItem">
-                                                <div className="item-image-wrapper ancient">
-                                                    <img src={elixirImg} alt="빛나는 지혜의 엘릭서" className="item-image" />
-                                                    <span className="item-progress yellow">{item.elixirSum}</span>
-                                                </div>
-                                                <div>
-                                                    <p className="average-elixir-ability dark:text-gray-300">{item.elixirAbility}</p>
-                                                    <p className="average-value dark:text-gray-300">{item.elixirValue !== 0 ? `${item.elixirValue}%` : ''}</p>
-                                                </div>
-                                                <div className="item-image-wrapper ancient">
-                                                    <img src={hyperImg} alt="초월 이미지" className="item-image" />
-                                                    <span className="item-progress yellow">{item.hyperSum}</span>
-                                                </div>
-                                                <div>
-                                                    <p className="average-elixir-ability dark:text-gray-300 w-12">{item.hyperAvg}</p>
-                                                    <p className="average-elixir-ability dark:text-gray-300 w-12">
-                                                        {item.hyperValue !== 0 ? `${item.hyperValue}%` : `낙인력 ${item.stigmaticValue}%`}
-                                                    </p>
-                                                </div>
-                                            </ul>
-                                        </div>
-                                    ) : (
-                                        <>
-                                            <div className={`item-image-wrapper ${getGradeClass(item.grade)}`}>
-                                                <img src={item.imageUrl} alt={item.name} className="item-image" />
-                                                <p className="level">T{item.tier}</p>
-                                                <span className={`item-progress ${getProgressClass(item.progress)}`}>{item.progress}</span>
-                                            </div>
-                                            <div className="item-info">
-                                                {Number(item.hyper) > 0 && (
-                                                    <div className="hyper-wrap">
-                                                        <img
-                                                            className="item-image"
-                                                            src="https://cdn-lostark.game.onstove.com/2018/obt/assets/images/common/game/ico_tooltip_transcendence.png"
-                                                            alt="초월 아이콘"
-                                                        />
-                                                        <p className="hyperWarp1">{item.hyper}</p>
-                                                        <p className="hyperWarp2 dark:text-gray-300">{item.hyperLevel}</p>
-                                                    </div>
-                                                )}
-                                                <p className="name dark:text-gray-300">{item.name}</p>
-                                                <ul className="attributes">
-                                                    {(item.elixirs || []).map((elixir, index) => (
-                                                        <li key={index} className="attribute-item dark:text-gray-300">{elixir}</li>
-                                                    ))}
-                                                </ul>
-                                            </div>
-                                        </>
-                                    )}
+            <div className="group">
+                {/* 캐릭터 정보 영역 */}
+                <div className="group-info">
+                    <div className="character">
+                        <img className="character-img" src={profile.IMG_URL} alt="캐릭터 이미지" />
+                        <button className="renew-button" onClick={handleRenew}>갱신하기</button>
+                        <div className="character-info">
+                            <p className="character-name dark:text-gray-300">{profile.TITLE !== "없음" ? profile.TITLE : ""}</p>
+                            <h1 className="character-name dark:text-gray-300">Lv.{profile.CHARACTER_LEVEL}&nbsp;{profile.NICKNAME} {profile.IS_DONATE === "Y" ? <img src={donatePng} alt={"후원"} className="inline-block align-middle w-5 h-5 ml-1" /> : ""}</h1>
+                            <ul className="character-info-list">
+                                <li className="character-info-item">
+                                    <p className="character-info radius dark:bg-gray-300">전투력</p>
+                                    <span className="name dark:bg-gray-300">{profile.COMBAT_POWER}</span>
                                 </li>
-                            ))}
-                        </ul>
-                    </div>
-
-                    {/* 악세서리 영역 */}
-                    <div className="accessory-area dark:bg-background">
-                        <ul className="accessory-list">
-                            {accessoryItems.map((accessory, index) => (
-                                <li key={index} className="equipment-item">
-                                    <div className={`item-image-wrapper ${getGradeClass(accessory.grade)}`}>
-                                        <img src={accessory.imgSrc} alt={accessory.name} className="item-image" />
-                                        <p className="level">T{accessory.tier}</p>
-                                        <span className={`item-progress ${getProgressClass(accessory.progress)}`}>
-                                            {isNaN(Number(accessory.progress))
-                                                ? accessory.name === "팔찌"
-                                                    ? <>{accessory.name} <span className="bangleValue">{accessory.bangleValue}%</span></>
-                                                    : accessory.name
-                                                : accessory.progress}
-                                        </span>
-                                    </div>
-                                    <div className="accessory-options">
-                                        {accessory.options.map((option, idx) => (
-                                            <div key={idx}>
-                                                {option.grade ? (
-                                                    <ul>
-                                                        <li className="attribute-item">
-                                                            <span className={`option-${option.grade} dark:text-black`}>{option.grade}</span>&nbsp;
-                                                            <span className="optionName dark:text-gray-300"> {option.optionName} </span>
-                                                        </li>
-                                                    </ul>
-                                                ) : (
-                                                    <div className="attribute-item">
-                                                        <span className="optionName dark:text-gray-300">{option.optionName}</span>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        ))}
-                                    </div>
+                                <li className="character-info-item">
+                                    <p className="character-info radius dark:bg-gray-300">직업</p>
+                                    <span className="name dark:bg-gray-300">{profile.JOB} {profile.SUBJOB !== "서폿" ? profile.SUBJOB : ""}</span>
                                 </li>
-                            ))}
-                        </ul>
-                    </div>
-                </div>
-
-                {/* 보석 영역 */}
-                <div className="gem-area dark:bg-background">
-                    {gemItems.map((gem, index) => (
-                        <div key={index} className={`gem-box ${getGradeClass(gem.grade)}`}>
-                            <img src={gem.imgSrc} alt={gem.name} />
-                            <p className="level">{gem.level}</p>
-                            <div className="detail">{gem.name} {gem.option}<br />{gem.desc}</div>
-                        </div>
-                    ))}
-                </div>
-
-                {/* 아크패시브 영역 */}
-                <div className="arkPassive-area dark:bg-background">
-                    {['evolution', 'enlightenment', 'leap'].map((key) => (
-                        <div key={key} className="arkPassive-column">
-                            <div className="arkPassive-header">
-                                <span className={`arkPassive-name ${key}`}>
-                                    {key === "evolution" ? "진화" : key === "enlightenment" ? "깨달음" : "도약"}
-                                </span>
-                                <span className="arkPassive-point dark:text-gray-300">{arkItems[key].point}</span>
-                            </div>
-                            <ul className="arkPassive-list">
-                                {arkItems[key].items.map((arkPassive, index) => (
-                                    <li key={index} className="arkPassive-item">
-                                        <img src={arkPassive.imgSrc} alt={arkPassive.name} className="arkPassive-image" />
-                                        <div className="arkPassive-info">
-                                            <span className="arkPassive-tier dark:text-gray-300">{arkPassive.tier}티어</span>
-                                            <span className="arkPassive-name dark:text-gray-300">{arkPassive.name}</span>
-                                        </div>
-                                    </li>
-                                ))}
+                                <li className="character-info-item">
+                                    <p className="character-info radius dark:bg-gray-300">서버</p>
+                                    <span className="name dark:bg-gray-300">{profile.SERVER}</span>
+                                </li>
+                                <li className="character-info-item">
+                                    <p className="character-info radius dark:bg-gray-300">레벨</p>
+                                    <span className="name dark:bg-gray-300">{profile.ITEM_LEVEL} / {profile.EXPEDITION_LEVEL}</span>
+                                </li>
+                                <li className="character-info-item">
+                                    <p className="character-info radius dark:bg-gray-300">길드</p>
+                                    <span className="name dark:bg-gray-300">{Boolean(guild.IS_OWNER) && <img className="guild" src={guildImg} alt="길드장" />}{guild.NAME}</span>
+                                </li>
+                                <li className="character-info-item">
+                                    <p className="character-info radius dark:bg-gray-300">영지</p>
+                                    <span className="name dark:bg-gray-300">Lv.{wisdom.LEVEL}&nbsp;{wisdom.NAME}</span>
+                                </li>
                             </ul>
                         </div>
-                    ))}
+                    </div>
+
+                    {/* 각인 정보 영역 */}
+                    <div className="engraving dark:bg-background">
+                        {engravings.map((item, index) => (
+                            <div key={index}>
+                                <img className="engraving-img" src={item.imgSrc} alt={item.name} />
+                                <div className={`engraving-ico ${item.color}`}></div>
+                                <p className="name dark:text-gray-300">X{item.grade}</p>
+                                <p className="name dark:text-gray-300">{item.name}</p>
+                                {item.abilityLevel && (
+                                    <div>
+                                        <div className="engraving-ico level" />
+                                        <p className="name dark:text-gray-300">{item.abilityLevel}</p>
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* 광고 영역 */}
+                    <div className="engraving dark:bg-background">
+                        {/* <KakaoAdFit unit="DAN-KjllsdstWjrHOWe6" width={250} height={250} disabled={true} /> */}
+                        <AdSense adSlot="1488834693" />
+                    </div>
+                </div>
+
+                {/* 장비 및 액세서리 영역 */}
+                <div className="group-equip">
+                    <div className="w-full flex justify-center gap-1 mb-1">
+                        {['정보', '원정대'].map((tab) => (
+                            <button
+                                key={tab}
+                                onClick={() => setSelectedTab(tab)}
+                                className={`
+                                        px-3 py-1 text-xs font-medium rounded-md border transition-all duration-150
+                                        ${selectedTab === tab
+                                        ? 'bg-blue-500 text-white border-blue-500'
+                                        : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700'}
+                                        `}
+                            >
+                                {tab}
+                            </button>
+                        ))}
+                    </div>
+                    {/* 탭 컨텐츠 영역 */}
+                    {selectedTab === '정보' ? (
+                        <div className="armor-wrap -mt-5">
+                            <div className="armor-area dark:bg-background">
+                                <ul className="equipment-list">
+                                    {equipItems.map((item, index) => (
+                                        <li key={index} className="equipment-item">
+                                            {item.name === "평균" ? (
+                                                <div className="average-item">
+                                                    <ul className="avgItem">
+                                                        <div className="item-image-wrapper ancient">
+                                                            <img src={elixirImg} alt="빛나는 지혜의 엘릭서" className="item-image" />
+                                                            <span className="item-progress yellow">{item.elixirSum}</span>
+                                                        </div>
+                                                        <div>
+                                                            <p className="average-elixir-ability dark:text-gray-300">{item.elixirAbility}</p>
+                                                            <p className="average-value dark:text-gray-300">{item.elixirValue !== 0 ? `${item.elixirValue}%` : ''}</p>
+                                                        </div>
+                                                        <div className="item-image-wrapper ancient">
+                                                            <img src={hyperImg} alt="초월 이미지" className="item-image" />
+                                                            <span className="item-progress yellow">{item.hyperSum}</span>
+                                                        </div>
+                                                        <div>
+                                                            <p className="average-elixir-ability dark:text-gray-300 w-12">{item.hyperAvg}</p>
+                                                            <p className="average-elixir-ability dark:text-gray-300 w-12">
+                                                                {item.hyperValue !== 0 ? `${item.hyperValue}%` : `낙인력 ${item.stigmaticValue}%`}
+                                                            </p>
+                                                        </div>
+                                                    </ul>
+                                                </div>
+                                            ) : (
+                                                <>
+                                                    <div className={`item-image-wrapper ${getGradeClass(item.grade)}`}>
+                                                        <img src={item.imageUrl} alt={item.name} className="item-image" />
+                                                        <p className="level">T{item.tier}</p>
+                                                        <span className={`item-progress ${getProgressClass(item.progress)}`}>{item.progress}</span>
+                                                    </div>
+                                                    <div className="item-info">
+                                                        {Number(item.hyper) > 0 && (
+                                                            <div className="hyper-wrap">
+                                                                <img
+                                                                    className="item-image"
+                                                                    src="https://cdn-lostark.game.onstove.com/2018/obt/assets/images/common/game/ico_tooltip_transcendence.png"
+                                                                    alt="초월 아이콘"
+                                                                />
+                                                                <p className="hyperWarp1">{item.hyper}</p>
+                                                                <p className="hyperWarp2 dark:text-gray-300">{item.hyperLevel}</p>
+                                                            </div>
+                                                        )}
+                                                        <p className="name dark:text-gray-300">{item.name}</p>
+                                                        <ul className="attributes">
+                                                            {(item.elixirs || []).map((elixir, index) => (
+                                                                <li key={index} className="attribute-item dark:text-gray-300">{elixir}</li>
+                                                            ))}
+                                                        </ul>
+                                                    </div>
+                                                </>
+                                            )}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+
+                            {/* 악세서리 영역 */}
+                            <div className="accessory-area dark:bg-background">
+                                <ul className="accessory-list">
+                                    {accessoryItems.map((accessory, index) => (
+                                        <li key={index} className="equipment-item">
+                                            <div className={`item-image-wrapper ${getGradeClass(accessory.grade)}`}>
+                                                <img src={accessory.imgSrc} alt={accessory.name} className="item-image" />
+                                                <p className="level">T{accessory.tier}</p>
+                                                <span className={`item-progress ${getProgressClass(accessory.progress)}`}>
+                                                    {isNaN(Number(accessory.progress))
+                                                        ? accessory.name === "팔찌"
+                                                            ? <>{accessory.name} <span className="bangleValue">{accessory.bangleValue}%</span></>
+                                                            : accessory.name
+                                                        : accessory.progress}
+                                                </span>
+                                            </div>
+                                            <div className="accessory-options">
+                                                {accessory.options.map((option, idx) => (
+                                                    <div key={idx}>
+                                                        {option.grade ? (
+                                                            <ul>
+                                                                <li className="attribute-item">
+                                                                    <span className={`option-${option.grade} dark:text-black`}>{option.grade}</span>&nbsp;
+                                                                    <span className="optionName dark:text-gray-300"> {option.optionName} </span>
+                                                                </li>
+                                                            </ul>
+                                                        ) : (
+                                                            <div className="attribute-item">
+                                                                <span className="optionName dark:text-gray-300">{option.optionName}</span>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="armor-wrap">
+                            <div className="armor-area dark:bg-background">
+                                <h2 className="text-lg font-bold mb-4 dark:text-gray-200">원정대 캐릭터 목록</h2>
+
+                                {serverOrder.map(server => (
+                                    <div key={server} className="mb-8">
+                                        <h3 className="text-md font-semibold mb-2 dark:text-gray-300">{server}</h3>
+                                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                                            {charactersByServer[server].map((char, index) => {
+                                                const link = `/character/${char.NICKNAME}`;
+                                                return (
+                                                    <Link
+                                                        key={index}
+                                                        href={link}
+                                                         className="bg-gray-200 dark:bg-gray-600 hover:scale-[1.02] transition rounded-xl flex flex-col items-center gap-1"
+                                                    >
+                                                        <span className="text-[13px] text-gray-600 font-semibold dark:text-gray-100">{char.NICKNAME}</span>
+                                                        <span className="text-xs text-gray-600 dark:text-gray-300">{char.JOB}</span>
+                                                        <span className="text-xs text-gray-600 dark:text-gray-300">Lv. {char.ITEM_LEVEL}</span>
+                                                    </Link>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* 정보탭일때만 표시 */}
+                    {selectedTab === '정보' ? (
+                        <>
+                            {/* 보석 영역 */}
+                            <div className="gem-area dark:bg-background">
+                                {gemItems.map((gem, index) => (
+                                    <div key={index} className={`gem-box ${getGradeClass(gem.grade)}`}>
+                                        <img src={gem.imgSrc} alt={gem.name} />
+                                        <p className="level">{gem.level}</p>
+                                        <div className="detail">
+                                            {gem.name} {gem.option}
+                                            <br />
+                                            {gem.desc}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* 아크패시브 영역 */}
+                            <div className="arkPassive-area dark:bg-background">
+                                {['evolution', 'enlightenment', 'leap'].map((key) => (
+                                    <div key={key} className="arkPassive-column">
+                                        <div className="arkPassive-header">
+                                            <span className={`arkPassive-name ${key}`}>
+                                                {key === 'evolution'
+                                                    ? '진화'
+                                                    : key === 'enlightenment'
+                                                        ? '깨달음'
+                                                        : '도약'}
+                                            </span>
+                                            <span className="arkPassive-point dark:text-gray-300">
+                                                {arkItems[key].point}
+                                            </span>
+                                        </div>
+                                        <ul className="arkPassive-list">
+                                            {arkItems[key].items.map((arkPassive, index) => (
+                                                <li key={index} className="arkPassive-item">
+                                                    <img
+                                                        src={arkPassive.imgSrc}
+                                                        alt={arkPassive.name}
+                                                        className="arkPassive-image"
+                                                    />
+                                                    <div className="arkPassive-info">
+                                                        <span className="arkPassive-tier dark:text-gray-300">
+                                                            {arkPassive.tier}티어
+                                                        </span>
+                                                        <span className="arkPassive-name dark:text-gray-300">
+                                                            {arkPassive.name}
+                                                        </span>
+                                                    </div>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                ))}
+                            </div>
+                        </>
+                    ) : (<div></div>)}
+
+
                 </div>
             </div>
-        </div>
         </div>
     );
 };
