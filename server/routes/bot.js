@@ -376,6 +376,7 @@ router.get('/booksLog', botService.getBooksLog);
  */
 router.post('/enhance/try', botService.executeEnhance);
 
+router.post('/enhance/advancedTry', botService.executeAdvancedEnhance);
 /**
  * @swagger
  * /bot/enhance/rank:

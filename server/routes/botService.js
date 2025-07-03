@@ -34,6 +34,54 @@ const ENHANCEMENTDATA = [
   { step: 25, chance: 0.5, bonusChance: 0.23 }
 ];
 
+// 기본 상급재련 성공 확률
+const reinforcementChances = [
+  { type: '대성공x2', chance: 5, xp: 40 },
+  { type: '대성공', chance: 15, xp: 20 },
+  { type: '성공', chance: 80, xp: 10 },
+];
+
+// 상급재련 가호 확률 (6번째 시도마다 발동)
+const blessings = [
+  { name: '갈라투르의 망치', chance: 15, effect: (xp) => xp * 5, desc: '🔥 상급 재련 경험치 ×5' },
+  { name: '겔라르의 칼', chance: 35, effect: (xp) => xp * 3, desc: '⚔️ 상급 재련 경험치 ×3' },
+  { name: '쿠훔바르의 모루', chance: 15, effect: (xp) => xp + 30, preserveBlessing: "Y", desc: '✨ 경험치 +30\n🔄 선조의 가호가 재충전됩니다!' },
+  { name: '테메르의 정', chance: 35, effect: (xp) => xp + 10, skipNextCost: "Y", desc: '✨ 경험치 +10\n⏩ 다음 재련 시 쿨타임 생략!' },
+];
+
+// 가중확률 계산
+function calculatedChances(option) {
+  const r = Math.random() * 100;
+  let acc = 0;
+  for (const opt of option) {
+    acc += opt.chance;
+    if (r < acc) {
+      return opt;
+    }
+  }
+  return option[option.length - 1];
+}
+
+function makeBar(count, max = 100, barLength = 10) {
+  const FULL = '▉';
+  const EMPTY = '　';
+  const filled = Math.floor((count / max) * barLength);
+  const empty = barLength - filled;
+  return FULL.repeat(filled) + EMPTY.repeat(empty);
+}
+
+function blessingGauge(count, max = 6) {
+  const filled = '★';  // 채워진 별
+  const empty = '☆';   // 빈 별
+  // count가 max를 초과하거나 음수일 때 제한
+  count = Math.min(Math.max(count, 0), max);
+
+  const filledStars = filled.repeat(count);
+  const emptyStars = empty.repeat(max - count);
+  const gauge = `(${count}/${max})`;
+  return `📌 선조의 가호: [${filledStars + emptyStars}] ${count != 6 ? gauge : ''}`;
+}
+
 // 시간계산
 function toDate(dateTimeStr) {
   var parts = dateTimeStr.split(" "); // 날짜와 시간을 분리
@@ -569,6 +617,215 @@ exports.executeEnhance = async (req, res, next) => {
   }
 }
 
+// 상급재련강화
+exports.executeAdvancedEnhance = async (req, res, next) => {
+
+  let { userId, userName, roomId, roomName, site } = req.body;
+
+  // LOAGAP 재련으로 들어왔을경우
+  if (site == "Y") {
+    if (!userId || !roomId) {
+      return res.status(200).send(
+        "필수 파라미터가 누락되었습니다."
+      );
+    }
+  }
+  else {
+    if (!userId || !userName || !roomId || !roomName) {
+      return res.status(200).send(
+        "필수 파라미터가 누락되었습니다."
+      );
+    }
+  }
+
+  const connection = await pool.getConnection();
+  try {
+    // 트랜잭션 시작
+    await connection.beginTransaction();
+
+    // USER_CODE
+    const selectSql = `
+      SELECT 
+        A.STEP AS ENHANCE_STEP, 
+        B.STEP, 
+        B.XP,
+        BLESSING_PRESERVED ,
+        SKIP_NEXT_COST ,
+        ATTEMPT_COUNT ,
+        CAST(DATE_FORMAT(B.ACHIEVE_DTTI, '%Y-%m-%d %H:%i:%s') AS CHAR) AS ACHIEVE_DTTI,
+        CAST(DATE_FORMAT(B.LST_DTTI, '%Y-%m-%d %H:%i:%s') AS CHAR) AS LST_DTTI,
+        A.USER_NAME,
+        A.ROOM_NAME
+      FROM BOT_ENHANCE_STATUS  A
+      LEFT JOIN BOT_ENHANCE_ADVANCED B
+        ON A.USER_ID = B.USER_ID
+      AND A.ROOM_ID = B.ROOM_ID
+      WHERE A.USER_ID = ?
+        AND A.ROOM_ID = ?
+    `;
+
+    const [selectReInfo] = await connection.execute(selectSql, [userId, roomId]);
+
+    logger.info({
+      method: req.method,
+      url: req.url,  // 요청 URL
+      message: `\nSql ${selectSql} \nParam ${[userId, roomId]}`
+    });
+
+    const userRefInfo = (Array.isArray(selectReInfo) && selectReInfo.length > 0)
+      ? selectReInfo[0]
+      : {};  // 결과가 없을 경우 초기값
+
+    // 유저 재련 정보
+    let currentDate = getDateTime();
+    let currentStep = userRefInfo.STEP || 0;
+    let xp = userRefInfo.XP || 0;
+    let blessingYn = userRefInfo.BLESSING_PRESERVED || "N"; // 가호 유지 여부
+    let skip_coolYn = userRefInfo.SKIP_NEXT_COST || "N"; // 쿨타임 스킵 여부
+    let count = userRefInfo.ATTEMPT_COUNT || 0;
+    let achieveDtti = userRefInfo.ACHIEVE_DTTI || null;
+    let lstDtti = userRefInfo.LST_DTTI || null;
+    let msg = "";
+
+    // 재련 초기 데이터 없을 경우 불가능
+    // LOAGAP 사이트에선 초기 데이터 없을 경우 불가능
+    if (site === "Y") {
+      if (!userRefInfo || Object.keys(userRefInfo).length === 0) {
+       return res.status(200).send(
+        "상급재련 시뮬레이션은 본인의 채팅방에서 재련 최초 1회 실행되어야 합니다.",
+      );
+      } else {
+        userName = userRefInfo.USER_NAME;
+        roomName = userRefInfo.ROOM_NAME;
+      }
+    }
+
+    if (currentStep >= 40) {
+      msg = `🏆 ${userName}님은 \n**최대 상급 재련 단계(40)**에 도달했습니다!`
+      return res.status(200).send(msg);
+    }
+
+    if (userRefInfo.ENHANCE_STEP < 10 && !roomName.includes("후원")) {
+      msg = `${userName}님, 상급재련 시뮬레이션은 \n**무료 분양의 경우 재련 10단계 이상부터 이용 가능합니다.**\n현재 단계는 ${userRefInfo.ENHANCE_STEP}단계입니다. 조건을 달성하면 이용하실 수 있어요!`;
+      return res.status(200).send(msg);
+    }
+
+    if ((currentStep >= 20 && userRefInfo.ENHANCE_STEP < 20) && !roomName.includes("후원")) {
+      msg = `${userName}님, 상급재련 시뮬레이션 20단게 이상부터는 \n**무료 분양의 경우 재련 20단계 이상부터 이용 가능합니다.**\n현재 단계는 ${userRefInfo.ENHANCE_STEP}단계입니다. 조건을 달성하면 이용하실 수 있어요!`;
+      return res.status(200).send(msg);
+    }
+
+    if (lstDtti != null && skip_coolYn == 'N') {
+      var baseTime = 30 * 60 * 1000; // 30분
+
+      var nowDate = toDate(currentDate);
+      var lastChatDate = toDate(lstDtti);
+
+      var checkTime = nowDate - lastChatDate;
+
+      if (checkTime < baseTime) {
+        var remainingTime = baseTime - checkTime;
+        var minutes = Math.floor(remainingTime / 60000);
+        var seconds = Math.floor((remainingTime % 60000) / 1000);
+
+        msg += `⏳ [쿨타임 대기 중]\n\n${userName}님\n`;
+        msg += `🕒 남은 시간: ${minutes > 0 ? minutes + "분 " : ""}${seconds}초`;
+
+        return res.status(200).send(msg);
+      }
+    } else {
+      skip_coolYn = "N";
+    }
+
+    // 강화 확률 게산
+    const chance = calculatedChances(reinforcementChances);
+    let gainedXP = chance.xp;
+    const gainedType = chance.type;
+
+    // 6번째 시도마다 가호 발동
+    let usedBlessing = null;
+    let blessMsg = "";
+    if (count == 6 || blessingYn == "Y") {
+      const blessing = calculatedChances(blessings);
+
+      usedBlessing = blessing;
+      gainedXP = usedBlessing.effect(gainedXP);
+      xp += gainedXP;
+
+      skip_coolYn = usedBlessing.skipNextCost || "N";
+      blessingYn = usedBlessing.preserveBlessing || "N";
+      count = 0;
+
+      blessMsg += "\n🌟 선조의 가호 발동\n"
+      blessMsg += "[" + usedBlessing?.name + "]\n";
+      blessMsg += usedBlessing?.desc + "\n\n";
+    }
+    else {
+      xp += gainedXP;
+      count += 1;
+    }
+
+    // 선조재충전 특수효과
+    if (blessingYn == "Y") {
+      count = 6;
+    }
+    msg += `🎉 [상급재련 ${gainedType}]\n\n`;
+    msg += `${blessingGauge(count)}\n`;
+
+    // XP 100 도달 시 강화
+    if (xp >= 100) {
+      currentStep += 1;
+      xp -= 100;
+      achieveDtti = getDateTime();
+      msg += `🔨 현재 단계: ${currentStep - 1} ➝ ${currentStep}\n`;
+    } else {
+      msg += `🔨 현재 단계: ${currentStep}\n`;
+    }
+    msg += `🔋경험치: ${xp} / 100 (+${gainedXP})\n`;
+    msg += `[${makeBar(xp)}]\n`;
+    if (count == 6) {
+      msg += `✨ 다음 시도에 선조의 가호 발동!\n`;
+    }
+    msg += blessMsg;
+
+    // msg += `✨ 장인의 기운이 초기화`;
+
+    const refinmInsertSql = `
+          INSERT INTO BOT_ENHANCE_ADVANCED (
+              USER_ID, ROOM_ID, USER_NAME, ROOM_NAME, STEP, XP, BLESSING_PRESERVED, SKIP_NEXT_COST, ATTEMPT_COUNT, ACHIEVE_DTTI, LST_DTTI
+          ) VALUES (
+              ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+          )
+          ON DUPLICATE KEY UPDATE
+              USER_NAME = VALUES(USER_NAME),
+              ROOM_NAME = VALUES(ROOM_NAME),
+              STEP = VALUES(STEP),
+              XP = VALUES(XP),
+              BLESSING_PRESERVED = VALUES(BLESSING_PRESERVED),
+              SKIP_NEXT_COST = VALUES(SKIP_NEXT_COST),
+              ATTEMPT_COUNT = VALUES(ATTEMPT_COUNT),
+              ACHIEVE_DTTI = VALUES(ACHIEVE_DTTI),
+              LST_DTTI = VALUES(LST_DTTI)
+      `;
+
+    connection.execute(refinmInsertSql, [userId, roomId, userName, roomName, currentStep, xp, blessingYn, skip_coolYn, count, achieveDtti, currentDate]);
+
+    // 트랜잭션 커밋
+    await connection.commit();
+
+    return res.status(200).send(msg);
+  } catch (err) {
+    // 오류 발생 시 롤백
+    await connection.rollback();
+    next(new Error(err));  // 
+
+    res.status(400).send('잘못된 요청입니다.');
+  } finally {
+    // DB 연결 해제
+    if (connection) connection.release();
+  }
+}
+
 exports.getEnhanceRank = async (req, res, next) => {
   const connection = await pool.getConnection();
 
@@ -584,21 +841,24 @@ exports.getEnhanceRank = async (req, res, next) => {
         SELECT 
           A.USER_ID,
           A.STEP,
+          C.STEP AS ADVANCE_STEP,
           A.USER_NAME,
           A.ROOM_NAME,
           A.USERNAME AS NICKNAME,
           B.ITEM_LEVEL,
           B.JOB,
           B.SUBJOB,
-          RANK() OVER (ORDER BY A.STEP DESC, A.ACHIEVE_DTTI) AS RANKING,
+          RANK() OVER (ORDER BY (A.STEP + IFNULL(C.STEP, 0)) DESC, A.ACHIEVE_DTTI) AS RANKING,
           CAST(DATE_FORMAT(A.ACHIEVE_DTTI, '%Y-%m-%d %H:%i:%s') AS CHAR) AS ACHIEVE_DTTI,
           A.SUCCESS_CNT,
           A.FAIL_CNT
         FROM BOT_ENHANCE_STATUS A
         LEFT JOIN CHARACTER_INFO B
           ON A.USERNAME = B.NICKNAME
+        LEFT JOIN BOT_ENHANCE_ADVANCED C
+          ON A.USER_ID = C.USER_ID
+			    AND A.ROOM_ID = C.ROOM_ID
         WHERE A.DL_YN = 'N' 
-          AND (B.DL_YN = 'N' OR B.DL_YN IS NULL)
           ${roomId ? ' AND A.ROOM_ID = ?' : ''}
       )
       SELECT *
@@ -622,28 +882,35 @@ exports.getEnhanceRank = async (req, res, next) => {
     let myRanking = null;
     if (userId) {
       let myRankingSql = `
-        SELECT *
-        FROM (
-          SELECT 
-            USER_ID,
-            STEP,
-            USER_NAME,
-            ROOM_NAME,
-            USERNAME AS NICKNAME,
-            RANK() OVER (ORDER BY STEP DESC, ACHIEVE_DTTI) AS RANKING,
-            CAST(DATE_FORMAT(ACHIEVE_DTTI, '%Y-%m-%d %H:%i:%s') AS CHAR) AS ACHIEVE_DTTI,
-            SUCCESS_CNT,
-            FAIL_CNT
-          FROM BOT_ENHANCE_STATUS
-          WHERE DL_YN = 'N'
-          ${roomId ? ' AND ROOM_ID = ?' : ''}
-        ) AS Ranked
-        WHERE USER_ID = ?
+        SELECT 
+            A.USER_ID,
+            A.STEP,
+            C.STEP AS ADVANCE_STEP,
+            A.USER_NAME,
+            A.ROOM_NAME,
+            A.USERNAME AS NICKNAME,
+            RANK() OVER (ORDER BY (A.STEP + IFNULL(C.STEP, 0)) DESC, A.ACHIEVE_DTTI) AS RANKING,
+            CAST(DATE_FORMAT(A.ACHIEVE_DTTI, '%Y-%m-%d %H:%i:%s') AS CHAR) AS ACHIEVE_DTTI,
+            A.SUCCESS_CNT,
+            A.FAIL_CNT
+          FROM BOT_ENHANCE_STATUS A
+            LEFT JOIN BOT_ENHANCE_ADVANCED C
+            ON A.USER_ID = C.USER_ID
+            AND A.ROOM_ID = C.ROOM_ID
+          WHERE A.DL_YN = 'N'
+          AND A.USER_ID = ?
+          ${roomId ? ' AND A.ROOM_ID = ?' : ''}
       `;
-      const myRankingParams = roomId ? [roomId, userId] : [userId];
+      const myRankingParams = roomId ? [userId, roomId] : [userId];
+
+      logger.info({
+        method: req.method,
+        url: req.url,  // 요청 URL
+        message: `\nSql ${myRankingSql} \nParam ${myRankingParams}`
+      });
 
       const [myRankingRows] = await connection.execute(myRankingSql, myRankingParams);
-      myRanking = myRankingRows.length > 0 ? myRankingRows[0] : null;
+      myRanking = myRankingRows[0] || null;
     }
 
     res.json({
