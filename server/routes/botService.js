@@ -705,7 +705,7 @@ exports.executeAdvancedEnhance = async (req, res, next) => {
         "상급재련 시뮬레이션은 본인의 채팅방에서 재련 최초 1회 실행되어야 합니다.",
       );
     }
-    
+
     if (currentStep >= 40) {
       msg = `🏆 ${userName}님은 \n**최대 상급 재련 단계(40)**에 도달했습니다!`
       return res.status(200).send(msg);
@@ -716,8 +716,13 @@ exports.executeAdvancedEnhance = async (req, res, next) => {
       return res.status(200).send(msg);
     }
 
-    if ((currentStep >= 20 && userRefInfo.ENHANCE_STEP < 20) && !roomName.includes("후원") && !(roomName.includes("빈틈") || roomName.includes("봇테스트"))) {
+    if (currentStep >= 20 && userRefInfo.ENHANCE_STEP < 20 && !roomName.includes("후원") && !(roomName.includes("빈틈") || roomName.includes("봇테스트"))) {
       msg = `${userName}님, 상급재련 시뮬레이션 20단게 이상부터는 \n**무료 분양의 경우 재련 20단계 이상부터 이용 가능합니다.**\n현재 단계는 ${userRefInfo.ENHANCE_STEP}단계입니다. 조건을 달성하면 이용하실 수 있어요!`;
+      return res.status(200).send(msg);
+    }
+
+    if (currentStep >= 30 && userRefInfo.ENHANCE_STEP < 25 && !roomName.includes("후원") && !(roomName.includes("빈틈") || roomName.includes("봇테스트"))) {
+       msg = `${userName}님, 상급재련 시뮬레이션 30단게 이상부터는 \n**무료 분양의 경우 재련 25단계 이상부터 이용 가능합니다.**\n현재 단계는 ${userRefInfo.ENHANCE_STEP}단계입니다. 조건을 달성하면 이용하실 수 있어요!`;
       return res.status(200).send(msg);
     }
 
