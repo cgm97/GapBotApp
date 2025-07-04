@@ -722,7 +722,7 @@ exports.executeAdvancedEnhance = async (req, res, next) => {
     }
 
     if (currentStep >= 30 && userRefInfo.ENHANCE_STEP < 25 && !roomName.includes("후원") && !(roomName.includes("빈틈") || roomName.includes("봇테스트"))) {
-       msg = `${userName}님, 상급재련 시뮬레이션 30단게 이상부터는 \n**무료 분양의 경우 재련 25단계 이상부터 이용 가능합니다.**\n현재 단계는 ${userRefInfo.ENHANCE_STEP}단계입니다. 조건을 달성하면 이용하실 수 있어요!`;
+      msg = `${userName}님, 상급재련 시뮬레이션 30단게 이상부터는 \n**무료 분양의 경우 재련 25단계 이상부터 이용 가능합니다.**\n현재 단계는 ${userRefInfo.ENHANCE_STEP}단계입니다. 조건을 달성하면 이용하실 수 있어요!`;
       return res.status(200).send(msg);
     }
 
@@ -892,24 +892,27 @@ exports.getEnhanceRank = async (req, res, next) => {
     let myRanking = null;
     if (userId) {
       let myRankingSql = `
-        SELECT 
-            A.USER_ID,
-            A.STEP,
-            C.STEP AS ADVANCE_STEP,
-            A.USER_NAME,
-            A.ROOM_NAME,
-            A.USERNAME AS NICKNAME,
-            RANK() OVER (ORDER BY (A.STEP + IFNULL(C.STEP, 0)) DESC, A.ACHIEVE_DTTI) AS RANKING,
-            CAST(DATE_FORMAT(A.ACHIEVE_DTTI, '%Y-%m-%d %H:%i:%s') AS CHAR) AS ACHIEVE_DTTI,
-            A.SUCCESS_CNT,
-            A.FAIL_CNT
-          FROM BOT_ENHANCE_STATUS A
-            LEFT JOIN BOT_ENHANCE_ADVANCED C
-            ON A.USER_ID = C.USER_ID
-            AND A.ROOM_ID = C.ROOM_ID
-          WHERE A.DL_YN = 'N'
-          AND A.USER_ID = ?
-          ${roomId ? ' AND A.ROOM_ID = ?' : ''}
+        SELECT *
+          FROM (
+            SELECT 
+              A.USER_ID,
+              A.STEP,
+              C.STEP AS ADVANCE_STEP,
+              A.USER_NAME,
+              A.ROOM_NAME,
+              A.USERNAME AS NICKNAME,
+              RANK() OVER (ORDER BY (A.STEP + IFNULL(C.STEP, 0)) DESC, A.ACHIEVE_DTTI) AS RANKING,
+              CAST(DATE_FORMAT(A.ACHIEVE_DTTI, '%Y-%m-%d %H:%i:%s') AS CHAR) AS ACHIEVE_DTTI,
+              A.SUCCESS_CNT,
+              A.FAIL_CNT
+            FROM BOT_ENHANCE_STATUS A
+              LEFT JOIN BOT_ENHANCE_ADVANCED C
+                ON A.USER_ID = C.USER_ID
+                AND A.ROOM_ID = C.ROOM_ID
+            WHERE A.DL_YN = 'N'
+            ${roomId ? 'AND A.ROOM_ID = ?' : ''}
+          ) AS ranked
+          WHERE ranked.USER_ID = ?
       `;
       const myRankingParams = roomId ? [userId, roomId] : [userId];
 
