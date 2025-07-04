@@ -15,13 +15,13 @@ const Rank = ({ roomId }) => {
   const [userCode, setUserCode] = useState(null);
   const [roomCode, setRoomCode] = useState(roomId);
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const storedUserCode = sessionStorage.getItem("userCode") || null;
-      setUserCode(storedUserCode);
 
-      const storedRoomCode = sessionStorage.getItem("roomCode") || roomId;
-      setRoomCode(storedRoomCode);
-    }
+    const storedUserCode = sessionStorage.getItem("userCode") || null;
+    setUserCode(storedUserCode);
+
+    const storedRoomCode = sessionStorage.getItem("roomCode") || roomId;
+    setRoomCode(storedRoomCode);
+
   }, [roomId]);
 
   const fetchRanking = async (pageNum = 1) => {
@@ -32,7 +32,7 @@ const Rank = ({ roomId }) => {
       const res = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/bot/enhance/rank`, {
         page: pageNum,
         limit: 20,
-        userId: userCode,
+        userId: sessionStorage.getItem("userCode") || null,
         roomId: roomCode
       });
 
@@ -111,7 +111,7 @@ const Rank = ({ roomId }) => {
             <p className="text-gray-800 dark:text-gray-100">👤 닉네임: {myRank.USER_NAME}</p>
             <p className="text-gray-800 dark:text-gray-100">👤 대표 캐릭터: {myRank.NICKNAME}</p>
             <p className="text-gray-800 dark:text-gray-100">🏅 순위: {myRank.RANKING}위</p>
-            <p className="text-gray-800 dark:text-gray-100">🔨 단계: {myRank.STEP}단계</p>
+            <p className="text-gray-800 dark:text-gray-100">🔨 단계: {myRank.STEP}단계{myRank.ADVANCE_STEP ? ` (+${myRank.ADVANCE_STEP})` : ''}</p>
           </div>
         </div>
       )}
@@ -121,10 +121,10 @@ const Rank = ({ roomId }) => {
           <thead className="bg-gray-100 dark:bg-blue-900">
             <tr>
               <th className="p-2 border dark:border-gray-600 w-[60px]">순위</th>
-              <th className="p-2 border dark:border-gray-600 w-[80px]">재련</th>
-              <th className="p-2 border dark:border-gray-600 w-[250px]">닉네임</th>
-              <th className="p-2 border dark:border-gray-600 w-[250px]">대표 캐릭터</th>
-              <th className="p-2 border dark:border-gray-600 w-[150px]">직업</th>
+              <th className="p-2 border dark:border-gray-600 w-[160px]">재련(상급재련)</th>
+              <th className="p-2 border dark:border-gray-600 w-[100px]">닉네임</th>
+              <th className="p-2 border dark:border-gray-600 w-[200px]">대표 캐릭터</th>
+              <th className="p-2 border dark:border-gray-600 w-[180px]">직업</th>
               <th className="p-2 border dark:border-gray-600 w-[250px]">최종 달성 일시</th>
             </tr>
           </thead>
@@ -133,7 +133,7 @@ const Rank = ({ roomId }) => {
               <tr
                 key={user.USER_ID}
                 className={
-                  user.USER_ID === userCode
+                  user.USER_ID === sessionStorage.getItem("userCode")
                     ? 'bg-yellow-100 dark:bg-yellow-900 font-bold'
                     : 'hover:bg-gray-50 dark:hover:bg-gray-800'
                 }
@@ -156,8 +156,13 @@ const Rank = ({ roomId }) => {
                         ? '🥉'
                         : `${user.RANKING}위`}
                 </td>
-                <td className="text-center border p-2 dark:border-gray-600 dark:text-gray-200">{user.STEP}단계</td>
-                <td className="text-left border p-2 dark:border-gray-600 dark:text-gray-200">{user.USER_NAME}</td>
+                <td className="text-center border p-2 dark:border-gray-600 dark:text-gray-200"><span className="font-bold text-blue-600 dark:text-gray-200">{user.STEP}단계</span>
+                  {user.ADVANCE_STEP > 0 && (
+                    <span className="text-sm  text-green-600 dark:text-green-400 ml-1">
+                      (+{user.ADVANCE_STEP})
+                    </span>
+                  )}</td>
+                <td className="border p-2 dark:border-gray-600 dark:text-gray-200 text-left max-w-[100px] truncate">{user.USER_NAME}</td>
                 <td className="text-center border p-2 dark:border-gray-600 dark:text-gray-200">
                   {user.NICKNAME && user.NICKNAME !== 'UNKNOWN' ? (
                     <Link href={`/character/${user.NICKNAME}`} className="text-blue-600 dark:text-blue-400 hover:underline">
