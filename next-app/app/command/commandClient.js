@@ -42,8 +42,9 @@ const CommandPage = () => {
       description: '씨익콩,더줘콩,뿅콩,감사콩,꺼억콩,도망콩,머쓱해요,놀자에요,뭐라구요',
     },
     { id: 102, prefix: '/로또', img: '/img/cmd/lotto.png', description: '1 ~ 4 확정 로또번호 지원' },
-    { id: 104, prefix: '/재련' },
-    { id: 105, prefix: '/재련랭킹', }
+    { id: 104, prefix: '/재련', description: 'LOAGAP 재련 시뮬 참조' },
+    { id: 105, prefix: '/상급재련 | /상재', description: 'LOAGAP 재련 시뮬 참조' },
+    { id: 106, prefix: '/재련랭킹', description: 'LOAGAP 재련 순위 참조' }
   ];
 
   const toggleCard = (id) => {
