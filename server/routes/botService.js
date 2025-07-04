@@ -794,13 +794,11 @@ exports.executeAdvancedEnhance = async (req, res, next) => {
       msg += `현재 단계: ${currentStep}\n`;
     }
     msg += `경험치: ${xp} / 100 (+${gainedXP})\n`;
-    msg += `[${makeBar(xp)}]\n`;
+    msg += `[${makeBar(xp)}]`;
     if (count == 6) {
-      msg += `✨ 다음 시도에 선조의 가호 발동!`;
+      msg += `\n\n✨ 다음 시도에 선조의 가호 발동!`;
     }
     msg += blessMsg;
-
-    // msg += `✨ 장인의 기운이 초기화`;
 
     const refinmInsertSql = `
           INSERT INTO BOT_ENHANCE_ADVANCED (
