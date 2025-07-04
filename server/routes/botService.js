@@ -767,9 +767,9 @@ exports.executeAdvancedEnhance = async (req, res, next) => {
       blessingYn = usedBlessing.preserveBlessing || "N";
       count = 0;
 
-      blessMsg += "\n🌟 선조의 가호 발동\n"
+      blessMsg += "🌟 선조의 가호 발동\n"
       blessMsg += "[" + usedBlessing?.name + "]\n";
-      blessMsg += usedBlessing?.desc + "\n\n";
+      blessMsg += usedBlessing?.desc;
     }
     else {
       xp += gainedXP;
@@ -780,7 +780,8 @@ exports.executeAdvancedEnhance = async (req, res, next) => {
     if (blessingYn == "Y") {
       count = 6;
     }
-    msg += `🎉 [상급재련 ${gainedType}]\n\n`;
+    msg += `🎉 [상급재련 ${gainedType}]\n`;
+    msg += `${userName}님\n\n`;
     msg += `${blessingGauge(count)}\n`;
 
     // XP 100 도달 시 강화
