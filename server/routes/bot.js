@@ -485,6 +485,60 @@ router.get('/enhance/rates', botService.getEnhanceRates);
 
 /**
  * @swagger
+ * /bot/enhance/rates/advance:
+ *   get:
+ *     summary: 재련 단계별 확률표 조회
+ *     tags: [BOT API]
+ *     description: 각 재련 단계별 성공 확률과 실패 시 증가하는 장인의 기운(보너스 확률)을 반환합니다.
+ *     responses:
+ *       200:
+ *         description: 강화 확률표 및 가호 효과 정보
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 reinforcementChances:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       type:
+ *                         type: string
+ *                         example: 대성공x2
+ *                       chance:
+ *                         type: number
+ *                         example: 5
+ *                       xp:
+ *                         type: number
+ *                         example: 40
+ *                 blessings:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       name:
+ *                         type: string
+ *                         example: 갈라투르의 망치
+ *                       chance:
+ *                         type: number
+ *                         example: 15
+ *                       desc:
+ *                         type: string
+ *                         example: "🔥 상급 재련 경험치 ×5"
+ *                       preserveBlessing:
+ *                         type: string
+ *                         example: "Y"
+ *                       skipNextCost:
+ *                         type: string
+ *                         example: "Y"
+ *       500:
+ *         description: 서버 내부 오류
+ */
+router.get('/enhance/rates/advance', botService.getEnhanceAdvanceRates);
+
+/**
+ * @swagger
  * /bot/myNickName:
  *   post:
  *     summary: 대표 캐릭터 닉네임 조회

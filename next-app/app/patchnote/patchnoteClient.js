@@ -17,9 +17,9 @@ const PatchNote = () => {
     <div className="container-patch bg-background text-foreground min-h-screen">
       <h2>빈틈봇 패치노트</h2>
       {patchNote.map(({ TITLE, CONTENTS }, index) => (
-        <div className="release" key={index}>
-          <h3>{TITLE}</h3>
-          <p>
+        <div className="release dark:bg-gray-600" key={index}>
+          <h3 className="dark:text-blue-400">{TITLE}</h3>
+          <p className="dark:text-gray-300">
             {CONTENTS.split("\n").map((line, lineIndex) => (
               <React.Fragment key={lineIndex}>
                 {line}
