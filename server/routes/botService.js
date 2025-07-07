@@ -4,6 +4,7 @@ const logger = require('../logger');  // logger.js 임포트
 const spec = require('../calculator/specPoint');
 const accessoryFillter = require('../accessoryFillter');
 const { sessionCache, getDateTime, getDate, calculatePriceDiff } = require('../sessionUtil'); // 세션 모듈 가져오기
+const characterService = require('./characterService'); // 상대 경로로 apiService 불러오기
 
 // 재련강화확률표
 const ENHANCEMENTDATA = [
@@ -209,7 +210,6 @@ function calculatejewelryGrad(totalJewelry) {
 exports.getCharacterCube = async (req, res, next) => {
 
   const { roomCode, userCode } = req.query;
-  console.log(roomCode, userCode);
   const connection = await pool.getConnection();
   try {
     // 트랜잭션 시작
@@ -1210,3 +1210,128 @@ function groupByNameArray(items) {
     items: items.map(({ name, ...rest }) => rest), // name 제거 후 나머지만 반환
   }));
 }
+
+// 로아베스팅 - 재련 견적 게산 API
+exports.executeLoavestCalc = async (req, res, next) => {
+
+  const { nickName, targetLevel } = req.query;
+
+  const [rows] = await characterService.selectCharacter(nickName);
+
+  if (rows.length > 0 && rows[0].characterData.equipItems != null) {
+    // 조회된 데이터가 있을 경우
+    const characterData = rows[0].characterData;
+
+    // JSON 데이터를 해체할당으로 분리
+    const {
+      equipItems
+    } = characterData;
+
+    const parts = [];
+
+    0
+    // : 
+    // {current_level: "19", target_level: "20", part_type: "weapon"}
+    // 1
+    // : 
+    // {current_level: "15", target_level: "19", part_type: "helmet"}
+    // 2
+    // : 
+    // {current_level: "15", target_level: "19", part_type: "chest"}
+    // 3
+    // : 
+    // {current_level: "15", target_level: "19", part_type: "pants"}
+    // 4
+    // : 
+    // {current_level: "16", target_level: "19", part_type: "gloves"}
+    // 5
+    // : 
+    // {current_level: "15", target_level: "19", part_type: "shoulder"}
+
+    const partTypes = ["helmet", "shoulder", "chest", "pants", "gloves", "weapon"];
+    equipItems.slice(0, -1).map((item, index) => {
+
+      const enhanceMatch = item.name.match(/\+(\d+)/); // + 뒤 숫자
+      const advanceMatch = item.name.match(/X(\d+)/);     // X 뒤 숫자
+
+      const enhance = enhanceMatch ? parseInt(enhanceMatch[1]) : null;
+      const advance = advanceMatch ? parseInt(advanceMatch[1]) : null;
+
+
+
+      parts.push({
+        current_level: enhance,
+        target_level: targetLevel,
+        part_type: partTypes[index]
+      });
+    });
+
+    const requestData = {
+      book_count: 0,
+      breath_count: 0,
+      parts: parts,
+      tier: 4
+    };
+    // 응답 반환
+    return res.status(200).json(
+      requestData
+    );
+  } else {
+    return res.status(500).send("LOAGAP에서 우선 캐릭터 조회를 해주세요.");
+  }
+};
+
+// 로스트 빌드 - TOP 3 스킬 조회
+exports.getlostBuilds = async (req, res, next) => {
+
+  const { nickName } = req.query;
+
+  try {
+    const API_URL = `https://api.lostbuilds.com/bot/teum/character/${nickName}`;
+    const lostBuilds = await axios.get(API_URL, {
+      headers: {
+        accept: 'application/json'
+      },
+    });
+
+
+    const topSkills = lostBuilds.data.top3Skills;
+    let bracelet = 0;
+    let msg = `❚ ${nickName}님 로스트빌드\n\n`;
+
+    msg += `❚ 스킬 데미지 TOP 3\n`;
+    topSkills.forEach(skill => {
+      const { skillName, expectedDamage, cooldown, dps, braceletEfficiency } = skill;
+
+      // 한글식 피해량 변환 (억, 만 단위)
+      const billion = Math.floor(expectedDamage / 1_0000_0000);
+      const million = Math.floor((expectedDamage % 1_0000_0000) / 1_0000);
+
+      const formattedDamage =
+        (billion ? `${billion}억 ` : '') +
+        (million ? `${million}만` : '');
+
+      // DPS: 천 단위 쉼표 + 한글식 표시
+      const formattedDps =
+        dps >= 10000 ? `${(dps / 10000).toFixed(2)}만` : Math.round(dps).toLocaleString();
+
+      // 팔찌 효율 % 변환
+      bracelet = ((braceletEfficiency - 1) * 100).toFixed(2);
+
+      msg += `[${skillName}]\n`;
+      msg += ` ┌ 피해량: ${formattedDamage.trim()}\n`;
+      msg += ` ┣ DPS: ${formattedDps}\n`;
+      msg += ` └ 쿨타임: ${cooldown.toFixed(2)}초\n\n`;
+    });
+
+    msg += `로스트빌드 바로가기 ▼`
+    msg += `\nhttps://lostbuilds.com/info/${nickName}`
+    // 응답 반환
+    return res.status(200).send(
+      msg
+    );
+  } catch (e) {
+    return res.status(500).send(`캐릭터에 오류가 발생했거나, 갱신이 필요합니다.\nhttps://lostbuilds.com/info/${nickName}`);
+  }
+
+};
