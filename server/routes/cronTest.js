@@ -9,4 +9,5 @@ router.get('/event', cronTestService.getEvent);
 router.get('/jem', cronTestService.getJem);
 router.get('/book', cronTestService.getbook);
 router.get('/accessory', cronTestService.getaccessory);
+router.get('/market', cronTestService.getMarket);
 module.exports = router;

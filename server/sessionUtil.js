@@ -5,6 +5,7 @@ const fillter = require('./accessoryFillter');  // logger.js 임포트
 const axios = require('axios');
 let lastBookPriceUpdate = 0;
 let lastJewelPriceUpdate = 0;
+let lastMarketPriceUpdate = 0;
 // let accessoryPriceLastUpdate = 0;
 
 // 초기 데이터 설정 함수
@@ -17,6 +18,7 @@ const initializeCache = async () => {
         if (process.env.NODE_ENV == "PROD") {
             await getBookPrice();
             await getJewelPrice();
+            await getMarketPrice();
 
             // 느린 작업: 백그라운드 처리
             getAccessoriesPrice()
@@ -350,6 +352,99 @@ const getAccessoriesPrice = async () => {
     return retAccessory;
 };
 
+// 실시간 재료 갱신 (1분 내에는 캐시 사용)
+const getMarketPrice = async () => {
+    const method = 'getMartketPrice';
+    const now = Date.now();
+
+    // if (now - lastBookPriceUpdate < 60 * 1000) {
+    //     logger.info({
+    //         method,
+    //         url: "SessionUtil",
+    //         message: `bookPrice: 1분 이내 요청 → 캐시 사용`,
+    //     });
+    //     return sessionCache.get("bookPrice");
+    // }
+
+    const API_URL = "https://developer-lostark.game.onstove.com/markets/items";
+
+    const CategoryCodeArray = [
+        { name: "강화재료", code: 50010, tier: 3 },
+        { name: "강화추가재료", code: 50020, tier: 3 },
+        { name: "강화재료", code: 50010, tier: 4 },
+        { name: "강화추가재료", code: 50020, tier: 4 },
+        { name: "에스더기운", code: 51100, tier: null },
+        { name: "식물채집", code: 90200, tier: null },
+        { name: "벌목", code: 90300, tier: null },
+        { name: "채광", code: 90400, tier: null },
+        { name: "수렵", code: 90500, tier: null },
+        { name: "낚시", code: 90600, tier: null },
+        { name: "고고학", code: 90700, tier: null }
+    ];
+
+    const marketArr = [];
+    for (const { name, code, tier } of CategoryCodeArray) {
+        const body = {
+            "CategoryCode": code,
+            "ItemTier": tier,
+            "Sort": "CURRENT_MIN_PRICE ",
+            "SortCondition": "DESC"
+        };
+
+        try {
+            const response = await axios.post(API_URL, body, {
+                headers: {
+                    accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    authorization: `bearer ${process.env.LOA_API_KEY}`,
+                },
+            });
+
+            for (const item of response.data.Items) {
+                marketArr.push({
+                    catergory: name,
+                    name: item.Name,
+                    tier: tier,
+                    grade: item.Grade,
+                    icon: item.Icon,
+                    bundleCount: item.BundleCount,
+                    price: item.CurrentMinPrice
+                })
+            }
+        } catch (error) {
+            logger.error({
+                method,
+                url: "SessionUtil",
+                message: `bookPrice API 호출 실패`,
+                error,
+            });
+            throw error;
+        }
+    }
+
+        logger.info({
+        method,
+        url: "getMarketPrice",
+        message: `marketPrice 갱신 완료 - ${marketArr.length}건`,
+    });
+
+    const categorizedMarketData = marketArr.reduce((acc, item) => {
+        const { catergory, ...rest } = item; // catergory 분리해서 제거
+        const key = catergory;
+
+        if (!acc[key]) acc[key] = [];
+        acc[key].push(rest); // catergory 빠진 나머지 정보만 넣기
+
+        return acc;
+    }, {});
+    
+    sessionCache.set("marketPrice", categorizedMarketData);
+    sessionCache.set("marketPriceLastUpdate", getDateTime());
+
+    lastMarketPriceUpdate = now;
+    return categorizedMarketData;
+};
+
 // 현지날짜 시간 조회
 const getDateTime = (offsetDays = 0) => {
     const now = new Date();
@@ -426,5 +521,7 @@ module.exports = {
     getAccessoriesPrice,
     getDateTime,
     getDate,
-    calculatePriceDiff
+    calculatePriceDiff,
+
+    getMarketPrice
 };

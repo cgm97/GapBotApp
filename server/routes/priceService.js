@@ -1,7 +1,7 @@
 const { Console } = require('winston/lib/winston/transports');
 const pool = require('../db/connection');
 const logger = require('../logger');  // logger.js 임포트
-const { sessionCache, getBookPrice, getDate, getJewelPrice, calculatePriceDiff, groupByNameArray } = require('../sessionUtil'); // 캐시 모듈 가져오기
+const { sessionCache, getBookPrice, getDate, getJewelPrice, calculatePriceDiff, groupByNameArray, getMarketPrice } = require('../sessionUtil'); // 캐시 모듈 가져오기
 require('dotenv').config(); // .env 파일에서 환경 변수 로드
 
 function formatDateString(dateStr) {
@@ -603,6 +603,76 @@ exports.getAccessoryChart = async (req, res, next) => {
 
     } catch (error) {
         next(new Error(error));  // 에러 객체를 넘겨서 next 미들웨어로 전달
+    }
+    finally {
+        // DB 연결 해제
+        if (connection) connection.release();
+    }
+}
+
+// 마켓 재료 시세 조회
+exports.getMarketPrice = async (req, res, next) => {
+
+    // DB 연결
+    const connection = await pool.getConnection();
+    try {
+
+        // 현재 각인서 가격 조회
+        // const nowMarketPrice = sessionCache.get("marketPrice");
+        const nowMarketPrice = await getMarketPrice();
+        // 트랜잭션 시작
+        const yesterday = getDate(-1).replaceAll("-", "");
+        await connection.beginTransaction();
+        const selectSql = `SELECT 
+                ITEM_DATA AS MARKETS_DATA
+              FROM ITEM_PRICE_LOG 
+                WHERE BASE_DATE = ? AND ITEM_DVCD = ?
+                 `;
+        const [yesterdayPrice] = await connection.execute(selectSql, [yesterday, '04']);
+
+        // logger.info({
+        //     method: req.method,
+        //     url: req.url,  // 요청 URL
+        //     message: `\nSql ${selectSql} \nParam ${[yesterday, '02']}`
+        // });
+
+        const preMarketPrice = yesterdayPrice[0]?.MARKETS_DATA || [];
+
+        const diffMarketPrice = {};
+        for (const category in nowMarketPrice) {
+            const nowItems = nowMarketPrice[category];
+            const preItems = preMarketPrice[category] || [];
+
+            diffMarketPrice[category] = nowItems.map(nowItem => {
+                const preItem = preItems.find(p => p.name === nowItem.name);
+
+                let priceDiff = null;
+                let percentChange = null;
+
+                if (preItem && typeof preItem.price === "number") {
+                    priceDiff = nowItem.price - preItem.price;
+                    if (preItem.price !== 0) {
+                        percentChange = ((priceDiff / preItem.price) * 100).toFixed(2);
+                    }
+                }
+
+                return {
+                    ...nowItem,
+                    priceDiff,
+                    percent: percentChange,
+                };
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            marketsPrice: diffMarketPrice,
+            marketPriceLastUpdate: sessionCache.get("marketPriceLastUpdate")
+        });
+
+    } catch (error) {
+        next(new Error(error));  // 에러 객체를 넘겨서 next 미들웨어로 전달
+        // return res.status(500).json({ message: "Internal Server Error" });
     }
     finally {
         // DB 연결 해제
