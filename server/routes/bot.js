@@ -577,8 +577,6 @@ router.get('/enhance/rates/advance', botService.getEnhanceAdvanceRates);
  */
 router.post('/myNickName', botService.getMyNickName);
 
-router.get('/lopec', botService.getLopecPoint);
-
 /**
  * @swagger
  * /bot/accessory:
@@ -660,4 +658,8 @@ router.get('/lopec', botService.getLopecPoint);
  */
 router.get('/accessory', botService.getAccessory);
 
+// 외부 API
+router.get('/loavestiong/calculator', botService.executeLoavestCalc);
+router.get('/lostBuilds', botService.getlostBuilds);
+router.get('/lopec', botService.getLopecPoint);
 module.exports = router;
