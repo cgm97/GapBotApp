@@ -1,7 +1,7 @@
 const axios = require('axios');
 const pool = require('../db/connection');
 const logger = require('../logger');  // logger.js 임포트
-const {getBookPrice, getJewelPrice, getAccessoriesPrice} = require('../sessionUtil');
+const { getBookPrice, getJewelPrice, getAccessoriesPrice, getMarketPrice } = require('../sessionUtil');
 require('dotenv').config(); // .env 파일에서 환경 변수 로드
 
 exports.getIsland = async (req, res, next) => {
@@ -55,16 +55,16 @@ exports.getIsland = async (req, res, next) => {
                 const groupedByDate = calender.StartTimes ? calender.StartTimes.reduce((acc, dateTime) => {
                     const date = dateTime.split('T')[0].replace(/-/g, ''); // 날짜만 추출 (2024-12-25 -> 20241225)
                     const time = dateTime.split('T')[1]; // 시간만 추출 (예: 19:00:00)
-                
+
                     if (!acc[date]) {
                         acc[date] = { times: [] }; // 날짜 키가 없으면 초기화
                     }
-                
+
                     acc[date].times.push(time);
-                
+
                     return acc;
                 }, {}) : {};  // StartTimes가 null이면 빈 객체 반환
-                
+
                 arr.push(Object.entries(groupedByDate).map(([date, { times }]) => {
                     // 첫 번째 시간
                     const firstTime = times[0];
@@ -176,7 +176,7 @@ exports.getIsland = async (req, res, next) => {
         // 연결 반환
         connection.release();
     }
-    return res.status(200).json({ msg:"success" }); // 유저 정보 반환
+    return res.status(200).json({ msg: "success" }); // 유저 정보 반환
 };
 
 exports.getNotice = async (req, res, next) => {
@@ -224,20 +224,20 @@ exports.getNotice = async (req, res, next) => {
 
         var arr = [];
         data.forEach(notice => {
-                    /* LOSTARK_NOTICE  Table
-                        SNO INT AUTO_INCREMENT PRIMARY KEY COMMENT '일련번호',
-                        TITLE VARCHAR(100) COMMENT '제목',
-                        TYPE VARCHAR(20) COMMENT '타입',
-                        URL VARCHAR(100) COMMENT '공지 URL'
-                    */
-                    arr.push(
-                        {
-                            TITLE : notice.Title,                 // 날짜 (모든 '-'를 제거한 값)
-                            TYPE: notice.Type,
-                            URL: notice.Link
-                        }
-                    );
-                });
+            /* LOSTARK_NOTICE  Table
+                SNO INT AUTO_INCREMENT PRIMARY KEY COMMENT '일련번호',
+                TITLE VARCHAR(100) COMMENT '제목',
+                TYPE VARCHAR(20) COMMENT '타입',
+                URL VARCHAR(100) COMMENT '공지 URL'
+            */
+            arr.push(
+                {
+                    TITLE: notice.Title,                 // 날짜 (모든 '-'를 제거한 값)
+                    TYPE: notice.Type,
+                    URL: notice.Link
+                }
+            );
+        });
 
 
         // 쿼리
@@ -283,7 +283,7 @@ exports.getNotice = async (req, res, next) => {
         // 연결 반환
         connection.release();
     }
-    return res.status(200).json({ msg:"success" }); // 유저 정보 반환
+    return res.status(200).json({ msg: "success" }); // 유저 정보 반환
 };
 
 // 매주 수요일 10시 1분에 실행 - 이벤트 정보
@@ -391,7 +391,7 @@ exports.getEvent = async (req, res, next) => {
         // 연결 반환
         connection.release();
     }
-    return res.status(200).json({ msg:"success" }); // 유저 정보 반환
+    return res.status(200).json({ msg: "success" }); // 유저 정보 반환
 };
 
 // 매일 0시 보석데이터
@@ -403,69 +403,69 @@ exports.getJem = async (req, res, next) => {
         message: '보석 저장 시작 START'
     });
 
-        // 여기에 실제로 실행할 작업 코드 작성
-        const connection = await pool.getConnection();
+    // 여기에 실제로 실행할 작업 코드 작성
+    const connection = await pool.getConnection();
 
-        try {
-    
-            // 트랜잭션 시작
-            await connection.beginTransaction();
+    try {
 
-            var jemArr = await getJewelPrice();
+        // 트랜잭션 시작
+        await connection.beginTransaction();
 
-            logger.info({
-                method: method,
-                url: '[CRON]',  // 요청 URL
-                message: `데이터 불러오기 성공 ${Object.keys(jemArr).length} 건`,
-            });
-    
-            const today = new Date();
+        var jemArr = await getJewelPrice();
 
-            // 년, 월, 일 구하기
-            const year = today.getFullYear();  // 4자리 연도
-            const month = (today.getMonth() + 1).toString().padStart(2, '0');  // 월 (0부터 시작하므로 +1, 두 자릿수로 만들기)
-            const day = today.getDate().toString().padStart(2, '0');  // 일, 두 자릿수로 만들기
+        logger.info({
+            method: method,
+            url: '[CRON]',  // 요청 URL
+            message: `데이터 불러오기 성공 ${Object.keys(jemArr).length} 건`,
+        });
 
-            // 'YYYYMMDD' 형식으로 결합
-            const baseDate = `${year}${month}${day}`;
+        const today = new Date();
 
-            console.log(baseDate);  // 예: 20250330
+        // 년, 월, 일 구하기
+        const year = today.getFullYear();  // 4자리 연도
+        const month = (today.getMonth() + 1).toString().padStart(2, '0');  // 월 (0부터 시작하므로 +1, 두 자릿수로 만들기)
+        const day = today.getDate().toString().padStart(2, '0');  // 일, 두 자릿수로 만들기
 
-            // // 쿼리
-            const insertSql = `INSERT INTO ITEM_PRICE_LOG (
+        // 'YYYYMMDD' 형식으로 결합
+        const baseDate = `${year}${month}${day}`;
+
+        console.log(baseDate);  // 예: 20250330
+
+        // // 쿼리
+        const insertSql = `INSERT INTO ITEM_PRICE_LOG (
                 BASE_DATE,
                 ITEM_DVCD,
                 ITEM_DATA
             ) VALUES (?, ?, ?)`;
 
-            connection.execute(insertSql, [
-                baseDate,
-                '01', // 아이템구분코드 _ 보석 _ 01
-                jemArr
-            ]);
+        connection.execute(insertSql, [
+            baseDate,
+            '01', // 아이템구분코드 _ 보석 _ 01
+            jemArr
+        ]);
 
-            // 트랜잭션 커밋
-            await connection.commit();
-            logger.info({
-                method: method,
-                url: '[CRON]',  // 요청 URL
-                //message: `${JSON.stringify(arr, null, 2)} 모험섬 데이터 가공 종료`,
-                message: `보석 데이터 ${Object.keys(jemArr).length}건 적재 완료 END`
-            });
-        } catch (error) {
-            // 오류 발생 시 롤백
-            await connection.rollback();
-            // 에러 로깅
-            logger.error({
-                method: method,
-                url: '[CRON]',  // 요청 URL
-                message: error.stack
-            });
-        } finally {
-            // 연결 반환
-            connection.release();
-        }
-    return res.status(200).json({ msg:"success" }); // 유저 정보 반환
+        // 트랜잭션 커밋
+        await connection.commit();
+        logger.info({
+            method: method,
+            url: '[CRON]',  // 요청 URL
+            //message: `${JSON.stringify(arr, null, 2)} 모험섬 데이터 가공 종료`,
+            message: `보석 데이터 ${Object.keys(jemArr).length}건 적재 완료 END`
+        });
+    } catch (error) {
+        // 오류 발생 시 롤백
+        await connection.rollback();
+        // 에러 로깅
+        logger.error({
+            method: method,
+            url: '[CRON]',  // 요청 URL
+            message: error.stack
+        });
+    } finally {
+        // 연결 반환
+        connection.release();
+    }
+    return res.status(200).json({ msg: "success" }); // 유저 정보 반환
 };
 
 // 매일 0시 각인서데이터
@@ -477,71 +477,71 @@ exports.getbook = async (req, res, next) => {
         message: '각인서 저장 시작 START'
     });
 
-        // 여기에 실제로 실행할 작업 코드 작성
-        const connection = await pool.getConnection();
+    // 여기에 실제로 실행할 작업 코드 작성
+    const connection = await pool.getConnection();
 
-        try {
-    
-            // 트랜잭션 시작
-            await connection.beginTransaction();
+    try {
 
-            var bookArr = await getBookPrice();
+        // 트랜잭션 시작
+        await connection.beginTransaction();
 
-            logger.info({   
-                method: method,
-                url: '[CRON]',  // 요청 URL
-                message: `데이터 불러오기 성공 ${Object.keys(bookArr).length} 건`,
-            });
-    
-            const today = new Date();
+        var bookArr = await getBookPrice();
 
-            // 년, 월, 일 구하기
-            const year = today.getFullYear();  // 4자리 연도
-            const month = (today.getMonth() + 1).toString().padStart(2, '0');  // 월 (0부터 시작하므로 +1, 두 자릿수로 만들기)
-            const day = today.getDate().toString().padStart(2, '0');  // 일, 두 자릿수로 만들기
+        logger.info({
+            method: method,
+            url: '[CRON]',  // 요청 URL
+            message: `데이터 불러오기 성공 ${Object.keys(bookArr).length} 건`,
+        });
 
-            // 'YYYYMMDD' 형식으로 결합
-            const baseDate = `${year}${month}${day}`;
+        const today = new Date();
 
-            // // 쿼리
-            const insertSql = `INSERT INTO ITEM_PRICE_LOG (
+        // 년, 월, 일 구하기
+        const year = today.getFullYear();  // 4자리 연도
+        const month = (today.getMonth() + 1).toString().padStart(2, '0');  // 월 (0부터 시작하므로 +1, 두 자릿수로 만들기)
+        const day = today.getDate().toString().padStart(2, '0');  // 일, 두 자릿수로 만들기
+
+        // 'YYYYMMDD' 형식으로 결합
+        const baseDate = `${year}${month}${day}`;
+
+        // // 쿼리
+        const insertSql = `INSERT INTO ITEM_PRICE_LOG (
                 BASE_DATE,
                 ITEM_DVCD,
                 ITEM_DATA
             ) VALUES (?, ?, ?)`;
 
-            connection.execute(insertSql, [
-                baseDate,
-                '02', // 아이템구분코드 _ 보석 _ 01
-                bookArr
-            ]);
+        connection.execute(insertSql, [
+            baseDate,
+            '02', // 아이템구분코드 _ 보석 _ 01
+            bookArr
+        ]);
 
-            // 트랜잭션 커밋
-            await connection.commit();
-            logger.info({
-                method: method,
-                url: '[CRON]',  // 요청 URL
-                //message: `${JSON.stringify(arr, null, 2)} 모험섬 데이터 가공 종료`,
-                message: `보석 데이터 ${Object.keys(bookArr).length}건 적재 완료 END`
-            });
-        } catch (error) {
-            // 오류 발생 시 롤백
-            await connection.rollback();
-            // 에러 로깅
-            logger.error({
-                method: method,
-                url: '[CRON]',  // 요청 URL
-                message: error.stack
-            });
-        } finally {
-            // 연결 반환
-            connection.release();
-        }
-    return res.status(200).json({ msg:"success" }); // 유저 정보 반환
+        // 트랜잭션 커밋
+        await connection.commit();
+        logger.info({
+            method: method,
+            url: '[CRON]',  // 요청 URL
+            //message: `${JSON.stringify(arr, null, 2)} 모험섬 데이터 가공 종료`,
+            message: `보석 데이터 ${Object.keys(bookArr).length}건 적재 완료 END`
+        });
+    } catch (error) {
+        // 오류 발생 시 롤백
+        await connection.rollback();
+        // 에러 로깅
+        logger.error({
+            method: method,
+            url: '[CRON]',  // 요청 URL
+            message: error.stack
+        });
+    } finally {
+        // 연결 반환
+        connection.release();
+    }
+    return res.status(200).json({ msg: "success" }); // 유저 정보 반환
 };
 
 exports.getaccessory = async (req, res, next) => {
- var method = '매일 0시 악세서리 데이터';
+    var method = '매일 0시 악세서리 데이터';
     logger.info({
         method: method,
         url: '[CRON]',  // 요청 URL
@@ -550,9 +550,9 @@ exports.getaccessory = async (req, res, next) => {
 
     // 여기에 실제로 실행할 작업 코드 작성
     const connection = await pool.getConnection();
-    
+
     try {
-        
+
         // 트랜잭션 시작
         await connection.beginTransaction();
 
@@ -612,3 +612,69 @@ exports.getaccessory = async (req, res, next) => {
         connection.release();
     }
 }
+
+// 매일 0시 재료 데이터
+exports.getMarket = async (req, res, next) => {
+    var method = '매일 0시 재료 데이터';
+    logger.info({
+        method: method,
+        url: '[CRON]',  // 요청 URL
+        message: '재료 저장 시작 START'
+    });
+
+    // 여기에 실제로 실행할 작업 코드 작성
+    const connection = await pool.getConnection();
+
+    try {
+
+        // 트랜잭션 시작
+        await connection.beginTransaction();
+
+        const marketArr = await getMarketPrice();
+
+        const today = new Date();
+
+        // 년, 월, 일 구하기
+        const year = today.getFullYear();  // 4자리 연도
+        const month = (today.getMonth() + 1).toString().padStart(2, '0');  // 월 (0부터 시작하므로 +1, 두 자릿수로 만들기)
+        const day = today.getDate().toString().padStart(2, '0');  // 일, 두 자릿수로 만들기
+
+        // 'YYYYMMDD' 형식으로 결합
+        const baseDate = `${year}${month}${day}`;
+
+        // // 쿼리
+        const insertSql = `INSERT INTO ITEM_PRICE_LOG (
+                BASE_DATE,
+                ITEM_DVCD,
+                ITEM_DATA
+            ) VALUES (?, ?, ?)`;
+
+        connection.execute(insertSql, [
+            baseDate,
+            '04', // 아이템구분코드 _ 재료 _ 04
+            marketArr
+        ]);
+
+        // 트랜잭션 커밋
+        await connection.commit();
+        logger.info({
+            method: method,
+            url: '[CRON]',  // 요청 URL
+            //message: `${JSON.stringify(arr, null, 2)} 모험섬 데이터 가공 종료`,
+            message: `마켓 데이터 ${marketArr.length}건 적재 완료 END`
+        });
+    } catch (error) {
+        // 오류 발생 시 롤백
+        await connection.rollback();
+        // 에러 로깅
+        logger.error({
+            method: method,
+            url: '[CRON]',  // 요청 URL
+            message: error.stack
+        });
+    } finally {
+        // 연결 반환
+        connection.release();
+    }
+    return res.status(200).json({ msg: "success" }); // 유저 정보 반환
+};
