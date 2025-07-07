@@ -33,7 +33,7 @@ const CommandPage = () => {
     { id: 19, prefix: <>.사사게</>, description: '.사사게 키워드' },
     { id: 20, prefix: <>.클골</> },
     { id: 21, prefix: <>.큐브</>, img: '/img/cmd/cube.png', description: 'LOAGAP 사이트와 연동이 되어야합니다.' },
-    { id: 22, prefix: <>.로빌</>, img: '/img/cmd/lostbuild.png', description: '로스트빌드 지원 - 데미지 TOP 3 스킬' },
+    { id: 22, prefix: <>.로빌<span className="text-xs text-blue-500 dark:text-blue-300">(.내로빌)</span></>, img: '/img/cmd/lostbuild.png', description: '로스트빌드 지원 - 데미지 TOP 3 스킬' },
   ];
 
   const listUtilItems = [
