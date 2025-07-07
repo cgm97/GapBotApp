@@ -2,7 +2,7 @@ const cron = require('node-cron');
 const axios = require('axios');
 const logger = require('./logger');  // logger.js 임포트
 const pool = require('./db/connection');
-const { getBookPrice, getJewelPrice, getAccessoriesPrice, getDate } = require('./sessionUtil');
+const { getBookPrice, getJewelPrice, getAccessoriesPrice, getDate, getMarketPrice } = require('./sessionUtil');
 require('dotenv').config(); // .env 파일에서 환경 변수 로드
 
 const url = 'CRON';
@@ -701,6 +701,81 @@ cron.schedule('0 0 * * *', async () => { // async로 변경
     }
 });
 
+// 매일 0시 30분_ 재료 조회
+cron.schedule('30 0 * * *', async () => { // async로 변경
+    var method = '매일 0시 30분 재료 데이터';
+    logger.info({
+        method: method,
+        url: url,  // 요청 URL
+        message: '재료 저장 시작 START'
+    });
+
+
+    if (process.env.NODE_ENV != "PROD") {
+        // 00시일 때는 실행하지 않음
+        logger.info({
+            method: method,
+            url: url,  // 요청 URL
+            message: `재료 조회 시작 END env:${process.env.NODE_ENV}`
+        });
+        return;
+    }
+
+    // 여기에 실제로 실행할 작업 코드 작성
+    const connection = await pool.getConnection();
+    try {
+
+        // 트랜잭션 시작
+        await connection.beginTransaction();
+
+        const marketArr = await getMarketPrice();
+
+        const today = new Date();
+
+        // 년, 월, 일 구하기
+        const year = today.getFullYear();  // 4자리 연도
+        const month = (today.getMonth() + 1).toString().padStart(2, '0');  // 월 (0부터 시작하므로 +1, 두 자릿수로 만들기)
+        const day = today.getDate().toString().padStart(2, '0');  // 일, 두 자릿수로 만들기
+
+        // 'YYYYMMDD' 형식으로 결합
+        const baseDate = `${year}${month}${day}`;
+
+        // // 쿼리
+        const insertSql = `INSERT INTO ITEM_PRICE_LOG (
+                BASE_DATE,
+                ITEM_DVCD,
+                ITEM_DATA
+            ) VALUES (?, ?, ?)`;
+
+        connection.execute(insertSql, [
+            baseDate,
+            '04', // 아이템구분코드 _ 재료 _ 04
+            marketArr
+        ]);
+
+        // 트랜잭션 커밋
+        await connection.commit();
+        logger.info({
+            method: method,
+            url: url,  // 요청 URL
+            //message: `${JSON.stringify(arr, null, 2)} 모험섬 데이터 가공 종료`,
+            message: `재료 데이터 ${marketArr.length}건 적재 완료 END`
+        });
+    } catch (error) {
+        // 오류 발생 시 롤백
+        await connection.rollback();
+        // 에러 로깅
+        logger.error({
+            method: method,
+            url: url,  // 요청 URL
+            message: error.stack
+        });
+    } finally {
+        // 연결 반환
+        connection.release();
+    }
+});
+
 // 매일 60분마다 _ 악세서리 조회 (재갱신)
 cron.schedule('*/60 * * * *', async () => { // async로 변경
     var method = '매 60분 악세서리 데이터';
@@ -805,7 +880,7 @@ cron.schedule('*/60 * * * *', async () => { // async로 변경
 // 매일 1분마다 보석, 각인서 갱신
 cron.schedule('* * * * *', async () => {
 
-    var method = '매 1분 각인서, 보석 데이터';
+    var method = '매 1분 각인서, 보석, 재료 데이터';
 
     logger.info({
         method: method,
@@ -828,9 +903,11 @@ cron.schedule('* * * * *', async () => {
     }
 
     try {
-        await getBookPrice();; // 각인서
-        await getJewelPrice(); // 보석
-
+        // if (process.env.NODE_ENV == "PROD") {
+            await getBookPrice(); // 각인서
+            await getJewelPrice(); // 보석
+            await getMarketPrice(); // 재료
+        // }
     } catch (error) {
         console.error('1분마다 작업 중 오류 발생:', error);
     }
