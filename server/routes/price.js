@@ -290,4 +290,5 @@ router.get('/accessory/chart', priceService.getAccessoryChart);
 
 router.get('/market', priceService.getMarketPrice);
 
+router.get('/market/chart', priceService.getMarketChart);
 module.exports = router;

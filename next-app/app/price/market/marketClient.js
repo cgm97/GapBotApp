@@ -33,8 +33,6 @@ export default function MarketClient({ marketsPrice, marketPriceLastUpdate }) {
     }
   );
 
-  const lastUpdateTimeRef = useRef(Date.now());
-
   useEffect(() => {
     if (!data) return;
     // 아이템 가격 변동 시
@@ -67,7 +65,7 @@ export default function MarketClient({ marketsPrice, marketPriceLastUpdate }) {
 
   const fetchChartData = async (itemName) => {
     try {
-      const res = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/price/jewel/chart?item=${encodeURIComponent(itemName)}`);
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/price/market/chart?item=${encodeURIComponent(itemName)}`);
       setChartData(prev => ({ ...prev, [itemName]: res.data.itemData }));
     } catch (e) {
       console.error("차트 데이터 오류:", e);
@@ -199,16 +197,24 @@ export default function MarketClient({ marketsPrice, marketPriceLastUpdate }) {
 
       {activeTab === 'price' && (
         <div className="price-table-container">
+          {/* SEO용 숨은 텍스트 영역 (화면에는 안 보임) */}
+          <section className="sr-only" aria-label="생활 재료 및 강화 재료 시세 키워드">
+            <h2>로스트아크 강화 재료 시세, 생활 재료 시세</h2>
+            <p>
+              강화 재료, 재련 재료, 생활 재료 시세, 벌목 재료 시세, 고고학 재료 시세, 채광 재료 시세, 낚시 재료 시세, 실시간 가격, T3, T4 재료, 오레하 융화 재료, 명예의 파편, 에스더 기운, 운명의 파편, 아비도스, 돌파석
+            </p>
+          </section>
+
           <main className="max-w-screen-lg mx-auto px-4 py-6">
             <section
               className="text-center mb-6 text-gray-700"
               aria-labelledby="jewel-price-guide"
             >
               <h1 id="jewel-price-guide" className="text-xl font-bold my-2 dark:text-gray-300">
-                로스트아크 재련 및 생활 재료 실시간 시세 조회
+                로스트아크 강화 재련 재료 시세 · 생활 재료 실시간 가격
               </h1>
               <p className="text-sm my-2 dark:text-gray-300">
-                변동가격은 기준일자 0시 기준으로 계산된 값이며, 차트를 추가하거나 제거할 수 있습니다. (차트 미완성)
+                변동가격은 기준일자 0시 종가 기준으로 계산된 값이며, 차트를 추가하거나 제거할 수 있습니다.
               </p>
               <p className="text-sm my-2 dark:text-gray-300">
                 <strong>기준일자:</strong>{' '}
@@ -315,12 +321,12 @@ export default function MarketClient({ marketsPrice, marketPriceLastUpdate }) {
                         현재 가격 <span className="ml-1 text-xs text-gray-300">(1분 대비)</span>
                       </th>
                       <th className="dark:border-gray-600">변동가격 <span className="ml-1 text-xs text-gray-300">(기준일자 대비)</span></th>
-                      {/* <th className="dark:border-gray-600">차트</th> */}
+                      <th className="dark:border-gray-600">차트</th>
                     </tr>
                   </thead>
                   <tbody className="dark:bg-background dark:text-gray-300">
                     {items.slice()
-                      .sort((a, b) => a.name.localeCompare(b.name)) // 여기서 가격순 정렬
+                      .sort((a, b) => b.tier - a.tier) // 여기서 티어 정렬
                       .map(item => {
                         const isSelected = selectedItems.includes(item.name);
                         const changedInfo = changedItems.find(ci => ci.name === item.name);
@@ -358,7 +364,7 @@ export default function MarketClient({ marketsPrice, marketPriceLastUpdate }) {
                               }`}>
                               {item.priceDiff > 0 ? '▲' : item.priceDiff < 0 ? '▼' : '—'} {Math.abs(item.priceDiff).toLocaleString()} ({item.percent}%)
                             </td>
-                            {/* 
+
                             <td className="dark:border-gray-600">
                               <button
                                 onClick={(e) => handleItemToggle(item.name, e)}
@@ -369,7 +375,7 @@ export default function MarketClient({ marketsPrice, marketPriceLastUpdate }) {
                               >
                                 {isSelected ? '−' : '+'}
                               </button>
-                            </td> */}
+                            </td>
                           </tr>
                         );
                       })}
