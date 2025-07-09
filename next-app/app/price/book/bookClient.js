@@ -160,6 +160,15 @@ export default function BookClient({ booksPrice, bookLastUpdate }) {
 
       {activeTab === "price" && (
         <div className="price-table-container">
+          {/* SEO용 숨은 텍스트 영역 (화면에는 안 보임) */}
+          <section className="sr-only" aria-label="유물각인서 시세 키워드">
+            <h2>로스트아크 유물 각인서 시세</h2>
+            <p>
+              로스트아크 유물 각인서 시세, 강화 유물 각인서 가격, 유물 각인서 거래소 시세, 유각 가격,
+              실시간 유각 가격 변동, 로아 유각 차트, 유각 시세 분석, 유각 강화 정보, 유각 거래 가격 추이 등
+              유물 각인서 관련 모든 시세 정보를 제공합니다.
+            </p>
+          </section>
           <main className="max-w-screen-lg mx-auto px-4 py-6">
             <section
               className="text-center mb-6 text-gray-700 dark:text-gray-200"
@@ -169,7 +178,7 @@ export default function BookClient({ booksPrice, bookLastUpdate }) {
                 로스트아크 유물 각인서 실시간 시세 조회
               </h1>
               <p className="text-sm my-2 dark:text-gray-300">
-                변동가격은 기준일자 0시 기준으로 계산된 값이며, 차트를 추가하거나 제거할 수 있습니다.
+                변동가격은 기준일자 0시 종가 기준으로 계산된 값이며, 차트를 추가하거나 제거할 수 있습니다.
               </p>
               <p className="text-sm my-2 dark:text-gray-300">
                 <strong>기준일자:</strong>{" "}
@@ -272,9 +281,8 @@ export default function BookClient({ booksPrice, bookLastUpdate }) {
                 return (
                   <tr
                     key={item.name}
-                    className={`border-t dark:border-gray-600 ${
-                      changeInfo ? "animate-price-change" : ""
-                    }`}
+                    className={`border-t dark:border-gray-600 ${changeInfo ? "animate-price-change" : ""
+                      }`}
                   >
                     <td className="p-2 dark:border-gray-600">
                       <img src={item.icon} alt={item.name} className="icon inline-block mr-1" />{" "}
@@ -283,7 +291,7 @@ export default function BookClient({ booksPrice, bookLastUpdate }) {
                     <td className="p-2 dark:border-gray-600">
                       {item.price.toLocaleString()}
                       {changeInfo && (
-<span
+                        <span
                           className={`
                             ml-2 text-sm font-medium
                             ${changeInfo.diff > 0
@@ -325,11 +333,10 @@ export default function BookClient({ booksPrice, bookLastUpdate }) {
                     <td className="p-2 dark:border-gray-600">
                       <button
                         onClick={(e) => handleItemToggle(item.name, e)}
-                        className={`border rounded px-2 py-1 text-sm transition dark:bg-gray-600 ${
-                          isSelected
-                            ? "border-green-500 text-green-500 hover:bg-green-100 dark:hover:bg-green-700"
-                            : "border-gray-400 text-gray-500 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
-                        }`}
+                        className={`border rounded px-2 py-1 text-sm transition dark:bg-gray-600 ${isSelected
+                          ? "border-green-500 text-green-500 hover:bg-green-100 dark:hover:bg-green-700"
+                          : "border-gray-400 text-gray-500 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+                          }`}
                       >
                         {isSelected ? "−" : "+"}
                       </button>

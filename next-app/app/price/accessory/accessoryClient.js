@@ -67,6 +67,15 @@ export default function AccessoryClient({ accessorysPrice, accessoryLastUpdate }
 
   return (
     <div className="p-4 max-w-screen-lg mx-auto text-gray-800 dark:text-gray-200">
+      <section className="sr-only" aria-label="로스트아크 악세서리 시세 키워드">
+        <h2>로스트아크 악세서리 시세</h2>
+        <p>
+          로스트아크 악세서리 시세, 귀걸이 시세, 목걸이 시세, 반지 시세, 고대 악세서리, 유물 악세서리, 전설 악세서리 가격,
+          상급 악세서리, 중급 악세서리, 상하, 상중, 상상, 중상, 중중 등급 악세서리 시세,
+          실시간 악세서리 가격 변동, 악세서리 거래소 시세, 강화 악세서리, 재련 악세서리, 로아 악세서리 차트,
+          악세서리 시세 분석, 로스트아크 장신구 가격 정보, 로아 장신구 시세 조회, 로아 악세 시세 조회
+        </p>
+      </section>
       {/* 안내 메시지 */}
       <main className="max-w-screen-lg mx-auto px-4 py-6">
         <section className="text-center mb-6 text-gray-700 dark:text-gray-200"
@@ -76,7 +85,7 @@ export default function AccessoryClient({ accessorysPrice, accessoryLastUpdate }
             로스트아크 악세서리 실시간 시세 조회
           </h1>
           <p className="text-sm my-2 dark:text-gray-300">
-            변동가격은 기준일자 0시 기준으로 계산되며, 목록을 클릭하면 상세 차트를 확인하실 수 있습니다.
+            변동가격은 기준일자 0시 종가 기준으로 계산되며, 목록을 클릭하면 상세 차트를 확인하실 수 있습니다.
           </p>
           <p className="text-sm my-2 dark:text-gray-300">
             <strong>기준일자:</strong>{' '}
@@ -165,7 +174,7 @@ export default function AccessoryClient({ accessorysPrice, accessoryLastUpdate }
                   <span className="text-sm text-gray-500 font-normal dark:text-gray-300">(4T, 고대, 품질 67 이상)</span>
                 </h4>
                 <div className="overflow-x-auto">
-                   <table className="w-full text-sm min-w-[600px]">
+                  <table className="w-full text-sm min-w-[600px]">
                     <thead>
                       <tr className="bg-blue-100 dark:bg-blue-900 text-gray-800 dark:text-gray-300">
                         <th className="border px-3 py-2">이름</th>
@@ -221,7 +230,7 @@ export default function AccessoryClient({ accessorysPrice, accessoryLastUpdate }
                               className={`border px-3 py-1 font-medium ${item.price === 0
                                 ? 'text-gray-400'
                                 : item.priceDiff > 0
-                                  ?  'text-red-500'
+                                  ? 'text-red-500'
                                   : item.priceDiff < 0
                                     ? 'text-blue-500'
                                     : 'text-gray-500'

@@ -18,6 +18,8 @@ const CommandPage = () => {
     { id: 9, prefix: <>.보석 <span className="text-xs text-blue-500 dark:text-blue-300">(.내보석)</span></>, img: '/img/cmd/qhtjr.png' },
     { id: 10, prefix: <>.주급 <span className="text-xs text-blue-500 dark:text-blue-300">(.내주급)</span></>, img: '/img/cmd/wnrmq.png' },
     { id: 11, prefix: <>.앜패 <span className="text-xs text-blue-500 dark:text-blue-300">(.내앜패)</span></>, img: '/img/cmd/dkzvo.png' },
+    { id: 22, prefix: <>.로빌 <span className="text-xs text-blue-500 dark:text-blue-300">(.내로빌)</span></>, img: '/img/cmd/lostbuild.png', description: '로스트빌드 지원 - 데미지 TOP 3 스킬' },
+    { id: 21, prefix: <>.큐브</>, img: '/img/cmd/cube.png', description: 'LOAGAP 사이트와 연동이 되어야합니다.' },
     { id: 12, prefix: <>.떠상 <span className="text-xs text-gray-500 dark:text-gray-300">(루페온 등)</span></>, img: '/img/cmd/ejtkd.png' },
     { id: 13, prefix: <>.분배금</>, img: '/img/cmd/qnsqorma.png' },
     { id: 14, prefix: <>.모험섬</>, img: '/img/cmd/ahgjatja.png' },
@@ -32,8 +34,6 @@ const CommandPage = () => {
     },
     { id: 19, prefix: <>.사사게</>, description: '.사사게 키워드' },
     { id: 20, prefix: <>.클골</> },
-    { id: 21, prefix: <>.큐브</>, img: '/img/cmd/cube.png', description: 'LOAGAP 사이트와 연동이 되어야합니다.' },
-    { id: 22, prefix: <>.로빌<span className="text-xs text-blue-500 dark:text-blue-300">(.내로빌)</span></>, img: '/img/cmd/lostbuild.png', description: '로스트빌드 지원 - 데미지 TOP 3 스킬' },
   ];
 
   const listUtilItems = [

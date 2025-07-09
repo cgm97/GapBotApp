@@ -617,9 +617,9 @@ exports.getMarketPrice = async (req, res, next) => {
     const connection = await pool.getConnection();
     try {
 
-        // 현재 각인서 가격 조회
-        // const nowMarketPrice = sessionCache.get("marketPrice");
-        const nowMarketPrice = await getMarketPrice();
+        // 현재 마켓 가격 조회
+        const nowMarketPrice = sessionCache.get("marketPrice");
+
         // 트랜잭션 시작
         const yesterday = getDate(-1).replaceAll("-", "");
         await connection.beginTransaction();
@@ -668,6 +668,90 @@ exports.getMarketPrice = async (req, res, next) => {
             success: true,
             marketsPrice: diffMarketPrice,
             marketPriceLastUpdate: sessionCache.get("marketPriceLastUpdate")
+        });
+
+    } catch (error) {
+        next(new Error(error));  // 에러 객체를 넘겨서 next 미들웨어로 전달
+        // return res.status(500).json({ message: "Internal Server Error" });
+    }
+    finally {
+        // DB 연결 해제
+        if (connection) connection.release();
+    }
+}
+
+// 마켓 강화 생활 재료 차트 조회
+exports.getMarketChart = async (req, res, next) => {
+
+    const { item } = req.query;
+
+    // 로깅
+    const referer = req.headers.referer || req.headers.origin;
+    logger.info({
+        method: req.method,
+        url: req.url,
+        message: `요청 Host: ${referer} 재료차트조회: ${item}`,
+    });
+
+    if (!referer || (!referer.includes('loagap.com') && !referer.includes('localhost'))) {
+        return res.status(403).json({ message: 'Invalid host' });
+    }
+
+    // DB 연결
+    const connection = await pool.getConnection();
+    try {
+
+        // 트랜잭션 시작
+        await connection.beginTransaction();
+        const selectSql = `SELECT
+                            BASE_DATE AS date,
+                            jt.name,
+                            jt.price
+                            FROM ITEM_PRICE_LOG,
+                            JSON_TABLE(
+                            ITEM_DATA,
+                            '$.*[*]' COLUMNS (
+                                name VARCHAR(100) PATH '$.name',
+                                price INT PATH '$.price'
+                            )
+                            ) AS jt
+                            WHERE jt.name = ?
+                            AND ITEM_DVCD = ?
+                            AND BASE_DATE <> CURRENT_DATE`;
+        let [marketData] = await connection.execute(selectSql, [item, '04']);
+
+        // logger.info({
+        //     method: req.method,
+        //     url: req.url,  // 요청 URL
+        //     message: `\nSql ${selectSql} \nParam ${[item]}`
+        // });
+
+        // 날자 포멧 변경
+        marketData = marketData.map(item => ({
+            ...item,
+            date: formatDateString(item.date),
+            time: formatDateString(item.date),
+        }));
+
+        // 현재 재료 가격 조회 - 오늘 시세가지 차트에 적용
+        const nowMarketPrice = sessionCache.get("marketPrice");
+
+        Object.values(nowMarketPrice).forEach(categoryItems => {
+            categoryItems.forEach(marketItem => {
+                if (marketItem.name === item) {
+                    marketData.push({
+                        date: getDate(),
+                        time: getDate(),
+                        name: marketItem.name,
+                        price: marketItem.price
+                    });
+                }
+            });
+        });
+
+        return res.status(200).json({
+            success: true,
+            itemData: marketData
         });
 
     } catch (error) {
