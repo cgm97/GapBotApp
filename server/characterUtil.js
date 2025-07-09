@@ -183,7 +183,7 @@ const insertCharacterInfo = async (equipItems, gemItems, accessoryItems, cardIte
         try {
             // const kloaCharacter = `https://api.korlark.com/lostark/characters/${nickname}?renew=true&blocking=true`;
             const kloaCharacter = `https://api.korlark.com/lostark/characters/${nickname}?renew=true`;
-            const responseChar = await axios.get(kloaCharacter, { timeout: 5000 });
+            const responseChar = await axios.get(kloaCharacter, { timeout: 10000 });
             const kloaCharacterData = responseChar.data; // 응답 데이터 저장
 
             // 캐틱터 스킬 SQL
@@ -213,7 +213,7 @@ const insertCharacterInfo = async (equipItems, gemItems, accessoryItems, cardIte
         try {
             // 내실
             const kloaCollectibles = `https://api.korlark.com/lostark/characters/${nickname}/collectibles`;
-            const responseCollect = await axios.get(kloaCollectibles,{ timeout: 2000 });
+            const responseCollect = await axios.get(kloaCollectibles,{ timeout: 10000 });
             const kloaCollectiblesData = responseCollect.data; // 응답 데이터 저장
 
             // 캐틱터 스킬 SQL
