@@ -290,6 +290,15 @@ export default function JewelClient({ jewelsPrice, jewelPriceLastUpdate }) {
 
       {activeTab === 'price' && (
         <div className="price-table-container">
+          {/* SEO용 숨은 텍스트 영역 (화면에는 안 보임) */}
+          <section className="sr-only" aria-label="보석 시세 키워드">
+            <h2>로스트아크 보석 시세</h2>
+            <p>
+              1겁, 1작, 2겁, 2작, 3겁, 3작, 4겁, 4작, 5겁, 5작, 6겁, 6작, 7겁, 7작, 8겁, 8작, 9겁, 9작, 10겁, 10작
+              강화 보석, 재련 보석, 고대 보석, 유물 보석, 희귀 보석, 영웅 보석, 전설 보석,
+              로스트아크 보석 시세, 실시간 보석 가격, 보석 가격 변동, 보석값, 보석 차트
+            </p>
+          </section>
           <main className="max-w-screen-lg mx-auto px-4 py-6">
             <section
               className="text-center mb-6 text-gray-700"
@@ -299,7 +308,7 @@ export default function JewelClient({ jewelsPrice, jewelPriceLastUpdate }) {
                 로스트아크 보석 실시간 시세 조회
               </h1>
               <p className="text-sm my-2 dark:text-gray-300">
-                변동가격은 기준일자 0시 기준으로 계산된 값이며, 차트를 추가하거나 제거할 수 있습니다.
+                변동가격은 기준일자 0시 종가 기준으로 계산된 값이며, 차트를 추가하거나 제거할 수 있습니다.
               </p>
               <p className="text-sm my-2 dark:text-gray-300">
                 <strong>기준일자:</strong>{' '}

@@ -205,8 +205,7 @@ const Character = ({ nickName }) => {
                             <div key={index}>
                                 <img className="engraving-img" src={item.imgSrc} alt={item.name} />
                                 <div className={`engraving-ico ${item.color}`}></div>
-                                <p className="name dark:text-gray-300">X{item.grade}</p>
-                                <p className="name dark:text-gray-300">{item.name}</p>
+                                <p className="name dark:text-gray-300">X{item.grade} {item.name}</p>
                                 {item.abilityLevel && (
                                     <div>
                                         <div className="engraving-ico level" />
