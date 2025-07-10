@@ -13,10 +13,10 @@ const EnhanceTry = () => {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const storedUserCode = sessionStorage.getItem("userCode") || null;
+      const storedUserCode = localStorage.getItem("userCode") || null;
       setUserId(storedUserCode);
 
-      const storedRoomCode = sessionStorage.getItem("roomCode") || roomId;
+      const storedRoomCode = localStorage.getItem("roomCode") || roomId;
       setRoomId(storedRoomCode);
 
     }
