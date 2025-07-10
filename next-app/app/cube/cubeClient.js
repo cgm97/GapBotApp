@@ -39,7 +39,7 @@ const Cube = ({ characterTemp, cubeTemp }) => {
       return newCharacterInfo;
     });
 
-    if (sessionStorage.getItem("token")) {
+    if (localStorage.getItem("token")) {
       const saveCube = async () => {
         try {
           await api.post(
@@ -47,7 +47,7 @@ const Cube = ({ characterTemp, cubeTemp }) => {
             characterInfo[characterIndex],
             {
               headers: {
-                Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
               },
               withCredentials: true // 쿠키도 자동으로 포함되어 전송
             });
@@ -189,7 +189,7 @@ const Cube = ({ characterTemp, cubeTemp }) => {
       } else {
         character.CUBES[character.CUBES.length] = { name: tierName, count: newValue };
       }
-      if (sessionStorage.getItem("token")) {
+      if (localStorage.getItem("token")) {
         character.isSaveEnabled = false; // 수정 시 무조건 저장 버튼 활성화
       }
       return newCharacterInfo;
@@ -206,7 +206,7 @@ const Cube = ({ characterTemp, cubeTemp }) => {
         ...cube,
         count: 0,
       }));
-      if (sessionStorage.getItem("token")) {
+      if (localStorage.getItem("token")) {
         character.isSaveEnabled = false; // 수정 시 무조건 저장 버튼 활성화
       }
       return newCharacterInfo;
@@ -221,7 +221,7 @@ const Cube = ({ characterTemp, cubeTemp }) => {
           {},
           {
             headers: {
-              Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
             withCredentials: true, // 쿠키 사용
           });
@@ -242,7 +242,7 @@ const Cube = ({ characterTemp, cubeTemp }) => {
       }
     };
 
-    if (sessionStorage.getItem("token")) {
+    if (localStorage.getItem("token")) {
       fetchUserInfo(); // 토큰이 있을 때만 사용자 정보 호출
     } else {
       // 임시 데이터로 설정

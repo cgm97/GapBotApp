@@ -10,8 +10,8 @@ export const UserProvider = ({ children }) => {
 
   useEffect(() => {
     try {
-      const storedUser = sessionStorage.getItem('user');
-      const storedToken = sessionStorage.getItem('token');
+      const storedUser = localStorage.getItem('user');
+      const storedToken = localStorage.getItem('token');
 
       if (storedUser && storedToken) {
         setUser(storedUser); // JSON 문자열이라면 JSON.parse(storedUser) 가능
@@ -23,10 +23,10 @@ export const UserProvider = ({ children }) => {
 
   const login = (userData, tokenData, userCode, roomCode) => {
     setUser(userData);
-    sessionStorage.setItem('user', userData);
-    sessionStorage.setItem('token', tokenData);
-    sessionStorage.setItem('userCode', userCode);
-    sessionStorage.setItem('roomCode', roomCode);
+    localStorage.setItem('user', userData);
+    localStorage.setItem('token', tokenData);
+    localStorage.setItem('userCode', userCode);
+    localStorage.setItem('roomCode', roomCode);
   };
 
   const logout = async () => {
@@ -36,15 +36,15 @@ export const UserProvider = ({ children }) => {
       console.error('로그아웃 실패:', error);
     } finally {
       setUser(null);
-      sessionStorage.removeItem('user');
-      sessionStorage.removeItem('token');
-      sessionStorage.removeItem('userCode');
-      sessionStorage.removeItem('roomCode');
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      localStorage.removeItem('userCode');
+      localStorage.removeItem('roomCode');
     }
   };
 
   const resetToken = (tokenData) => {
-    sessionStorage.setItem('token', tokenData);
+    localStorage.setItem('token', tokenData);
   };
 
   return (
