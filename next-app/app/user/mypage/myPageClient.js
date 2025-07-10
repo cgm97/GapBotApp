@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useUserContext } from "@/context/UserContext";
-import api from '@/utils/api';
+import userAxios from '@/utils/userAxios'; // 로그인 유저 전용 Axios
 import { useRouter } from "next/navigation";
 
 const MyPage = () => {
@@ -19,16 +19,7 @@ const MyPage = () => {
     useEffect(() => {
         const fetchUserInfo = async () => {
             try {
-                const response = await api.post(
-                    '/user/mypage',
-                    {},
-                    {
-                        headers: {
-                            Authorization: `Bearer ${localStorage.getItem("token")}`,
-                        },
-                        withCredentials: true
-                    }
-                );
+                const response = await userAxios.post('/user/mypage');
                 setUserInfo(response.data);
                 setRoomCode(response.data.roomCode ?? '');
                 setUserCode(response.data.userCode ?? '');
@@ -61,7 +52,7 @@ const MyPage = () => {
         e.preventDefault();
         try {
             setLoading(true);
-            const response = await api.post(
+            const response = await userAxios.post(
                 '/user/save',
                 {
                     email: userInfo.email,

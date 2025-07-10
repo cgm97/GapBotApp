@@ -1,3 +1,4 @@
+import ProtectedRoute from '@/context/ProtectedRoute';
 import MyPage from './myPageClient';
 
 export const metadata = {
@@ -20,5 +21,5 @@ export const metadata = {
 
 export default async function Page() {
 
-  return <MyPage/>;
+  return <ProtectedRoute> <MyPage/> </ProtectedRoute>;
 }

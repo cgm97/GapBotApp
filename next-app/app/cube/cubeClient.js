@@ -1,8 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from "react";
-// import axios from "axios";
-import api from '@/utils/api'; // 설정된 Axios 인스턴스
+import userAxios from '@/utils/userAxios'; // 로그인 유저 전용 Axios
 import { useUserContext } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
 import '@/css/Cube.css'; // CSS 파일 (위에서 작성한 스타일을 참조)
@@ -42,15 +41,7 @@ const Cube = ({ characterTemp, cubeTemp }) => {
     if (localStorage.getItem("token")) {
       const saveCube = async () => {
         try {
-          await api.post(
-            '/cube/save',
-            characterInfo[characterIndex],
-            {
-              headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-              },
-              withCredentials: true // 쿠키도 자동으로 포함되어 전송
-            });
+          await userAxios.post('/cube/save', characterInfo[characterIndex]);
         } catch (err) {
           if (err.response.status === 403) {
             setError('로그인기한이 만료되어 로그아웃 되었습니다.');
@@ -216,7 +207,7 @@ const Cube = ({ characterTemp, cubeTemp }) => {
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
-        const response = await api.post(
+        const response = await userAxios.post(
           '/cube',
           {},
           {
