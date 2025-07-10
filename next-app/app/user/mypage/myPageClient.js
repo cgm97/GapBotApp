@@ -24,7 +24,7 @@ const MyPage = () => {
                     {},
                     {
                         headers: {
-                            Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+                            Authorization: `Bearer ${localStorage.getItem("token")}`,
                         },
                         withCredentials: true
                     }
@@ -48,7 +48,7 @@ const MyPage = () => {
             }
         };
 
-        if (sessionStorage.getItem("token")) {
+        if (localStorage.getItem("token")) {
             fetchUserInfo();
         }
     }, [navigate, logout]);
@@ -71,7 +71,7 @@ const MyPage = () => {
                 },
                 {
                     headers: {
-                        Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+                        Authorization: `Bearer ${localStorage.getItem("token")}`,
                     },
                     withCredentials: true
                 }
