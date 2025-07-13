@@ -332,26 +332,26 @@ exports.getJewelsLog = async (req, res, next) => {
           WHERE BASE_DATE = ? AND ITEM_DVCD = ?
            `;
 
-    const [todayPrice] = await connection.execute(selectSql, [todayDate, '01']);
+    const todayPrice = sessionCache.get("jewelPrice");
     const [yesterdayPrice] = await connection.execute(selectSql, [yesterdayDate, '01']);
 
     logger.info({
       method: req.method,
       url: req.url,  // 요청 URL
-      message: `\nSql ${selectSql} \nParam ${[todayDate, yesterdayDate]}`
+      message: `\nSql ${selectSql} \nParam ${[yesterdayDate]}`
     });
 
     let retJson = {};
     let todayArr = [];
     let yesterdayArr = [];
 
-    const todayKeys = Object.keys(todayPrice[0]?.JEWELS_DATA || {});
+    const todayKeys = Object.keys(todayPrice);
     const yesterdayKeys = Object.keys(yesterdayPrice[0]?.JEWELS_DATA || {});
 
     // 오늘 가격 배열 만들기
     for (let i = 0; i < todayKeys.length; i++) {
       const key = todayKeys[i];
-      todayArr.push(...todayPrice[0].JEWELS_DATA[key]);
+      todayArr.push(...todayPrice[key]);
     }
 
     // 어제 가격 배열 만들기
@@ -979,21 +979,12 @@ exports.getLopecPoint = async (req, res, next) => {
     message: `로펙조회: ${nickName}`,
   });
 
-  const API_URL = "https://api.lopec.kr/api/character/stats";
-
-  let param = {
-    "nickname": nickName,
-    "characterClass": "",
-    "totalStatus": "",
-    "statusSpecial": "",
-    "statusHaste": ""
-  }
+  const API_URL = `https://lopec-api.tassardar6-c0f.workers.dev/${nickName}`;
 
   try {
-    const response = await axios.post(API_URL, param, {
+    const response = await axios.get(API_URL, {
       headers: {
-        accept: 'application/json',
-        'Content-Type': 'application/json',
+        accept: 'application/json'
       },
     });
 
@@ -1007,7 +998,7 @@ exports.getLopecPoint = async (req, res, next) => {
     //     "totalSum": 3715.199998305726,
     //     "achieveDate": "20250614044140"
     // }
-    param = response.data;
+    param = response.data.result;
   } catch (error) {
     logger.error({
       method: req.method,
@@ -1015,21 +1006,19 @@ exports.getLopecPoint = async (req, res, next) => {
       message: `로펙 API 호출 실패`,
       error,
     });
-    throw error;
+    return res.send("캐릭터 정보가 없습니다.");
   }
 
   let = msg = `📢 ${nickName}님의 LOPEC\n\n`;
-  if (param?.totalSum != null) {
-    msg += `스펙 포인트: ${(param.totalSum).toFixed(0)}\n`
-    msg += `클래스: ${param.characterClass}\n\n`
-    msg += `LOPEC 상세보기\n`
-    msg += `https://lopec.kr/search/search.html?headerCharacterName=${nickName}`
+  if (param?.specPoint != null) {
+    msg += `스펙 포인트: ${(param.specPoint).toFixed(2)}\n`
+    msg += `클래스: ${param.Class}\n\n`
+    msg += `LOPEC 상세보기 ▼\n`
+    msg += `${param.thumbnailUrl}`
   } else {
     msg += "캐릭터 정보가 없습니다."
   }
-
   res.send(msg);
-
 };
 
 // 악세 시세 조회
