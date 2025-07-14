@@ -291,4 +291,9 @@ router.get('/accessory/chart', priceService.getAccessoryChart);
 router.get('/market', priceService.getMarketPrice);
 
 router.get('/market/chart', priceService.getMarketChart);
+
+router.get('/package/efficiency/list', priceService.getPackageEfficiencyList);
+router.post('/package/efficiency/insert', priceService.insertPackageEfficiencyList);
+router.get('/package/efficiency/delete', priceService.deletePackageEfficiencyList);
+
 module.exports = router;

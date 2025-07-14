@@ -20,7 +20,7 @@ const Header = () => {
         <nav className="nav">
           <ul className="flex gap-4">
             <li><Link href="/command">명령어</Link></li>
-             <li
+            <li
               className="dropdown relative"
               onClick={handleDropdownClick}
             >
@@ -28,9 +28,8 @@ const Header = () => {
                 재련
               </span>
               <ul
-                className={`dropdown-menu absolute top-full left-0 z-50 bg-[#3678cf] shadow-md transition-all duration-300 ${
-                  isOpen ? 'block' : 'hidden'
-                }`}
+                className={`dropdown-menu absolute top-full left-0 z-50 bg-[#3678cf] shadow-md transition-all duration-300 ${isOpen ? 'block' : 'hidden'
+                  }`}
               >
                 <li className="px-4 py-2 whitespace-nowrap">
                   <Link href="/enhance/try" title="재련 시뮬레이터">시뮬</Link>
@@ -42,6 +41,9 @@ const Header = () => {
                   <Link href="/enhance/rank/room">톡방 순위</Link>
                 </li>
               </ul>
+            </li>
+            <li>
+              <Link href="/efficiency" title="크리스탈 패키지 효율 계산">패키지효율</Link>
             </li>
             <li><Link href="/price/market">재료시세</Link></li>
             <li><Link href="/price/book">유각시세</Link></li>

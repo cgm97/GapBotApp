@@ -763,3 +763,156 @@ exports.getMarketChart = async (req, res, next) => {
         if (connection) connection.release();
     }
 }
+
+// 저장된 패키지 효율 리스트 조회
+exports.getPackageEfficiencyList = async (req, res, next) => {
+
+    // 01 크리스탈, 02 로열크리스탈
+    // const { packageDvcd } = req.query;
+
+    // 로깅
+    const referer = req.headers.referer || req.headers.origin;
+    logger.info({
+        method: req.method,
+        url: req.url,
+        message: `요청 Host: ${referer} 패키지리스트조회`,
+    });
+
+    if (!referer || (!referer.includes('loagap.com') && !referer.includes('localhost'))) {
+        return res.status(403).json({ message: 'Invalid host' });
+    }
+
+    // DB 연결
+    const connection = await pool.getConnection();
+    try {
+
+        // 트랜잭션 시작
+        await connection.beginTransaction();
+        const selectSql = `SELECT
+                            PACKAGE_NAME,
+                            PACKAGE_PRICE,
+                            PACKAGE_COUNT,
+                            PACKAGE_DVCD,
+                            ITEMS,
+                            PACKAGE_BUY_PRICE,
+                            PACKAGE_BUY_GOLD,
+                            ITEMS_GOLD,
+                            DIFFERENCE_PRICE,
+                            EFFICIENCY,
+
+                            DICO_PRICE,
+                            DIFFERENCE_DICO_PRICE,
+                            EFFICIENCY_DICO
+
+                        FROM PACKAGE_LIST
+                        WHERE DL_YN = 'N'
+                            `;
+        let [packageList] = await connection.execute(selectSql);
+
+
+        return res.status(200).json({
+            success: true,
+            packageList
+        });
+
+    } catch (error) {
+        next(new Error(error));  // 에러 객체를 넘겨서 next 미들웨어로 전달
+        // return res.status(500).json({ message: "Internal Server Error" });
+    }
+    finally {
+        // DB 연결 해제
+        if (connection) connection.release();
+    }
+}
+
+// 패키지 효율 리스트 저장
+exports.insertPackageEfficiencyList = async (req, res, next) => {
+
+    let { packageName, packagePrice, packageCount, packageDvcd, items, packageBuyPrice, packageBuyGold, itemsGold, differencePrice, efficiency, dicoPrice, differenceDicoPrice, efficiencyDico } = req.body;
+
+    // 로깅
+    const referer = req.headers.referer || req.headers.origin;
+    logger.info({
+        method: req.method,
+        url: req.url,
+        message: `요청 Host: ${referer} 패키지리스트저장`,
+    });
+
+    if (!referer || (!referer.includes('loagap.com') && !referer.includes('localhost'))) {
+        return res.status(403).json({ message: 'Invalid host' });
+    }
+
+    // DB 연결
+    const connection = await pool.getConnection();
+    try {
+
+        // 트랜잭션 시작
+        await connection.beginTransaction();
+        const insertSql = `
+        INSERT INTO PACKAGE_LIST (
+                PACKAGE_NAME, PACKAGE_PRICE, PACKAGE_COUNT, PACKAGE_DVCD, ITEMS, PACKAGE_BUY_PRICE, PACKAGE_BUY_GOLD, ITEMS_GOLD, DIFFERENCE_PRICE, EFFICIENCY, DICO_PRICE, DIFFERENCE_DICO_PRICE, EFFICIENCY_DICO
+            ) VALUES (
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+            )
+        `;
+        await connection.execute(insertSql, [packageName, packagePrice, packageCount, packageDvcd, items, packageBuyPrice, packageBuyGold, itemsGold, differencePrice, efficiency, dicoPrice, differenceDicoPrice, efficiencyDico]);
+
+        connection.commit();
+        return res.status(200).json({
+            success: true
+        });
+
+    } catch (error) {
+        connection.rollback();
+        next(new Error(error));  // 에러 객체를 넘겨서 next 미들웨어로 전달
+        // return res.status(500).json({ message: "Internal Server Error" });
+    }
+    finally {
+        // DB 연결 해제
+        if (connection) connection.release();
+    }
+}
+
+// 저장된 패키지 효율 리스트 조회
+exports.deletePackageEfficiencyList = async (req, res, next) => {
+
+    const { packageName } = req.query;
+
+    // 로깅
+    const referer = req.headers.referer || req.headers.origin;
+    logger.info({
+        method: req.method,
+        url: req.url,
+        message: `요청 Host: ${referer} 패키지리스트삭제`,
+    });
+
+    if (!referer || (!referer.includes('loagap.com') && !referer.includes('localhost'))) {
+        return res.status(403).json({ message: 'Invalid host' });
+    }
+
+    // DB 연결
+    const connection = await pool.getConnection();
+    try {
+
+        // 트랜잭션 시작
+        await connection.beginTransaction();
+        const deleteSql = `UPDATE PACKAGE_LIST
+                            SET DL_YN = 'Y'
+                            WHERE PACKAGE_NAME = ? `;
+        await connection.execute(deleteSql,[packageName]);
+
+        connection.commit();
+        return res.status(200).json({
+            success: true
+        });
+
+    } catch (error) {
+        connection.rollback();
+        next(new Error(error));  // 에러 객체를 넘겨서 next 미들웨어로 전달
+        // return res.status(500).json({ message: "Internal Server Error" });
+    }
+    finally {
+        // DB 연결 해제
+        if (connection) connection.release();
+    }
+}
