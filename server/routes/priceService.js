@@ -802,8 +802,9 @@ exports.getPackageEfficiencyList = async (req, res, next) => {
 
                             DICO_PRICE,
                             DIFFERENCE_DICO_PRICE,
-                            EFFICIENCY_DICO
+                            EFFICIENCY_DICO,
 
+                            CAST(DATE_FORMAT(LST_DTTI, '%Y-%m-%d %H:%i:%s') AS CHAR) AS LST_DTTI
                         FROM PACKAGE_LIST
                         WHERE DL_YN = 'N'
                             `;
@@ -850,10 +851,23 @@ exports.insertPackageEfficiencyList = async (req, res, next) => {
         await connection.beginTransaction();
         const insertSql = `
         INSERT INTO PACKAGE_LIST (
-                PACKAGE_NAME, PACKAGE_PRICE, PACKAGE_COUNT, PACKAGE_DVCD, ITEMS, PACKAGE_BUY_PRICE, PACKAGE_BUY_GOLD, ITEMS_GOLD, DIFFERENCE_PRICE, EFFICIENCY, DICO_PRICE, DIFFERENCE_DICO_PRICE, EFFICIENCY_DICO
-            ) VALUES (
-                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
-            )
+                PACKAGE_NAME, PACKAGE_PRICE, PACKAGE_COUNT, PACKAGE_DVCD, ITEMS,
+                PACKAGE_BUY_PRICE, PACKAGE_BUY_GOLD, ITEMS_GOLD, DIFFERENCE_PRICE, EFFICIENCY,
+                DICO_PRICE, DIFFERENCE_DICO_PRICE, EFFICIENCY_DICO
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON DUPLICATE KEY UPDATE
+                PACKAGE_PRICE = VALUES(PACKAGE_PRICE),
+                PACKAGE_COUNT = VALUES(PACKAGE_COUNT),
+                PACKAGE_DVCD = VALUES(PACKAGE_DVCD),
+                ITEMS = VALUES(ITEMS),
+                PACKAGE_BUY_PRICE = VALUES(PACKAGE_BUY_PRICE),
+                PACKAGE_BUY_GOLD = VALUES(PACKAGE_BUY_GOLD),
+                ITEMS_GOLD = VALUES(ITEMS_GOLD),
+                DIFFERENCE_PRICE = VALUES(DIFFERENCE_PRICE),
+                EFFICIENCY = VALUES(EFFICIENCY),
+                DICO_PRICE = VALUES(DICO_PRICE),
+                DIFFERENCE_DICO_PRICE = VALUES(DIFFERENCE_DICO_PRICE),
+                EFFICIENCY_DICO = VALUES(EFFICIENCY_DICO)
         `;
         await connection.execute(insertSql, [packageName, packagePrice, packageCount, packageDvcd, items, packageBuyPrice, packageBuyGold, itemsGold, differencePrice, efficiency, dicoPrice, differenceDicoPrice, efficiencyDico]);
 
@@ -899,7 +913,7 @@ exports.deletePackageEfficiencyList = async (req, res, next) => {
         const deleteSql = `UPDATE PACKAGE_LIST
                             SET DL_YN = 'Y'
                             WHERE PACKAGE_NAME = ? `;
-        await connection.execute(deleteSql,[packageName]);
+        await connection.execute(deleteSql, [packageName]);
 
         connection.commit();
         return res.status(200).json({
