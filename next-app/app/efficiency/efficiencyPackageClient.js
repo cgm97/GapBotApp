@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 
-function PackageCalc({ packageDvcd, marketsPrice, crystalPrice }) {
+function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, selectedPackageData }) {
   const [packageName, setPackageName] = useState('');
   const [packagePrice, setPackagePrice] = useState('');
   const [packageCount, setPackageCount] = useState('');
@@ -33,6 +33,33 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice }) {
 
     setNowCrystalPrice(crystalPrice[crystalPrice.length - 1].close / 100);
   }, [marketsPrice, crystalPrice]);
+
+  useEffect(() => {
+    if (!selectedPackageData) return;
+
+    setPackageName(selectedPackageData.PACKAGE_NAME);
+    setPackagePrice(selectedPackageData.PACKAGE_PRICE);
+    setPackageCount(selectedPackageData.PACKAGE_COUNT);
+
+    const updatedItems = (selectedPackageData.ITEMS || []).map((item) => {
+      const marketItem =
+        allItemList.find((m) => m.name === item.name) || {};
+
+      return {
+        ...item,
+        price: marketItem.price
+          ? marketItem.price / (marketItem.bundleCount || 1)
+          : item.price, // market 가격 있으면 사용, 없으면 기존 가격 유지
+      };
+    });
+
+    setItems(updatedItems);
+
+    if (packageDvcd === '02') {
+      setDicoPrice(selectedPackageData.DICO_PRICE || '');
+    }
+  }, [selectedPackageData, allItemList, packageDvcd]);
+
 
   const handleItemChange = (index, field, value) => {
     const updated = [...items];
@@ -453,7 +480,7 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice }) {
   );
 }
 
-function PackageList() {
+function PackageList({ onSelectPackage }) {
   const [allPackageList, setAllPackageList] = useState([]);
 
   const getPackageList = () => {
@@ -480,6 +507,7 @@ function PackageList() {
         return (
           <div
             key={idx}
+            onClick={() => onSelectPackage(item)}
             className="relative border rounded-lg p-4 shadow-md bg-white dark:bg-gray-700"
           >
             {localStorage.getItem('user') == 'cgm97@naver.com' && (
@@ -519,8 +547,10 @@ function PackageList() {
                   ></span>
                 )}
                 {item.PACKAGE_NAME}
-              </h3>
-
+              </h3>  
+              <span className="ml-auto text-xs text-gray-400">
+                ({item.LST_DTTI})
+              </span>
               <p className="text-sm text-gray-600 dark:text-gray-300">
                 💠 패키지 가격: {item.PACKAGE_PRICE} × {item.PACKAGE_COUNT} ={' '}
                 <strong>{item.PACKAGE_BUY_PRICE.toLocaleString()}</strong>
@@ -597,6 +627,7 @@ function PackageList() {
 
 export default function PackageEfficiencyPage({ marketsPrice, crystalPrice }) {
   const [activeTab, setActiveTab] = useState('calc1');
+  const [selectedPackageData, setSelectedPackageData] = useState(null);
 
   return (
     <>
@@ -647,6 +678,7 @@ export default function PackageEfficiencyPage({ marketsPrice, crystalPrice }) {
           packageDvcd="01"
           marketsPrice={marketsPrice}
           crystalPrice={crystalPrice}
+          selectedPackageData={selectedPackageData}
         />
       )}
       {activeTab === 'calc2' && (
@@ -654,9 +686,14 @@ export default function PackageEfficiencyPage({ marketsPrice, crystalPrice }) {
           packageDvcd="02"
           marketsPrice={marketsPrice}
           crystalPrice={crystalPrice}
+          selectedPackageData={selectedPackageData}
         />
       )}
-      {activeTab === 'list' && <PackageList />}
+      {activeTab === 'list' &&
+        <PackageList onSelectPackage={(pkg) => {
+          setSelectedPackageData(pkg);
+          setActiveTab(pkg.PACKAGE_DVCD === '02' ? 'calc2' : 'calc1');
+        }} />}
     </>
   );
 }
