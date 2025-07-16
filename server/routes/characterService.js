@@ -1,7 +1,8 @@
-const axios = require('axios');
 const pool = require('../db/connection');
 const logger = require('../logger');  // logger.js 임포트
 const characterUtil = require('../characterUtil');
+// const combatUtil = require('../combat-power-calculator/run');
+
 require('dotenv').config(); // .env 파일에서 환경 변수 로드
 
 
@@ -48,7 +49,145 @@ exports.getCharacterInfo = async (req, res, next) => {
     }
 
     try {
-        const query = `SELECT 
+
+        if(!referer.includes('loagap.com/meta')){
+            const isSuccess = await exports.renewCharacterInfo(nickName);
+            logger.info({
+                method: req.method,
+                url: req.url,
+                message: `캐릭터검색 갱신 : ${isSuccess}`,
+            });
+        }
+
+        const [rows] = await exports.selectCharacter(nickName);
+
+        if (rows.length > 0 && rows[0].characterData.equipItems != null) {
+            // 조회된 데이터가 있을 경우
+            const characterData = rows[0].characterData;
+
+            // JSON 데이터를 해체할당으로 분리
+            const {
+                equipItems,
+                gemItems,
+                accessoryItems,
+                cardItems,
+                engravings,
+                profile,
+                guild,
+                wisdom,
+                arkItems,
+                skillItems
+            } = characterData;
+
+            // 응답 반환
+            return res.status(200).json({
+                equipItems,
+                gemItems,
+                accessoryItems,
+                cardItems,
+                engravings,
+                profile,
+                guild,
+                wisdom,
+                arkItems,
+                skillItems,
+                lastFetchDate: rows[0].last_fetch_date,
+            });
+        } else {
+            logger.info({
+                method: req.method,
+                url: req.url,
+                message: `캐릭터검색 DB 존재 x : ${nickName}`,
+            });
+            // 캐릭터 정보 파싱
+            const { equipItems, gemItems, accessoryItems, cardItems, engravings, profile, guild, wisdom, arkItems } = await characterUtil.getCharacterProfile(nickName);
+            // 캐릭터 정보 Insert
+            const isSuccess = await characterUtil.insertCharacterInfo(equipItems, gemItems, accessoryItems, cardItems, engravings, profile, guild, wisdom, arkItems);
+            if (isSuccess) {
+                res.status(200).json({ equipItems, gemItems, accessoryItems, cardItems, engravings, profile, guild, wisdom, arkItems });
+            }
+            else {
+                if (referer.includes('loagap.com/meta')) {
+                    // Meta 검색시에는 200 정상처리
+                    res.status(200).send('등록되지 않은 캐릭터입니다.');
+                } else {
+                    res.status(404).send('등록되지 않은 캐릭터입니다.');
+                }
+            }
+        }
+    } catch (error) {
+        next(new Error(error));  // 에러 객체를 넘겨서 next 미들웨어로 전달
+    }
+}
+
+exports.executeRenew = async (req, res, next) => {
+    let { nickName } = req.query;
+    nickName = tryDecodeURIComponent(nickName);
+
+    try {
+        const referer = req.headers.referer || req.headers.origin;
+        logger.info({
+            method: req.method,
+            url: req.url,
+            message: `요청 Host: ${referer} 캐릭터갱신: ${nickName}`,
+        });
+
+        if (!referer || (!referer.includes('loagap.com') && !referer.includes('localhost'))) {
+            return res.status(403).json({ message: 'Invalid host' });
+        }
+
+        const isSuccess = await exports.renewCharacterInfo(nickName);
+
+        if (isSuccess) {
+            res.status(200).send("갱신완료");
+        } else {
+            res.status(404).send("갱신실패");
+        }
+    } catch (error) {
+        next(new Error(error));
+    }
+};
+
+exports.renewCharacterInfo = async (nickName) => {
+    const query = `SELECT ITEM_LEVEL_HISTORY FROM CHARACTER_INFO WHERE NICKNAME = ?`;
+    const [rows] = await pool.query(query, [nickName]);
+
+    const originItemLevelHistory = rows[0]?.ITEM_LEVEL_HISTORY || null;
+
+    // 파싱
+    const { equipItems, gemItems, accessoryItems, cardItems, engravings, profile, guild, wisdom, arkItems } = await characterUtil.getCharacterProfile(nickName);
+
+    // 히스토리 병합
+    if (originItemLevelHistory) {
+        const updatedHistory = updateItemLevelHistory(originItemLevelHistory, profile.ITEM_LEVEL_HISTORY);
+        profile.ITEM_LEVEL_HISTORY = updatedHistory;
+    }
+
+    const isSuccess = await characterUtil.insertCharacterInfo(
+        equipItems, gemItems, accessoryItems, cardItems,
+        engravings, profile, guild, wisdom, arkItems
+    );
+
+    return isSuccess;
+};
+
+function tryDecodeURIComponent(value) {
+    try {
+        ``
+        const decoded = decodeURIComponent(value);
+        // 디코딩했는데 다시 인코딩하면 같으면 → 이미 디코딩된 값
+        if (encodeURIComponent(decoded) === value) {
+            return decoded; // 원래 디코딩된 값이 맞음
+        }
+    } catch (e) {
+        // decodeURIComponent가 실패하면 원본 그대로 사용
+    }
+    return value;
+}
+
+exports.selectCharacter = async (nickName) => {
+
+    const query = ` SELECT
                         CI.NICKNAME AS profile,
                         JSON_OBJECT(
                             'profile',JSON_OBJECT(
@@ -86,8 +225,13 @@ exports.getCharacterInfo = async (req, res, next) => {
                                 'NAME', CW.NAME,
                                 'LEVEL', CW.LEVEL
                             ),
-                            'arkItems', CAP.ARK_PASSIVE
-                        ) AS characterData
+                            'arkItems', CAP.ARK_PASSIVE,
+							'skillItems', JSON_OBJECT(
+                                'point', CSK.SKILL_POINT,
+                                'skill', CSK.SKILLS
+                            )
+                        ) AS characterData,
+                         CAST(DATE_FORMAT(CI.LST_DTTI, '%Y-%m-%d %H:%i:%s') AS CHAR) AS last_fetch_date
                     FROM 
                         CHARACTER_INFO CI
                     LEFT JOIN CHARACTER_EQUIPMENT CE ON CI.NICKNAME = CE.NICKNAME
@@ -96,123 +240,17 @@ exports.getCharacterInfo = async (req, res, next) => {
                     LEFT JOIN CHARACTER_GUILD CG ON CI.NICKNAME = CG.NICKNAME
                     LEFT JOIN CHARACTER_WISDOM CW ON CI.NICKNAME = CW.NICKNAME
                     LEFT JOIN CHARACTER_ARKPASSIVE CAP ON CI.NICKNAME = CAP.NICKNAME
+                    LEFT JOIN CHARACTER_SKILL CSK ON CI.NICKNAME = CSK.NICKNAME
                     WHERE CI.NICKNAME = ?`;
 
-        const [rows] = await pool.query(query, [nickName]);
-
-        if (rows.length > 0 &&  rows[0].characterData.equipItems != null) {
-            // 조회된 데이터가 있을 경우
-            const characterData = rows[0].characterData;
-
-            // JSON 데이터를 해체할당으로 분리
-            const {
-                equipItems,
-                gemItems,
-                accessoryItems,
-                cardItems,
-                engravings,
-                profile,
-                guild,
-                wisdom,
-                arkItems
-            } = characterData;
-
-            // 응답 반환
-            return res.status(200).json({
-                equipItems,
-                gemItems,
-                accessoryItems,
-                cardItems,
-                engravings,
-                profile,
-                guild,
-                wisdom,
-                arkItems
-            });
-        } else {
-            logger.info({
-                method: req.method,
-                url: req.url,
-                message: `캐릭터검색 DB 존재 x : ${nickName}`,
-            });
-            // 캐릭터 정보 파싱
-            const { equipItems, gemItems, accessoryItems, cardItems, engravings, profile, guild, wisdom, arkItems } = await characterUtil.getCharacterProfile(nickName);
-            // 캐릭터 정보 Insert
-            const isSuccess = await characterUtil.insertCharacterInfo(equipItems, gemItems, accessoryItems, cardItems, engravings, profile, guild, wisdom, arkItems);
-            if (isSuccess) {
-                res.status(200).json({ equipItems, gemItems, accessoryItems, cardItems, engravings, profile, guild, wisdom, arkItems });
-            }
-            else {
-                if(referer.includes('loagap.com/meta')){
-                    // Meta 검색시에는 200 정상처리
-                    res.status(200).send('등록되지 않은 캐릭터입니다.');
-                } else{
-                    res.status(404).send('등록되지 않은 캐릭터입니다.');
-                }
-            }
-        }
-    } catch (error) {
-        next(new Error(error));  // 에러 객체를 넘겨서 next 미들웨어로 전달
-    }
+    return await pool.query(query, [nickName]);
 }
 
+// exports.executeCombatPower = async (req, res, next) => {
+//     let { nickName } = req.query;
+//     nickName = tryDecodeURIComponent(nickName);
 
-exports.executeRenew = async (req, res, next) => {
-    let { nickName } = req.query;
-    nickName = tryDecodeURIComponent(nickName);
+//     const char = await combatUtil.getCharacterCombat(nickName);
 
-    try {
-        // 로깅
-        const referer = req.headers.referer || req.headers.origin;
-        logger.info({
-            method: req.method,
-            url: req.url,
-            message: `요청 Host: ${referer} 캐릭터갱신: ${nickName}`,
-        });
-
-        if (!referer || (!referer.includes('loagap.com') && !referer.includes('localhost'))) {
-            return res.status(403).json({ message: 'Invalid host' });
-        }
-
-        const query = `SELECT 
-                    CI.ITEM_LEVEL_HISTORY
-                FROM 
-                    CHARACTER_INFO CI
-                WHERE CI.NICKNAME = ?`;
-
-        const [rows] = await pool.query(query, [nickName]);
-
-        const originItemLevelHistory = rows[0].ITEM_LEVEL_HISTORY;
-
-        // 캐릭터 정보 파싱
-        const { equipItems, gemItems, accessoryItems, cardItems, engravings, profile, guild, wisdom, arkItems } = await characterUtil.getCharacterProfile(nickName);
-
-        const updatedHistory = updateItemLevelHistory(originItemLevelHistory, profile.ITEM_LEVEL_HISTORY);
-        profile.ITEM_LEVEL_HISTORY = updatedHistory;
-
-        // 캐릭터 정보 Insert
-        const isSuccess = await characterUtil.insertCharacterInfo(equipItems, gemItems, accessoryItems, cardItems, engravings, profile, guild, wisdom, arkItems);
-        if (isSuccess) {
-            res.status(200).send("갱신완료");
-        }
-        else {
-            res.status(404).send('갱신실패');
-        }
-
-    } catch (error) {
-        next(new Error(error));  // 에러 객체를 넘겨서 next 미들웨어로 전달
-    }
-}
-
-function tryDecodeURIComponent(value) {
-  try {
-    const decoded = decodeURIComponent(value);
-    // 디코딩했는데 다시 인코딩하면 같으면 → 이미 디코딩된 값
-    if (encodeURIComponent(decoded) === value) {
-      return decoded; // 원래 디코딩된 값이 맞음
-    }
-  } catch (e) {
-    // decodeURIComponent가 실패하면 원본 그대로 사용
-  }
-  return value;
-}
+//     res.status(200).json(char);
+// }
