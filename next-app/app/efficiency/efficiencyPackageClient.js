@@ -601,7 +601,7 @@ function PackageList({ onSelectPackage }) {
                     />
                     <div className="text-sm">
                       <p className="font-medium text-gray-800 dark:text-white">{subItem.name}</p>
-                      <p className="text-gray-600 dark:text-gray-300">{subItem.count}개 ({subItem.bundleCount}개당 {subItem.price}G)</p>
+                      <p className="text-gray-600 dark:text-gray-300">{subItem.count}개 (1개당 {subItem.price}G)</p>
                     </div>
                   </div>
                 ))}

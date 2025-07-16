@@ -35,6 +35,7 @@ const CommandPage = () => {
     },
     { id: 19, prefix: <>.사사게</>, description: '.사사게 키워드' },
     { id: 20, prefix: <>.클골</> },
+    { id: 24, prefix: <>.패키지효율</>, img: '/img/cmd/vozlwlgydbf.png', description: 'LOAGAP 패키지 효율 참조'},
   ];
 
   const listUtilItems = [
