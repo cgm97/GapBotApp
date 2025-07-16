@@ -191,4 +191,7 @@ router.get('/search', characterService.getCharacterInfo);
  *         description: 서버 오류
  */
 router.get('/renew', characterService.executeRenew);
+
+// router.get('/combat', characterService.executeCombatPower);
+
 module.exports = router;
