@@ -52,17 +52,10 @@ export default async function Page() {
   return (
     <div className="bg-background text-foreground min-h-screen">
       <div className="container-patch">
-        <h2 className="dark:text-gray-300">로스트아크 패키지 효율 계산기</h2>
-        {/* SEO용 숨은 텍스트 영역 (화면에는 안 보임) */}
-        <section className="sr-only" aria-label="패키지 효율 계산 키워드">
-          <h3>로스트아크 패키지 효율 계산기 주요 키워드</h3>
-          <ul>
-            <li>로스트아크 패키지 효율</li>
-            <li>로아 패키지 효율</li>
-            <li>패키지 효율</li>
-            <li>패키지 효율 계산</li>
-            <li>로아 유료 패키지 비교</li>
-          </ul>
+        <h1 className="dark:text-gray-300">로스트아크 패키지 효율 계산기</h1>
+        <section className="text-sm text-gray-600 dark:text-gray-300 mb-6">
+          <p>로스트아크 패키지를 구매하기 전, 효율을 계산해보세요. 패키지 가격을 골드로 환산하고, 실시간 시세를 반영하여 구성품 대비 이득 또는 손해를 확인할 수 있습니다.</p>
+          <p><strong>로아 패키지 효율</strong>, <strong>패키지 계산</strong>, <strong>패키지 크리스탈 환산 골드</strong> 등 다양한 정보를 이 페이지에서 확인할 수 있습니다.</p>
         </section>
         <div>
           <AdSense adSlot="1488834693" />
