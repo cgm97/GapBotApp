@@ -853,8 +853,8 @@ exports.insertPackageEfficiencyList = async (req, res, next) => {
         INSERT INTO PACKAGE_LIST (
                 PACKAGE_NAME, PACKAGE_PRICE, PACKAGE_COUNT, PACKAGE_DVCD, ITEMS,
                 PACKAGE_BUY_PRICE, PACKAGE_BUY_GOLD, ITEMS_GOLD, DIFFERENCE_PRICE, EFFICIENCY,
-                DICO_PRICE, DIFFERENCE_DICO_PRICE, EFFICIENCY_DICO
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                DICO_PRICE, DIFFERENCE_DICO_PRICE, EFFICIENCY_DICO, LST_DTTI
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
             ON DUPLICATE KEY UPDATE
                 PACKAGE_PRICE = VALUES(PACKAGE_PRICE),
                 PACKAGE_COUNT = VALUES(PACKAGE_COUNT),
@@ -867,7 +867,8 @@ exports.insertPackageEfficiencyList = async (req, res, next) => {
                 EFFICIENCY = VALUES(EFFICIENCY),
                 DICO_PRICE = VALUES(DICO_PRICE),
                 DIFFERENCE_DICO_PRICE = VALUES(DIFFERENCE_DICO_PRICE),
-                EFFICIENCY_DICO = VALUES(EFFICIENCY_DICO)
+                EFFICIENCY_DICO = VALUES(EFFICIENCY_DICO),
+                 LST_DTTI = NOW()
         `;
         await connection.execute(insertSql, [packageName, packagePrice, packageCount, packageDvcd, items, packageBuyPrice, packageBuyGold, itemsGold, differencePrice, efficiency, dicoPrice, differenceDicoPrice, efficiencyDico]);
 

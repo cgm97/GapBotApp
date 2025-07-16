@@ -23,6 +23,8 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, selectedPackageD
 
   const [differenceDicoPrice, setDifferenceDicoPrice] = useState(0);
   const [efficiencyDico, setEfficiencyDico] = useState(0);
+  const [goldDico, setgoldDico] = useState(0);
+
   useEffect(() => {
     if (!marketsPrice) return;
     const mergedList = [
@@ -159,8 +161,9 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, selectedPackageD
 
     setDifferenceDicoPrice(diff.toFixed(0));
     setEfficiencyDico(efficiency.toFixed(2));
+    setgoldDico(gold);
     return {
-      gold,
+      gold: goldDico,
       diff: diff.toFixed(0),
       efficiency: efficiency.toFixed(2)
     };
@@ -417,55 +420,76 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, selectedPackageD
         </button>
 
         {result && (
-          <div className="mt-6 p-4 rounded bg-gray-100 dark:bg-gray-600 space-y-4 text-sm">
-            <div className="space-y-1">
-              <p><strong>패키지 구매 비용:</strong> {packageBuyPrice.toLocaleString()}</p>
-              <p><strong>패키지 환산 골드:</strong> {packageBuyGold.toLocaleString()} G</p>
+          <div className="mt-6 p-4 rounded bg-gray-100 dark:bg-gray-600 text-sm space-y-4">
+
+            {/* 패키지 기본 정보 */}
+            <div className="grid grid-cols-2 gap-2">
+              <div><strong>패키지 구매 비용</strong></div>
+              <div className="text-right">{packageBuyPrice.toLocaleString()} 크리스탈</div>
+
+              <div><strong>구성품 총 가치</strong></div>
+              <div className="text-right">{itemsGold.toLocaleString()} G</div>
             </div>
 
-            <div className="space-y-1">
-              <p>📦 <strong>구성품 총 가치:</strong> {itemsGold.toLocaleString()} G</p>
-              <p>
-                💰 <strong>이득/손해:</strong>{' '}
-                <span className={differencePrice >= 0 ? 'text-green-600' : 'text-red-600'}>
+            {/* 화폐 거래소 기준 */}
+            <div className="mt-4 p-3 rounded bg-white dark:bg-gray-800 shadow">
+              <p className="font-semibold mb-2">화폐 거래소 기준</p>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="text-sm text-gray-800 dark:text-gray-200">
+                    <strong>환산 골드</strong>
+                    <span className="text-xs text-gray-400"> 5% 수수료 차감</span>
+                  </div>
+                <div className="text-right">{packageBuyGold.toLocaleString()} G</div>
+
+                <div><strong>이득/손해</strong></div>
+                <div className={`text-right font-bold ${differencePrice >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                   {differencePrice.toLocaleString()} G
-                </span>
-              </p>
-              <p>
-                📈 <strong>패키지 효율:</strong>{' '}
-                <span className={efficiency >= 0 ? 'text-green-600' : 'text-red-600'}>
+                </div>
+
+                <div><strong>패키지 효율</strong></div>
+                <div className={`text-right font-bold ${efficiency >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                   {efficiency}% {efficiency >= 0 ? '이득' : '손해'}
-                </span>
-              </p>
-              {packageDvcd === '02' && dicoResult && (
-                <>
-                  <br />
-                  <p><strong>어둠 경로 기준 (100 : {dicoPrice})</strong></p>
-                  <p>
-                    💰 <strong>이득/손해:</strong>{' '}
-                    <span className={dicoResult.diff >= 0 ? 'text-green-600' : 'text-red-600'}>
-                      {Number(dicoResult.diff).toLocaleString()} G
-                    </span>
-                  </p>
-                  <p>
-                    📈 <strong>패키지 효율:</strong>{' '}
-                    <span className={dicoResult.efficiency >= 0 ? 'text-green-600' : 'text-red-600'}>
-                      {dicoResult.efficiency}% {dicoResult.efficiency >= 0 ? '이득' : '손해'}
-                    </span>
-                  </p>
-                </>
-              )}
-
-
+                </div>
+              </div>
             </div>
 
-            <button
-              type="submit"
-              className="ml-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-            >
-              저장하기
-            </button>
+            {/* 어둠 경로 기준 */}
+            {packageDvcd === '02' && dicoResult && (
+              <div className="p-3 rounded bg-gray-200 dark:bg-gray-700 shadow">
+                <p className="font-semibold mb-2">어둠 경로 기준 (100 : {dicoPrice})</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="text-sm text-gray-800 dark:text-gray-200">
+                    <strong>환산 골드</strong>
+                    <span className="text-xs text-gray-400"> 5% 수수료 차감</span>
+                  </div>
+
+                  <div className="text-right">{goldDico.toLocaleString()} G</div>
+
+                  <div><strong>이득/손해</strong></div>
+                  <div className={`text-right font-bold ${dicoResult.diff >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {Number(dicoResult.diff).toLocaleString()} G
+                  </div>
+
+                  <div><strong>패키지 효율</strong></div>
+                  <div className={`text-right font-bold ${dicoResult.efficiency >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {dicoResult.efficiency}% {dicoResult.efficiency >= 0 ? '이득' : '손해'}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 저장 버튼 */}
+            <div className="text-right">
+              <button
+                type="submit"
+                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+              >
+                저장하기
+              </button>
+            </div>
           </div>
+
+
         )}
       </form>
 
@@ -547,10 +571,12 @@ function PackageList({ onSelectPackage }) {
                   ></span>
                 )}
                 {item.PACKAGE_NAME}
-              </h3>  
+              </h3>
               <span className="ml-auto text-xs text-gray-400">
+                화폐거래소 기준 계산
                 ({item.LST_DTTI})
               </span>
+
               <p className="text-sm text-gray-600 dark:text-gray-300">
                 💠 패키지 가격: {item.PACKAGE_PRICE} × {item.PACKAGE_COUNT} ={' '}
                 <strong>{item.PACKAGE_BUY_PRICE.toLocaleString()}</strong>
@@ -627,7 +653,8 @@ function PackageList({ onSelectPackage }) {
 
 export default function PackageEfficiencyPage({ marketsPrice, crystalPrice }) {
   const [activeTab, setActiveTab] = useState('calc1');
-  const [selectedPackageData, setSelectedPackageData] = useState(null);
+  const [selectedPackageData01, setSelectedPackageData01] = useState(null);
+  const [selectedPackageData02, setSelectedPackageData02] = useState(null);
 
   return (
     <>
@@ -678,7 +705,7 @@ export default function PackageEfficiencyPage({ marketsPrice, crystalPrice }) {
           packageDvcd="01"
           marketsPrice={marketsPrice}
           crystalPrice={crystalPrice}
-          selectedPackageData={selectedPackageData}
+          selectedPackageData={selectedPackageData01}
         />
       )}
       {activeTab === 'calc2' && (
@@ -686,12 +713,18 @@ export default function PackageEfficiencyPage({ marketsPrice, crystalPrice }) {
           packageDvcd="02"
           marketsPrice={marketsPrice}
           crystalPrice={crystalPrice}
-          selectedPackageData={selectedPackageData}
+          selectedPackageData={selectedPackageData02}
         />
       )}
       {activeTab === 'list' &&
         <PackageList onSelectPackage={(pkg) => {
-          setSelectedPackageData(pkg);
+          if (pkg.PACKAGE_DVCD === '01') {
+            setSelectedPackageData01(pkg);
+            setActiveTab('calc1');
+          } else {
+            setSelectedPackageData02(pkg);
+            setActiveTab('calc2');
+          }
           setActiveTab(pkg.PACKAGE_DVCD === '02' ? 'calc2' : 'calc1');
         }} />}
     </>
