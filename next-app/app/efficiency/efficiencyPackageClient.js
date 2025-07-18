@@ -42,7 +42,7 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, jewelsPrice, sel
       ...marketsPrice.강화재료.map(item => ({ ...item, category: '강화재료' })),
       ...marketsPrice.강화추가재료.map(item => ({ ...item, category: '강화추가재료' })),
       { name: "크리스탈", bundleCount: 1, price: crystalPrice[crystalPrice.length - 1].close / 100 },
-      { name: "고대의 백금화", bundleCount: 1, price: 200, icon:"https://cdn-lostark.game.onstove.com/efui_iconatlas/all_quest/all_quest_03_20.png"},
+      { name: "고대의 백금화", bundleCount: 1, price: 200, icon: "https://cdn-lostark.game.onstove.com/efui_iconatlas/all_quest/all_quest_03_20.png" },
       { name: "큐브 (2해금)", bundleCount: 1, price: cube_red_price * 5 + cube_blue_price * 5 + cube_stone_price * 25 + cube_jewels_price * 6, icon: "https://cdn-lostark.game.onstove.com/efui_iconatlas/use/use_12_194.png" },
       { name: "큐브 (3해금)", bundleCount: 1, price: cube_red_price * 6 + cube_blue_price * 6 + cube_stone_price * 32 + cube_jewels_price * 8, icon: "https://cdn-lostark.game.onstove.com/efui_iconatlas/use/use_12_195.png" }
     ];
@@ -620,11 +620,24 @@ function PackageList({ onSelectPackage }) {
                     key={subIdx}
                     className="flex items-center gap-2 bg-gray-100 dark:bg-gray-600 p-2 rounded"
                   >
-                    <img
-                      src={subItem.icon}
-                      alt={subItem.name}
-                      className="w-6 h-6 rounded"
-                    />
+                    {subItem.name === "크리스탈" ? (
+                      <span
+                        className="w-[19px] h-[21px] inline-block"
+                        style={{
+                          backgroundImage: `url("https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/sprite/sprite_shop.png?01ff928ef1fbd38c0933")`,
+                          backgroundPosition: '-395px -198px',
+                          backgroundSize: '606px 393px',
+                          backgroundRepeat: 'no-repeat',
+                        }}
+                      ></span>
+                    ) : (
+                      <img
+                        src={subItem.icon}
+                        alt={subItem.name}
+                        className="w-6 h-6 rounded"
+                      />
+                    )}
+
                     <div className="text-sm">
                       <p className="font-medium text-gray-800 dark:text-white">{subItem.name}</p>
                       <p className="text-gray-600 dark:text-gray-300">{subItem.count}개 (1개당 {subItem.price}G)</p>
@@ -719,7 +732,7 @@ export default function PackageEfficiencyPage({ marketsPrice, crystalPrice, jewe
 
         <button
           onClick={() => setActiveTab('list')}
-          className={`px-4 py-2 rounded ${activeTab === 'list' ? 'bg-blue-600 text-white dark:bg-blue-800 dark:text-black' : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-100'}`}
+          className={`px-4 py-2 rounded ${activeTab === 'list' ? 'bg-blue-600 text-white dark:bg-blue-800' : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-100'}`}
         >
           패키지 효율 리스트
         </button>
