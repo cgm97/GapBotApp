@@ -54,6 +54,8 @@ export default function RootLayout({
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3394263366814430"
           crossOrigin="anonymous"
         />
+        <link rel="icon" href="/favicon.ico" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
       </head>
       <body className="dark:bg-background">
         <div className="bg-background text-foreground min-h-screen">

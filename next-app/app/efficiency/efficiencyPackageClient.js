@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 
-function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, selectedPackageData }) {
+function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, jewelsPrice, selectedPackageData }) {
   const [packageName, setPackageName] = useState('');
   const [packagePrice, setPackagePrice] = useState('');
   const [packageCount, setPackageCount] = useState('');
@@ -27,13 +27,27 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, selectedPackageD
 
   useEffect(() => {
     if (!marketsPrice) return;
+    setNowCrystalPrice(crystalPrice[crystalPrice.length - 1].close / 100);
+
+    // 큐브 패키지 3해금 기준으로 계산
+    const cube_red_price = marketsPrice.강화추가재료.find(item => item.name === '용암의 숨결').price;
+    const cube_blue_price = marketsPrice.강화추가재료.find(item => item.name === '빙하의 숨결').price;
+    const cube_stone_price = marketsPrice.강화재료.find(item => item.name === '운명의 돌파석').price;
+    const filtered = Object.values(jewelsPrice).filter(item => item.name.includes('2레벨'));
+    const cube_jewels_price = filtered.reduce((prev, current) => {
+      return (prev.price > current.price) ? prev : current;
+    }).price;
+
     const mergedList = [
       ...marketsPrice.강화재료.map(item => ({ ...item, category: '강화재료' })),
       ...marketsPrice.강화추가재료.map(item => ({ ...item, category: '강화추가재료' })),
+      { name: "크리스탈", bundleCount: 1, price: crystalPrice[crystalPrice.length - 1].close / 100 },
+      { name: "고대의 백금화", bundleCount: 1, price: 200, icon:"https://cdn-lostark.game.onstove.com/efui_iconatlas/all_quest/all_quest_03_20.png"},
+      { name: "큐브 (2해금)", bundleCount: 1, price: cube_red_price * 5 + cube_blue_price * 5 + cube_stone_price * 25 + cube_jewels_price * 6, icon: "https://cdn-lostark.game.onstove.com/efui_iconatlas/use/use_12_194.png" },
+      { name: "큐브 (3해금)", bundleCount: 1, price: cube_red_price * 6 + cube_blue_price * 6 + cube_stone_price * 32 + cube_jewels_price * 8, icon: "https://cdn-lostark.game.onstove.com/efui_iconatlas/use/use_12_195.png" }
     ];
     setAllItemList(mergedList);
 
-    setNowCrystalPrice(crystalPrice[crystalPrice.length - 1].close / 100);
   }, [marketsPrice, crystalPrice]);
 
   useEffect(() => {
@@ -227,7 +241,19 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, selectedPackageD
                 }}
                 className="cursor-pointer border p-2 rounded hover:bg-gray-500 flex items-center gap-2"
               >
-                <img src={item.icon} alt={item.name} className="w-8 h-8" />
+                {item.name === "크리스탈" ? (
+                  <span
+                    className="w-[19px] h-[21px] inline-block"
+                    style={{
+                      backgroundImage: `url("https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/sprite/sprite_shop.png?01ff928ef1fbd38c0933")`,
+                      backgroundPosition: '-395px -198px',
+                      backgroundSize: '606px 393px',
+                      backgroundRepeat: 'no-repeat',
+                    }}
+                  ></span>
+                ) : (
+                  <img src={item.icon} alt={item.name} className="w-8 h-8" />
+                )}
                 <div>
                   <p className="font-semibold text-sm">{item.name}</p>
                 </div>
@@ -362,7 +388,7 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, selectedPackageD
           )}
         </div>
 
-        <h4 className="mt-6 mb-2 font-semibold text-lg">📦 구성품</h4>
+        <h4 className="mt-6 mb-2 font-semibold text-lg">📦 구성품 (1 패키지 기준)</h4>
 
         <div className="flex text-xs font-bold text-gray-500 dark:text-gray-300 mb-1">
           <div className="flex-1">이름</div>
@@ -436,9 +462,9 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, selectedPackageD
               <p className="font-semibold mb-2">화폐 거래소 기준</p>
               <div className="grid grid-cols-2 gap-2">
                 <div className="text-sm text-gray-800 dark:text-gray-200">
-                    <strong>환산 골드</strong>
-                    <span className="text-xs text-gray-400"> 5% 수수료 차감</span>
-                  </div>
+                  <strong>환산 골드</strong>
+                  <span className="text-xs text-gray-400"> 5% 수수료 차감</span>
+                </div>
                 <div className="text-right">{packageBuyGold.toLocaleString()} G</div>
 
                 <div><strong>이득/손해</strong></div>
@@ -651,7 +677,7 @@ function PackageList({ onSelectPackage }) {
   );
 }
 
-export default function PackageEfficiencyPage({ marketsPrice, crystalPrice }) {
+export default function PackageEfficiencyPage({ marketsPrice, crystalPrice, jewelsPrice }) {
   const [activeTab, setActiveTab] = useState('calc1');
   const [selectedPackageData01, setSelectedPackageData01] = useState(null);
   const [selectedPackageData02, setSelectedPackageData02] = useState(null);
@@ -705,6 +731,7 @@ export default function PackageEfficiencyPage({ marketsPrice, crystalPrice }) {
           packageDvcd="01"
           marketsPrice={marketsPrice}
           crystalPrice={crystalPrice}
+          jewelsPrice={jewelsPrice}
           selectedPackageData={selectedPackageData01}
         />
       )}
@@ -713,6 +740,7 @@ export default function PackageEfficiencyPage({ marketsPrice, crystalPrice }) {
           packageDvcd="02"
           marketsPrice={marketsPrice}
           crystalPrice={crystalPrice}
+          jewelsPrice={jewelsPrice}
           selectedPackageData={selectedPackageData02}
         />
       )}
