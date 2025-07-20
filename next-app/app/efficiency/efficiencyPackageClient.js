@@ -25,11 +25,14 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, jewelsPrice, sel
   const [efficiencyDico, setEfficiencyDico] = useState(0);
   const [goldDico, setgoldDico] = useState(0);
 
+  const [error, setError] = useState("");
+
   useEffect(() => {
     if (!marketsPrice) return;
-    setNowCrystalPrice(crystalPrice[crystalPrice.length - 1].close / 100);
+    const crystalPrice_1 = crystalPrice[crystalPrice.length - 1].close / 100; // 1 블루크리스탈 골드 가격
+    setNowCrystalPrice(crystalPrice_1);
 
-    // 큐브 패키지 3해금 기준으로 계산
+    // 큐브 패키지 숨결 + 돌파석 + 보석 기준으로 계산
     const cube_red_price = marketsPrice.강화추가재료.find(item => item.name === '용암의 숨결').price;
     const cube_blue_price = marketsPrice.강화추가재료.find(item => item.name === '빙하의 숨결').price;
     const cube_stone_price = marketsPrice.강화재료.find(item => item.name === '운명의 돌파석').price;
@@ -37,14 +40,22 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, jewelsPrice, sel
     const cube_jewels_price = filtered.reduce((prev, current) => {
       return (prev.price > current.price) ? prev : current;
     }).price;
+    const cardExp_book_price = 43 * crystalPrice_1; // 메넬리크의 서(9000) 1188원 = 블루크리스탈 43개
+    const cardExp_taecho_price = 22 * crystalPrice_1; // 대초의 조각(3000) 594원 = 블루크리스탈 22개
 
     const mergedList = [
       ...marketsPrice.강화재료.map(item => ({ ...item, category: '강화재료' })),
       ...marketsPrice.강화추가재료.map(item => ({ ...item, category: '강화추가재료' })),
-      { name: "크리스탈", bundleCount: 1, price: crystalPrice[crystalPrice.length - 1].close / 100 },
+      { name: "크리스탈", bundleCount: 1, price: crystalPrice_1 },
       { name: "고대의 백금화", bundleCount: 1, price: 200, icon: "https://cdn-lostark.game.onstove.com/efui_iconatlas/all_quest/all_quest_03_20.png" },
-      { name: "큐브 (2해금)", bundleCount: 1, price: cube_red_price * 5 + cube_blue_price * 5 + cube_stone_price * 25 + cube_jewels_price * 6, icon: "https://cdn-lostark.game.onstove.com/efui_iconatlas/use/use_12_194.png" },
-      { name: "큐브 (3해금)", bundleCount: 1, price: cube_red_price * 6 + cube_blue_price * 6 + cube_stone_price * 32 + cube_jewels_price * 8, icon: "https://cdn-lostark.game.onstove.com/efui_iconatlas/use/use_12_195.png" }
+      // { name: "큐브 입장권(1해금)", bundleCount: 1, price: ((cube_red_price * 4) + (cube_blue_price * 4) + (cube_stone_price * 14) + (cube_jewels_price * 3) + cardExp_book_price + (cardExp_taecho_price * 1.67)).toFixed(0), icon: "https://cdn-lostark.game.onstove.com/efui_iconatlas/use/use_12_193.png" },
+      // { name: "큐브 입장권(2해금)", bundleCount: 1, price: ((cube_red_price * 5) + (cube_blue_price * 5) + (cube_stone_price * 25) + (cube_jewels_price * 6) + cardExp_book_price + (cardExp_taecho_price * 1.83)).toFixed(0), icon: "https://cdn-lostark.game.onstove.com/efui_iconatlas/use/use_12_194.png" },
+      // { name: "큐브 입장권(3해금)", bundleCount: 1, price: ((cube_red_price * 6) + (cube_blue_price * 6) + (cube_stone_price * 32) + (cube_jewels_price * 8) + cardExp_book_price + (cardExp_taecho_price * 2)).toFixed(0), icon: "https://cdn-lostark.game.onstove.com/efui_iconatlas/use/use_12_195.png" },
+      { name: "큐브 입장권(1해금)", bundleCount: 1, price: ((cube_red_price * 4) + (cube_blue_price * 4) + (cube_stone_price * 14) + (cube_jewels_price * 3)).toFixed(0), icon: "https://cdn-lostark.game.onstove.com/efui_iconatlas/use/use_12_193.png" },
+      { name: "큐브 입장권(2해금)", bundleCount: 1, price: ((cube_red_price * 5) + (cube_blue_price * 5) + (cube_stone_price * 25) + (cube_jewels_price * 6)).toFixed(0), icon: "https://cdn-lostark.game.onstove.com/efui_iconatlas/use/use_12_194.png" },
+      { name: "큐브 입장권(3해금)", bundleCount: 1, price: ((cube_red_price * 6) + (cube_blue_price * 6) + (cube_stone_price * 32) + (cube_jewels_price * 8)).toFixed(0), icon: "https://cdn-lostark.game.onstove.com/efui_iconatlas/use/use_12_195.png" },
+      { name: "메넬리크의 서", bundleCount: 1, price: cardExp_book_price.toFixed(0), icon: "https://cdn-lostark.game.onstove.com/efui_iconatlas/use/use_10_225.png" },
+      { name: "태초의 조각", bundleCount: 1, price: cardExp_taecho_price.toFixed(0), icon: "https://cdn-lostark.game.onstove.com/efui_iconatlas/use/use_10_224.png" }
     ];
     setAllItemList(mergedList);
 
@@ -81,6 +92,7 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, jewelsPrice, sel
     const updated = [...items];
     updated[index][field] = value;
     setItems(updated);
+    setResult(null);
   };
 
   const handleItemSelect = (item) => {
@@ -90,10 +102,11 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, jewelsPrice, sel
         name: item.name,
         icon: item.icon,
         bundleCount: item.bundleCount,
-        count: 0,
+        count: 1,
         price: (item.price / item.bundleCount) || 0,
       },
     ]);
+    setResult(null);
   };
 
   const addItem = () => {
@@ -104,9 +117,22 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, jewelsPrice, sel
     const updated = [...items];
     updated.splice(index, 1);
     setItems(updated);
+    setResult(null);
   };
 
   const calculate = () => {
+    if (!packagePrice) {
+      setError("패키지 가격을 입력해주세요.");
+      return;
+    }
+    if (!packageCount) {
+      setError("패키지 수량을 입력해주세요.");
+      return;
+    }
+    if (items.length < 1) {
+      setError("구성품을 입력해주세요.");
+      return;
+    }
     const totalItemGold = items.reduce((sum, item) => {
       const count = parseFloat(item.count) || 0;
       const price = parseFloat(item.price) || 0;
@@ -120,7 +146,7 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, jewelsPrice, sel
     setPackageBuyPrice((parseFloat(packagePrice) || 0) * (parseFloat(packageCount) || 0));
     setPackageBuyGold(totalPackageValue);
     setItemGold(totalItemGold);
-    setEfficiency(efficiencyCalc.toFixed(2));
+    setEfficiency(efficiencyCalc.toFixed(1));
     setDifferencePrice(totalItemGold - totalPackageValue);
 
     setResult({
@@ -131,7 +157,18 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, jewelsPrice, sel
   };
 
   const calculateRoyal = () => {
-
+    if (!packagePrice) {
+      setError("패키지 가격을 입력해주세요.");
+      return;
+    }
+    if (!packageCount) {
+      setError("패키지 수량을 입력해주세요.");
+      return;
+    }
+    if (items.length < 1) {
+      setError("구성품을 입력해주세요.");
+      return;
+    }
     // 1100원 = 40크리스탈
     const totalPackageValue = ((parseFloat(packagePrice) || 0) * (parseFloat(packageCount) || 0)) / 1100 * 40 * nowCrystalPrice;
 
@@ -148,12 +185,12 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, jewelsPrice, sel
     setPackageBuyPrice((parseFloat(packagePrice) || 0) * (parseFloat(packageCount) || 0));
     setPackageBuyGold(totalPackageValue);
     setItemGold(totalItemGold);
-    setEfficiency(efficiencyCalc.toFixed(2));
+    setEfficiency(efficiencyCalc.toFixed(1));
     setDifferencePrice(totalItemGold - totalPackageValue);
 
     setResult({
       totalPackageGold: totalPackageValue,
-      efficiency: efficiencyCalc.toFixed(2),
+      efficiency: efficiencyCalc.toFixed(1),
       totalItemGold
     });
   };
@@ -216,53 +253,69 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, jewelsPrice, sel
       .catch(() => alert('저장 중 오류가 발생했습니다.'));
   };
 
-  const ItemSelectModal = ({ itemList, onSelect, onClose }) => (
-    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-      <div className="bg-white p-4 rounded-lg max-w-3xl w-full max-h-[80vh] overflow-y-auto dark:bg-gray-800">
-        <div className="text-right mt-4">
+  const ItemSelectModal = ({ itemList, onSelect, onClose }) => {
+    const handleBackgroundClick = (e) => {
+      if (e.target === e.currentTarget) {
+        onClose();
+      }
+    };
+
+    return (
+      <div
+        className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+        onClick={handleBackgroundClick}
+      >
+        <div className="bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-xl max-w-4xl w-full max-h-[80vh] overflow-y-auto relative transition-all duration-300">
+          {/* 닫기 버튼 (상단 우측) */}
           <button
             onClick={onClose}
-            className="px-4 py-1 bg-gray-300 rounded hover:bg-gray-400"
+            className="absolute top-4 right-4 text-gray-600 hover:text-gray-100 dark:text-gray-300 bg-red-500"
+            aria-label="닫기"
           >
-            닫기
+            ✕
           </button>
-        </div>
-        <h3 className="text-xl font-bold mb-4">아이템 선택</h3>
-        <div className="grid grid-cols-3 gap-4">
-          {itemList
-            .filter(item => !item.name.includes('야금') && !item.name.includes('재봉'))
-            .sort((a, b) => b.tier - a.tier)
-            .map((item, idx) => (
-              <div
-                key={idx}
-                onClick={() => {
-                  onSelect(item);
-                  onClose();
-                }}
-                className="cursor-pointer border p-2 rounded hover:bg-gray-500 flex items-center gap-2"
-              >
-                {item.name === "크리스탈" ? (
-                  <span
-                    className="w-[19px] h-[21px] inline-block"
-                    style={{
-                      backgroundImage: `url("https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/sprite/sprite_shop.png?01ff928ef1fbd38c0933")`,
-                      backgroundPosition: '-395px -198px',
-                      backgroundSize: '606px 393px',
-                      backgroundRepeat: 'no-repeat',
-                    }}
-                  ></span>
-                ) : (
-                  <img src={item.icon} alt={item.name} className="w-8 h-8" />
-                )}
-                <div>
-                  <p className="font-semibold text-sm">{item.name}</p>
+
+          <h3 className="text-2xl font-bold text-center mb-6 text-gray-800 dark:text-white">
+            아이템 선택
+          </h3>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 gap-4">
+            {itemList
+              .filter(item => !item.name.includes('야금') && !item.name.includes('재봉'))
+              .sort((a, b) => b.tier - a.tier)
+              .map((item, idx) => (
+                <div
+                  key={idx}
+                  onClick={() => {
+                    onSelect(item);
+                    onClose();
+                  }}
+                  className="cursor-pointer border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-xl p-3 flex items-center gap-3 transition-all duration-200"
+                >
+                  {item.name === '크리스탈' ? (
+                    <span
+                      className="w-[19px] h-[21px] inline-block"
+                      style={{
+                        backgroundImage: `url("https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/sprite/sprite_shop.png?01ff928ef1fbd38c0933")`,
+                        backgroundPosition: '-395px -198px',
+                        backgroundSize: '606px 393px',
+                        backgroundRepeat: 'no-repeat',
+                      }}
+                    ></span>
+                  ) : (
+                    <img src={item.icon} alt={item.name} className="w-6 h-6 rounded" />
+                  )}
+                  <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                    {item.name}
+                  </span>
                 </div>
-              </div>
-            ))}
+              ))}
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
+
 
   return (
     <div className="max-w-xl mx-auto p-6 bg-white shadow-md rounded-lg dark:bg-gray-500">
@@ -346,7 +399,10 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, jewelsPrice, sel
             type="text"
             placeholder="패키지 이름"
             value={packageName}
-            onChange={(e) => setPackageName(e.target.value)}
+            onChange={(e) => {
+              setPackageName(e.target.value);
+              setResult(null);
+            }}
             required
             className="border p-2 w-full rounded"
           />
@@ -356,7 +412,10 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, jewelsPrice, sel
             type="number"
             placeholder="패키지 가격"
             value={packagePrice}
-            onChange={(e) => setPackagePrice(e.target.value)}
+            onChange={(e) => {
+              setPackagePrice(e.target.value);
+              setResult(null);
+            }}
             required
             className="border p-2 w-full rounded"
           />
@@ -366,7 +425,19 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, jewelsPrice, sel
             type="number"
             placeholder="구매 가능 횟수"
             value={packageCount}
-            onChange={(e) => setPackageCount(e.target.value)}
+            min={1}
+            max={3}
+            onChange={(e) => {
+              const value = parseInt(e.target.value, 10);
+
+              if (value >= 1 && value <= 3) {
+                setPackageCount(value);
+              } else if (e.target.value === '') {
+                setPackageCount(''); // 빈 문자열 입력 허용 시
+              }
+
+              setResult(null);
+            }}
             required
             className="border p-2 w-full rounded"
           />
@@ -380,8 +451,10 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, jewelsPrice, sel
                 type="number"
                 placeholder="가격 (ex 20)"
                 value={dicoPrice}
-                onChange={(e) => setDicoPrice(e.target.value)}
-                required
+                onChange={(e) => {
+                  setDicoPrice(e.target.value);
+                  setResult(null);
+                }}
                 className="border p-2 w-full rounded"
               />
             </>
@@ -514,8 +587,6 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, jewelsPrice, sel
               </button>
             </div>
           </div>
-
-
         )}
       </form>
 
@@ -525,6 +596,10 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, jewelsPrice, sel
           onSelect={handleItemSelect}
           onClose={() => setIsModalOpen(false)}
         />
+      )}
+
+      {error && (
+        <p className="text-red-500 text-sm mt-2">{error}</p>
       )}
     </div>
   );
@@ -565,7 +640,7 @@ function PackageList({ onSelectPackage }) {
                 {/* ❌ X 버튼 */}
                 <button
                   onClick={() => handleRemovePackage(item.PACKAGE_NAME)}
-                  className="absolute top-2 right-2 text-gray-400 hover:text-red-500 transition text-xl"
+                  className="absolute top-2 right-2 text-gray-400 hover:text-red-500 transition text-xl dark:bg-gray-500"
                   aria-label="삭제"
                 >
                   ✕
