@@ -793,16 +793,17 @@ exports.getPackageEfficiencyList = async (req, res, next) => {
                             PACKAGE_PRICE,
                             PACKAGE_COUNT,
                             PACKAGE_DVCD,
+                            PACKAGE_TYPE,
                             ITEMS,
                             PACKAGE_BUY_PRICE,
                             PACKAGE_BUY_GOLD,
                             ITEMS_GOLD,
                             DIFFERENCE_PRICE,
-                            EFFICIENCY,
+                            ROUND(EFFICIENCY, 2) AS EFFICIENCY,
 
                             DICO_PRICE,
                             DIFFERENCE_DICO_PRICE,
-                            EFFICIENCY_DICO,
+                            ROUND(EFFICIENCY_DICO, 2) AS EFFICIENCY_DICO,
 
                             CAST(DATE_FORMAT(LST_DTTI, '%Y-%m-%d %H:%i:%s') AS CHAR) AS LST_DTTI
                         FROM PACKAGE_LIST
@@ -829,7 +830,7 @@ exports.getPackageEfficiencyList = async (req, res, next) => {
 // 패키지 효율 리스트 저장
 exports.insertPackageEfficiencyList = async (req, res, next) => {
 
-    let { packageName, packagePrice, packageCount, packageDvcd, items, packageBuyPrice, packageBuyGold, itemsGold, differencePrice, efficiency, dicoPrice, differenceDicoPrice, efficiencyDico } = req.body;
+    let { packageName, packagePrice, packageCount, packageDvcd, packageType, items, packageBuyPrice, packageBuyGold, itemsGold, differencePrice, efficiency, dicoPrice, differenceDicoPrice, efficiencyDico } = req.body;
 
     // 로깅
     const referer = req.headers.referer || req.headers.origin;
@@ -851,14 +852,15 @@ exports.insertPackageEfficiencyList = async (req, res, next) => {
         await connection.beginTransaction();
         const insertSql = `
         INSERT INTO PACKAGE_LIST (
-                PACKAGE_NAME, PACKAGE_PRICE, PACKAGE_COUNT, PACKAGE_DVCD, ITEMS,
+                PACKAGE_NAME, PACKAGE_PRICE, PACKAGE_COUNT, PACKAGE_DVCD, PACKAGE_TYPE, ITEMS,
                 PACKAGE_BUY_PRICE, PACKAGE_BUY_GOLD, ITEMS_GOLD, DIFFERENCE_PRICE, EFFICIENCY,
                 DICO_PRICE, DIFFERENCE_DICO_PRICE, EFFICIENCY_DICO, LST_DTTI
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
             ON DUPLICATE KEY UPDATE
                 PACKAGE_PRICE = VALUES(PACKAGE_PRICE),
                 PACKAGE_COUNT = VALUES(PACKAGE_COUNT),
                 PACKAGE_DVCD = VALUES(PACKAGE_DVCD),
+                PACKAGE_TYPE = VALUES(PACKAGE_TYPE),
                 ITEMS = VALUES(ITEMS),
                 PACKAGE_BUY_PRICE = VALUES(PACKAGE_BUY_PRICE),
                 PACKAGE_BUY_GOLD = VALUES(PACKAGE_BUY_GOLD),
@@ -870,7 +872,7 @@ exports.insertPackageEfficiencyList = async (req, res, next) => {
                 EFFICIENCY_DICO = VALUES(EFFICIENCY_DICO),
                  LST_DTTI = NOW()
         `;
-        await connection.execute(insertSql, [packageName, packagePrice, packageCount, packageDvcd, items, packageBuyPrice, packageBuyGold, itemsGold, differencePrice, efficiency, dicoPrice, differenceDicoPrice, efficiencyDico]);
+        await connection.execute(insertSql, [packageName, packagePrice, packageCount, packageDvcd, packageType, items, packageBuyPrice, packageBuyGold, itemsGold, differencePrice, efficiency, dicoPrice, differenceDicoPrice, efficiencyDico]);
 
         connection.commit();
         return res.status(200).json({
