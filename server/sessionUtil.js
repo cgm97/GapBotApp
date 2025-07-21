@@ -384,45 +384,58 @@ const getMarketPrice = async () => {
 
     const marketArr = [];
     for (const { name, code, tier } of CategoryCodeArray) {
-        const body = {
-            "CategoryCode": code,
-            "ItemTier": tier,
-            "Sort": "CURRENT_MIN_PRICE ",
-            "SortCondition": "DESC"
-        };
+        let page = 1;
 
-        try {
-            const response = await axios.post(API_URL, body, {
-                headers: {
-                    accept: 'application/json',
-                    'Content-Type': 'application/json',
-                    authorization: `bearer ${process.env.LOA_API_KEY}`,
-                },
-            });
+        while (true) {
+            const body = {
+                "CategoryCode": code,
+                "ItemTier": tier,
+                "Sort": "CURRENT_MIN_PRICE ",
+                "SortCondition": "DESC",
+                "PageNo": page
+            };
 
-            for (const item of response.data.Items) {
-                marketArr.push({
-                    catergory: name,
-                    name: item.Name,
-                    tier: tier,
-                    grade: item.Grade,
-                    icon: item.Icon,
-                    bundleCount: item.BundleCount,
-                    price: item.CurrentMinPrice
-                })
+            try {
+                const response = await axios.post(API_URL, body, {
+                    headers: {
+                        accept: 'application/json',
+                        'Content-Type': 'application/json',
+                        authorization: `bearer ${process.env.LOA_API_KEY}`,
+                    },
+                });
+
+                for (const item of response.data.Items) {
+                    marketArr.push({
+                        catergory: name,
+                        name: item.Name,
+                        tier: tier,
+                        grade: item.Grade,
+                        icon: item.Icon,
+                        bundleCount: item.BundleCount,
+                        price: item.CurrentMinPrice
+                    })
+                }
+
+                // 만약 Items가 10개 미만이면 더이상 페이지 없음
+                if (response.data.Items.length < 10) {
+                    break;
+                } else {
+                    page++;
+                }
+
+            } catch (error) {
+                logger.error({
+                    method,
+                    url: "SessionUtil",
+                    message: `bookPrice API 호출 실패`,
+                    error,
+                });
+                throw error;
             }
-        } catch (error) {
-            logger.error({
-                method,
-                url: "SessionUtil",
-                message: `bookPrice API 호출 실패`,
-                error,
-            });
-            throw error;
         }
     }
 
-        logger.info({
+    logger.info({
         method,
         url: "getMarketPrice",
         message: `marketPrice 갱신 완료 - ${marketArr.length}건`,
@@ -437,7 +450,7 @@ const getMarketPrice = async () => {
 
         return acc;
     }, {});
-    
+
     sessionCache.set("marketPrice", categorizedMarketData);
     sessionCache.set("marketPriceLastUpdate", getDateTime());
 
