@@ -21,6 +21,8 @@ const Character = ({ nickName }) => {
     const [accessoryItems, setAccessoryItems] = useState([]);
     const [arkItems, setArkItems] = useState({});
     const [engravings, setEngravings] = useState([]);
+    const [cardItems, setCardItems] = useState([]);
+    const [skillItems, setSkillItems] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [isRenewing, setIsRenewing] = useState(false); // 갱신 중 상태 추가
     const [error, setError] = useState(null);
@@ -49,6 +51,8 @@ const Character = ({ nickName }) => {
                 setAccessoryItems(data.accessoryItems || []);
                 setArkItems(data.arkItems || {});
                 setEngravings(data.engravings || []);
+                setCardItems(data.cardItems || []);
+                setSkillItems(data.skillItems || []);
             }
         } catch (error) {
             handleError(error);
@@ -195,6 +199,10 @@ const Character = ({ nickName }) => {
                                     <p className="character-info radius dark:bg-gray-300">영지</p>
                                     <span className="name dark:bg-gray-300">Lv.{wisdom.LEVEL}&nbsp;{wisdom.NAME}</span>
                                 </li>
+                                <li className="character-info-item">
+                                    <p className="character-info radius dark:bg-gray-300">카드</p>
+                                    <span className="name dark:bg-gray-300">{cardItems.name}</span>
+                                </li>
                             </ul>
                         </div>
                     </div>
@@ -293,7 +301,13 @@ const Character = ({ nickName }) => {
                                                         <p className="name dark:text-gray-300">{item.name}</p>
                                                         <ul className="attributes">
                                                             {(item.elixirs || []).map((elixir, index) => (
-                                                                <li key={index} className="attribute-item dark:text-gray-300">{elixir}</li>
+                                                                <li
+                                                                    key={index}
+                                                                    className={`attribute-item dark:text-gray-300 ${elixir.includes('Lv.5') ? 'text-yellow-600' : ''
+                                                                        }`}
+                                                                >
+                                                                    {elixir}
+                                                                </li>
                                                             ))}
                                                         </ul>
                                                     </div>
@@ -358,7 +372,7 @@ const Character = ({ nickName }) => {
                                                     <Link
                                                         key={index}
                                                         href={link}
-                                                         className="bg-gray-200 dark:bg-gray-600 hover:scale-[1.02] transition rounded-xl flex flex-col items-center gap-1"
+                                                        className="bg-gray-200 dark:bg-gray-600 hover:scale-[1.02] transition rounded-xl flex flex-col items-center gap-1"
                                                     >
                                                         <span className="text-[13px] text-gray-600 font-semibold dark:text-gray-100">{char.NICKNAME}</span>
                                                         <span className="text-xs text-gray-600 dark:text-gray-300">{char.JOB}</span>
@@ -405,6 +419,15 @@ const Character = ({ nickName }) => {
                                             </span>
                                             <span className="arkPassive-point dark:text-gray-300">
                                                 {arkItems[key].point}
+                                            </span>
+                                            <span className="arkPassive-point text-gray-800 dark:text-gray-300">
+                                                <span className="font-bold text-blue-600 dark:text-blue-300">
+                                                    {arkItems[key].rank}랭크
+                                                </span>
+                                                <span className="mx-1 text-gray-400">|</span>
+                                                <span className="font-bold text-green-600 dark:text-green-300">
+                                                    {arkItems[key].level}레벨
+                                                </span>
                                             </span>
                                         </div>
                                         <ul className="arkPassive-list">

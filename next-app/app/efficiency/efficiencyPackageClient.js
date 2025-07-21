@@ -3,7 +3,14 @@
 import { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 
+const PACKAGE_TYPES = [
+  { label: '주간', value: '01' },
+  { label: '월간', value: '02' },
+  { label: '한정', value: '03' },
+];
+
 function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, jewelsPrice, selectedPackageData }) {
+  const [packageType, setPackageType] = useState('');
   const [packageName, setPackageName] = useState('');
   const [packagePrice, setPackagePrice] = useState('');
   const [packageCount, setPackageCount] = useState('');
@@ -64,6 +71,7 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, jewelsPrice, sel
   useEffect(() => {
     if (!selectedPackageData) return;
 
+    setPackageType(selectedPackageData.PACKAGE_TYPE);
     setPackageName(selectedPackageData.PACKAGE_NAME);
     setPackagePrice(selectedPackageData.PACKAGE_PRICE);
     setPackageCount(selectedPackageData.PACKAGE_COUNT);
@@ -121,6 +129,10 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, jewelsPrice, sel
   };
 
   const calculate = () => {
+    if (!packageType) {
+      setError("패키지 구분을 입력해주세요.");
+      return;
+    }
     if (!packagePrice) {
       setError("패키지 가격을 입력해주세요.");
       return;
@@ -157,6 +169,10 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, jewelsPrice, sel
   };
 
   const calculateRoyal = () => {
+    if (!packageType) {
+      setError("패키지 구분을 입력해주세요.");
+      return;
+    }
     if (!packagePrice) {
       setError("패키지 가격을 입력해주세요.");
       return;
@@ -230,6 +246,12 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, jewelsPrice, sel
       alert('먼저 효율 계산을 해주세요.');
       return;
     }
+
+    if (/^\d+$/.test(packageName) || /^[\u1100-\u11FF\u3131-\u318Eㅏ-ㅣ]+$/.test(packageName)) {
+      alert("정확한 패키지명을 입력하세요 !!!");
+      return;
+    }
+
     axios.post(
       `${process.env.NEXT_PUBLIC_SERVER_URL}/price/package/efficiency/insert`,
       {
@@ -237,6 +259,7 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, jewelsPrice, sel
         packagePrice,
         packageCount,
         packageDvcd,
+        packageType,
         items,
         packageBuyPrice,
         packageBuyGold,
@@ -334,78 +357,100 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, jewelsPrice, sel
         </h2>
         <div className="relative group">
           <span className="text-blue-600 cursor-pointer dark:text-blue-300">📘설명서</span>
-          <div className="absolute left-1/2 -translate-x-[50%] top-7 w-96 p-3 bg-blue-50 border border-blue-200 rounded shadow-md text-xs text-blue-900 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20 pointer-events-none">
-            <ul className="list-disc list-inside space-y-1">
-              <li>모든 구성품 수량은 1패키지 기준 상자 수량이 아닌, 상자 안의 아이템 개수로 입력해주세요.</li>
-              <li>모든 구성품의 단가는 1개당 가격을 기준으로 계산됩니다.</li>
-              <li>구성품 단가는 실시간 시세에 따라 자동으로 세팅됩니다.</li>
-              <li>‘효율 계산’ 버튼을 누르면 크리스탈 패키지 효율이 계산됩니다.</li>
-              <li>‘저장’ 버튼을 누르면, 모든 사용자가 패키지 효율 리스트를 상단 탭에서 확인할 수 있습니다.</li>
-              <li>모든 계산은 화폐거래소 크리스탈 시세를 기준으로 진행됩니다.</li>
+          <div className="absolute left-1/2 -translate-x-[50%] top-7 w-[28rem] p-3 bg-blue-50 border border-blue-200 rounded shadow-md text-xs text-blue-900 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20 pointer-events-none">
+            <ul className="list-disc list-inside space-y-1 text-sm leading-relaxed">
+              <li><strong>큐브 입장권 단가는 숨결, 돌파석, 2레벨 보석 기준으로 계산됩니다.</strong></li>
+              <li><strong>카드 경험치는 마일리지 샵 기준 골드 환산 단가로 계산됩니다.</strong></li>
+              <li>구성품 수량은 상자가 아닌, 상자 안의 아이템 개수로 입력해주세요.</li>
+              <li>구성품 단가는 1개당 가격 기준으로 계산됩니다.</li>
+              <li>단가는 실시간 시세 기준으로 자동 설정됩니다.</li>
+              <li>‘효율 계산’ 버튼을 누르면 패키지 효율이 계산됩니다.</li>
+              <li>‘저장’ 버튼을 누르면 모든 사용자에게 리스트가 공개됩니다.</li>
+              <li>모든 계산은 화폐거래소의 크리스탈 시세 기준으로 진행됩니다.</li>
               {packageDvcd === '01' && (
-                <li>골드 → 크리스탈 환산 시 수수료 5%가 적용됩니다.</li>
+                <li>블루 크리스탈 환산 시 5% 수수료가 적용됩니다.</li>
               )}
               {packageDvcd === '02' && (
-                <li>로얄크리스탈 1,100원 → 크리스탈 40으로 계산됩니다.</li>
+                <li>로열 크리스탈은 1,100원 = 크리스탈 40으로 환산됩니다.</li>
               )}
             </ul>
           </div>
         </div>
       </div>
-
-      <div className="text-sm font-bold mb-4 flex items-center gap-2"> 100 <span
-        className="w-[19px] h-[21px] inline-block"
-        style={{
-          backgroundImage: `url("https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/sprite/sprite_shop.png?01ff928ef1fbd38c0933")`,
-          backgroundPosition: '-395px -198px',
-          backgroundSize: '606px 393px',
-          backgroundRepeat: 'no-repeat',
-        }}
-      ></span> → {(nowCrystalPrice * 100).toLocaleString()}G </div>
-
-      {packageDvcd === '02' && (
-        <div className="text-sm font-bold mb-4 flex items-center gap-2">
-          <span
-            className="w-[19px] h-[21px] inline-block"
-            style={{
-              backgroundImage: `url("https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/sprite/sprite_shop.png?01ff928ef1fbd38c0933")`,
-              backgroundPosition: packageDvcd === '01' ? '-395px -198px' : '-337px -248px',
-              backgroundSize: '606px 393px',
-              backgroundRepeat: 'no-repeat',
-            }}
-          ></span>
-          1,100 →
-          <span
-            className="w-[19px] h-[21px] inline-block"
-            style={{
-              backgroundImage: `url("https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/sprite/sprite_shop.png?01ff928ef1fbd38c0933")`,
-              backgroundPosition: packageDvcd === '02' ? '-395px -198px' : '-337px -248px',
-              backgroundSize: '606px 393px',
-              backgroundRepeat: 'no-repeat',
-            }}
-          ></span>
-          40
-        </div>
-      )}
       <form
         onSubmit={(e) => {
           e.preventDefault();
           handleSave();
         }}
       >
-        <div className="mb-4 space-y-2 pr-4">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">패키지 이름</label>
-          <input
-            type="text"
-            placeholder="패키지 이름"
-            value={packageName}
-            onChange={(e) => {
-              setPackageName(e.target.value);
-              setResult(null);
+        <div className="mb-4 space-y-2 pr-4 max-w-lg mx-auto">
+          <div className="text-sm font-bold mb-4 flex items-center gap-2"> 100 <span
+            className="w-[19px] h-[21px] inline-block"
+            style={{
+              backgroundImage: `url("https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/sprite/sprite_shop.png?01ff928ef1fbd38c0933")`,
+              backgroundPosition: '-395px -198px',
+              backgroundSize: '606px 393px',
+              backgroundRepeat: 'no-repeat',
             }}
-            required
-            className="border p-2 w-full rounded"
-          />
+          ></span> → {(nowCrystalPrice * 100).toLocaleString()}G </div>
+
+          {packageDvcd === '02' && (
+            <div className="text-sm font-bold mb-4 flex items-center gap-2">
+              <span
+                className="w-[19px] h-[21px] inline-block"
+                style={{
+                  backgroundImage: `url("https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/sprite/sprite_shop.png?01ff928ef1fbd38c0933")`,
+                  backgroundPosition: packageDvcd === '01' ? '-395px -198px' : '-337px -248px',
+                  backgroundSize: '606px 393px',
+                  backgroundRepeat: 'no-repeat',
+                }}
+              ></span>
+              1,100 →
+              <span
+                className="w-[19px] h-[21px] inline-block"
+                style={{
+                  backgroundImage: `url("https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/sprite/sprite_shop.png?01ff928ef1fbd38c0933")`,
+                  backgroundPosition: packageDvcd === '02' ? '-395px -198px' : '-337px -248px',
+                  backgroundSize: '606px 393px',
+                  backgroundRepeat: 'no-repeat',
+                }}
+              ></span>
+              40
+            </div>
+          )}
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">패키지명</label>
+          <div className="flex gap-2 items-center w-[530px]">
+            <select
+              value={packageType}
+              onChange={(e) => {
+                setPackageType(e.target.value);
+                setResult(null);
+              }}
+              required
+              className="border p-2 rounded w-40 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer transition duration-200">
+              <option value="" disabled>
+                — 선택하세요 —
+              </option>
+              {PACKAGE_TYPES.map((type) => (
+                <option key={type.value} value={type.value}>
+                  {type.label}
+                </option>
+              ))}
+            </select>
+
+
+            <input
+              type="text"
+              placeholder="패키지명"
+              value={packageName}
+              onChange={(e) => {
+                setPackageName(e.target.value);
+                setResult(null);
+              }}
+              required
+              className="border p-2 rounded flex-1"
+            />
+          </div>
 
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">패키지 가격</label>
           <input
@@ -607,6 +652,7 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, jewelsPrice, sel
 
 function PackageList({ onSelectPackage }) {
   const [allPackageList, setAllPackageList] = useState([]);
+  const [selectedType, setSelectedType] = useState('all');
 
   const getPackageList = () => {
     axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/price/package/efficiency/list`)
@@ -616,7 +662,7 @@ function PackageList({ onSelectPackage }) {
 
   const handleRemovePackage = (packageName) => {
     axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/price/package/efficiency/delete?packageName=${packageName}`)
-      .then(getPackageList())
+      .then(() => getPackageList())
       .catch(() => alert(`[${packageName}] 삭제 실패`));
   };
 
@@ -624,144 +670,190 @@ function PackageList({ onSelectPackage }) {
     getPackageList();
   }, []);
 
+  // 필터링 데이터
+  const filteredList =
+    selectedType === 'all'
+      ? allPackageList
+      : allPackageList.filter((item) => item.PACKAGE_TYPE === selectedType);
+
+  // 필터 데이터 존재 여부 확인
+  const typeCounts = useMemo(() => {
+    const counts = {};
+
+    for (const item of allPackageList) {
+      counts[item.PACKAGE_TYPE] = (counts[item.PACKAGE_TYPE] || 0) + 1;
+    }
+
+    return counts;
+  }, [allPackageList]);
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      {allPackageList.map((item, idx) => {
-        const isProfit = parseFloat(item.EFFICIENCY) >= 0;
-        const isProfitDico = parseFloat(item.EFFICIENCY_DICO) >= 0;
-        return (
-          <div
-            key={idx}
-            onClick={() => onSelectPackage(item)}
-            className="relative border rounded-lg p-4 shadow-md bg-white dark:bg-gray-700"
-          >
-            {localStorage.getItem('user') == 'cgm97@naver.com' && (
-              <>
-                {/* ❌ X 버튼 */}
-                <button
-                  onClick={() => handleRemovePackage(item.PACKAGE_NAME)}
-                  className="absolute top-2 right-2 text-gray-400 hover:text-red-500 transition text-xl dark:bg-gray-500"
-                  aria-label="삭제"
-                >
-                  ✕
-                </button>
-              </>
-            )}
-            <div className="mb-3">
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1 flex items-center gap-1">
-                {item.PACKAGE_DVCD === '01' && (
-                  <span
-                    className="w-[19px] h-[21px] inline-block"
-                    style={{
-                      backgroundImage: `url("https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/sprite/sprite_shop.png?01ff928ef1fbd38c0933")`,
-                      backgroundPosition: '-395px -198px',
-                      backgroundSize: '606px 393px',
-                      backgroundRepeat: 'no-repeat',
-                    }}
-                  ></span>
-                )}
-                {item.PACKAGE_DVCD === '02' && (
-                  <span
-                    className="w-[18px] h-[21px] inline-block"
-                    style={{
-                      backgroundImage: `url("https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/sprite/sprite_shop.png?01ff928ef1fbd38c0933")`,
-                      backgroundPosition: '-337px -248px',
-                      backgroundSize: '606px 393px',
-                      backgroundRepeat: 'no-repeat',
-                    }}
-                  ></span>
-                )}
-                {item.PACKAGE_NAME}
-              </h3>
-              <span className="ml-auto text-xs text-gray-400">
-                화폐거래소 기준 계산
-                ({item.LST_DTTI})
-              </span>
+    <>
+      <div className="flex gap-2 mb-4 justify-center">
+        {[{ label: '전체', value: 'all' }, ...PACKAGE_TYPES].map((type) => {
+          const isDisabled =
+            allPackageList.length === 0 || // 전체가 아예 없거나
+            (type.value !== 'all' && !typeCounts[type.value]); // 특정 타입이 없을 경우
 
-              <p className="text-sm text-gray-600 dark:text-gray-300">
-                💠 패키지 가격: {item.PACKAGE_PRICE} × {item.PACKAGE_COUNT} ={' '}
-                <strong>{item.PACKAGE_BUY_PRICE.toLocaleString()}</strong>
-              </p>
-              <p className="text-sm text-gray-600 dark:text-gray-300">
-                💰 패키지 환산 골드: <strong>{item.PACKAGE_BUY_GOLD.toLocaleString()} G</strong>
-              </p>
-              <p className="text-sm text-gray-600 dark:text-gray-300">
-                📦 구성품 총 가치: <strong>{item.ITEMS_GOLD.toLocaleString()} G</strong>
-              </p>
+          return (
+            <button
+              key={type.value}
+              onClick={() => {
+                if (!isDisabled) setSelectedType(type.value);
+              }}
+              disabled={isDisabled}
+              className={`px-3 py-1 rounded text-sm font-medium border transition
+          ${selectedType === type.value
+                  ? 'bg-blue-600 text-white border-blue-600'
+                  : 'bg-white text-gray-700 border-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-500'}
+          ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+              {type.label}
+            </button>
+          );
+        })}
+      </div>
 
-              <div className="grid grid-cols-2 gap-3 mt-4">
-                {item.ITEMS.map((subItem, subIdx) => (
-                  <div
-                    key={subIdx}
-                    className="flex items-center gap-2 bg-gray-100 dark:bg-gray-600 p-2 rounded"
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {filteredList.map((item, idx) => {
+          const isProfit = parseFloat(item.EFFICIENCY) >= 0;
+          const isProfitDico = parseFloat(item.EFFICIENCY_DICO) >= 0;
+          return (
+            <div
+              key={idx}
+              onClick={() => onSelectPackage(item)}
+              className="relative border rounded-lg p-4 shadow-md bg-white dark:bg-gray-700"
+            >
+              {localStorage.getItem('user') == 'cgm97@naver.com' && (
+                <>
+                  {/* ❌ X 버튼 */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRemovePackage(item.PACKAGE_NAME);
+                    }}
+                    className="absolute top-2 right-2 text-gray-400 hover:text-red-500 transition text-xl dark:bg-gray-500"
+                    aria-label="삭제"
                   >
-                    {subItem.name === "크리스탈" ? (
-                      <span
-                        className="w-[19px] h-[21px] inline-block"
-                        style={{
-                          backgroundImage: `url("https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/sprite/sprite_shop.png?01ff928ef1fbd38c0933")`,
-                          backgroundPosition: '-395px -198px',
-                          backgroundSize: '606px 393px',
-                          backgroundRepeat: 'no-repeat',
-                        }}
-                      ></span>
-                    ) : (
-                      <img
-                        src={subItem.icon}
-                        alt={subItem.name}
-                        className="w-6 h-6 rounded"
-                      />
-                    )}
+                    ✕
+                  </button>
+                </>
+              )}
+              <div className="mb-3">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1 flex items-center gap-1">
+                  {item.PACKAGE_DVCD === '01' && (
+                    <span
+                      className="w-[19px] h-[21px] inline-block"
+                      style={{
+                        backgroundImage: `url("https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/sprite/sprite_shop.png?01ff928ef1fbd38c0933")`,
+                        backgroundPosition: '-395px -198px',
+                        backgroundSize: '606px 393px',
+                        backgroundRepeat: 'no-repeat',
+                      }}
+                    ></span>
+                  )}
+                  {item.PACKAGE_DVCD === '02' && (
+                    <span
+                      className="w-[18px] h-[21px] inline-block"
+                      style={{
+                        backgroundImage: `url("https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/sprite/sprite_shop.png?01ff928ef1fbd38c0933")`,
+                        backgroundPosition: '-337px -248px',
+                        backgroundSize: '606px 393px',
+                        backgroundRepeat: 'no-repeat',
+                      }}
+                    ></span>
+                  )}
+                  [{PACKAGE_TYPES.find((type) => type.value === item.PACKAGE_TYPE).label}] {item.PACKAGE_NAME}
+                </h3>
+                <span className="ml-auto text-xs text-gray-400">
+                  화폐거래소 기준 계산
+                  ({item.LST_DTTI})
+                </span>
 
-                    <div className="text-sm">
-                      <p className="font-medium text-gray-800 dark:text-white">{subItem.name}</p>
-                      <p className="text-gray-600 dark:text-gray-300">{subItem.count}개 (1개당 {subItem.price}G)</p>
+                <p className="text-sm text-gray-600 dark:text-gray-300">
+                  💠 패키지 가격: {item.PACKAGE_PRICE.toLocaleString()} × {item.PACKAGE_COUNT} ={' '}
+                  <strong>{item.PACKAGE_BUY_PRICE.toLocaleString()}</strong>
+                </p>
+                <p className="text-sm text-gray-600 dark:text-gray-300">
+                  💰 패키지 환산 골드: <strong>{item.PACKAGE_BUY_GOLD.toLocaleString()} G</strong>
+                </p>
+                <p className="text-sm text-gray-600 dark:text-gray-300">
+                  📦 구성품 총 가치: <strong>{item.ITEMS_GOLD.toLocaleString()} G</strong>
+                </p>
+
+                <div className="grid grid-cols-2 gap-3 mt-4">
+                  {item.ITEMS.map((subItem, subIdx) => (
+                    <div
+                      key={subIdx}
+                      className="flex items-center gap-2 bg-gray-100 dark:bg-gray-600 p-2 rounded"
+                    >
+                      {subItem.name === "크리스탈" ? (
+                        <span
+                          className="w-[19px] h-[21px] inline-block"
+                          style={{
+                            backgroundImage: `url("https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/sprite/sprite_shop.png?01ff928ef1fbd38c0933")`,
+                            backgroundPosition: '-395px -198px',
+                            backgroundSize: '606px 393px',
+                            backgroundRepeat: 'no-repeat',
+                          }}
+                        ></span>
+                      ) : (
+                        <img
+                          src={subItem.icon}
+                          alt={subItem.name}
+                          className="w-6 h-6 rounded"
+                        />
+                      )}
+                      <div className="text-sm">
+                        <p className="font-medium text-gray-800 dark:text-white">{subItem.name} {Number(subItem.count).toLocaleString()} X {item.PACKAGE_COUNT} </p>
+                        <p className="text-gray-600 dark:text-gray-300">{(Number(subItem.count * item.PACKAGE_COUNT)).toLocaleString()}개 (개당 {subItem.price.toLocaleString()}G)</p>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="space-y-2 mt-3">
-                {/* 화폐거래소 기준 */}
-                <div className="p-3 rounded bg-gray-100 dark:bg-gray-800 border dark:border-gray-600">
-                  <div className="text-xs text-gray-500 mb-1">화폐거래소 기준</div>
-                  <p className="text-sm">
-                    차익:{' '}
-                    <span className={isProfit ? 'text-green-500' : 'text-red-500'}>
-                      {item.DIFFERENCE_PRICE.toLocaleString()} G
-                    </span>{' '}
-                    / 효율:{' '}
-                    <span className={isProfit ? 'text-green-500' : 'text-red-500'}>
-                      {item.EFFICIENCY}% {isProfit ? '이득' : '손해'}
-                    </span>
-                  </p>
+                  ))}
                 </div>
 
-                {/* 어둠 경로 기준 */}
-                {item.PACKAGE_DVCD === '02' && item.DICO_PRICE > 0 && (
+                <div className="space-y-2 mt-3">
+                  {/* 화폐거래소 기준 */}
                   <div className="p-3 rounded bg-gray-100 dark:bg-gray-800 border dark:border-gray-600">
-                    <div className="text-xs text-gray-500 mb-1">
-                      어둠의 경로 기준 (100 : {item.DICO_PRICE})
-                    </div>
+                    <div className="text-xs text-gray-500 mb-1">화폐거래소 기준</div>
                     <p className="text-sm">
                       차익:{' '}
-                      <span className={isProfitDico ? 'text-green-500' : 'text-red-500'}>
-                        {Number(item.DIFFERENCE_DICO_PRICE).toLocaleString()} G
+                      <span className={isProfit ? 'text-green-500' : 'text-red-500'}>
+                        {item.DIFFERENCE_PRICE.toLocaleString()}G
                       </span>{' '}
                       / 효율:{' '}
-                      <span className={isProfitDico ? 'text-green-500' : 'text-red-500'}>
-                        {item.EFFICIENCY_DICO}% {isProfitDico ? '이득' : '손해'}
+                      <span className={isProfit ? 'text-green-500' : 'text-red-500'}>
+                        {item.EFFICIENCY}% {isProfit ? '이득' : '손해'}
                       </span>
                     </p>
                   </div>
-                )}
-              </div>
 
+                  {/* 어둠 경로 기준 */}
+                  {item.PACKAGE_DVCD === '02' && item.DICO_PRICE > 0 && (
+                    <div className="p-3 rounded bg-gray-100 dark:bg-gray-800 border dark:border-gray-600">
+                      <div className="text-xs text-gray-500 mb-1">
+                        어둠의 경로 기준 (100 : {item.DICO_PRICE})
+                      </div>
+                      <p className="text-sm">
+                        차익:{' '}
+                        <span className={isProfitDico ? 'text-green-500' : 'text-red-500'}>
+                          {Number(item.DIFFERENCE_DICO_PRICE).toLocaleString()}G
+                        </span>{' '}
+                        / 효율:{' '}
+                        <span className={isProfitDico ? 'text-green-500' : 'text-red-500'}>
+                          {item.EFFICIENCY_DICO}% {isProfitDico ? '이득' : '손해'}
+                        </span>
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+              </div>
             </div>
-          </div>
-        );
-      })}
-    </div>
+          );
+        })}
+      </div>
+    </>
   );
 }
 
