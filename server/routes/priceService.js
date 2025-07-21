@@ -785,7 +785,6 @@ exports.getPackageEfficiencyList = async (req, res, next) => {
     // DB 연결
     const connection = await pool.getConnection();
     try {
-
         // 트랜잭션 시작
         await connection.beginTransaction();
         const selectSql = `SELECT
