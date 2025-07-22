@@ -1,14 +1,41 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import '@/css/Donate.css';
 
 export default function DonatePage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [alert, setAlert] = useState(null);
+  const alertTimeoutRef = useRef(null);
+  const accountRef = useRef(null);
 
   const handleModalOpen = (e) => {
     e.preventDefault();
     setIsModalOpen(true);
+  };
+
+  const handleCopy = () => {
+    const account = '3333247122428';
+    navigator.clipboard.writeText(account)
+      .then(() => {
+        const rect = accountRef.current?.getBoundingClientRect();
+        let top = rect ? rect.top - 40 : 100;
+        let left = rect ? rect.left + rect.width / 2 : window.innerWidth / 2;
+
+        setAlert({
+          message: '계좌번호 복사됨',
+          top,
+          left,
+        });
+
+        if (alertTimeoutRef.current) clearTimeout(alertTimeoutRef.current);
+        alertTimeoutRef.current = setTimeout(() => {
+          setAlert(null);
+        }, 1500);
+      })
+      .catch((e) => {
+        window.alert(e);
+      });
   };
 
   const handleModalClose = () => setIsModalOpen(false);
@@ -21,7 +48,19 @@ export default function DonatePage() {
           <label>계좌이체</label>
           <ul>
             <li>은행명: 카카오뱅크</li>
-            <li>계좌번호: 3333-24-7122428</li>
+            <li>
+              <div className="flex items-center gap-2 mt-2">
+                <span className="text-sm text-gray-800">계좌번호: 3333-24-7122428</span>
+                <button
+                  type="button"
+                  ref={accountRef}
+                  onClick={handleCopy}
+                  className="text-xs bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-white px-2 py-1 rounded flex items-center gap-1"
+                >
+                  📋 복사
+                </button>
+              </div>
+            </li>
             <li>예금주: 최규민</li>
           </ul>
           <label>모바일 카카오페이 송금</label>
@@ -38,7 +77,7 @@ export default function DonatePage() {
         </div>
         <div className="form-group">
           여러분의 소중한 후원금은 모두 LOAGAP의 서버 운영 및 서비스 품질 향상을 위한 유지보수에 전액 사용됩니다. 더욱 안정적이고 빠른 서비스를 제공하기 위해 최선을 다하겠습니다.<br /><br />
-          광고 수익 또한 전액 서버 운영과 유지보수에 사용됩니다. ‘광고 클릭 = 사랑’이라는 공식, 알고 계셨나요? 클릭 해주셔서 감사합니다.
+          광고 수익 또한 전액 서버 운영과 유지보수에 사용됩니다. 광고 클릭 해주셔서 감사합니다.
         </div>
       </form>
 
@@ -54,6 +93,26 @@ export default function DonatePage() {
             </div>
             <button onClick={handleModalClose} className="login-button">닫기</button>
           </div>
+        </div>
+      )}
+
+      {alert && (
+        <div
+          style={{
+            position: 'fixed',
+            top: alert.top,
+            left: alert.left,
+            transform: 'translateX(-50%)',
+            backgroundColor: '#27ae60',
+            color: 'white',
+            padding: '6px 12px',
+            borderRadius: '6px',
+            zIndex: 1000,
+            fontWeight: 'bold',
+            fontSize: '13px',
+          }}
+        >
+          {alert.message}
         </div>
       )}
     </div>

@@ -37,6 +37,11 @@ const nextConfig: NextConfig = {
         source: "/jewelPrice",
         destination: "/price/jewel",
         permanent: true, // 301 리다이렉션 (SEO에 반영됨)
+      },
+      {
+        source: "/efficiency",
+        destination: "/efficiency/package",
+        permanent: true, // 301 리다이렉션 (SEO에 반영됨)
       }
     ];
   },
