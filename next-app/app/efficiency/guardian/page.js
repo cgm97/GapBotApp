@@ -2,12 +2,17 @@ import GuardianPage from './guardianClient';
 import AdSense from '@/components/Adsense';
 
 async function getGuardianData() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/price/guardian`, {
-    next: { revalidate: 10 }, // ISR or SSR
-  });
-  if (!res.ok) throw new Error("Failed to fetch");
-  const data = await res.json();
-  return data;
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/price/guardian`, {
+      next: { revalidate: 10 }, // ISR or SSR
+    });
+    if (!res.ok) throw new Error('Failed to fetch');
+    return await res.json();
+  } catch (e) {
+    console.error('API fetch 실패:', e);
+    // fallback 데이터 또는 빈 데이터 반환
+    return [];
+  }
 }
 
 export const metadata = {
