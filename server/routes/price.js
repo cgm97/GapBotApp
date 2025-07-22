@@ -296,4 +296,8 @@ router.get('/package/efficiency/list', priceService.getPackageEfficiencyList);
 router.post('/package/efficiency/insert', priceService.insertPackageEfficiencyList);
 router.get('/package/efficiency/delete', priceService.deletePackageEfficiencyList);
 
+router.get('/chaos', priceService.getChaosPrice);
+router.get('/guardian', priceService.getGuardianPrice);
+router.get('/raid', priceService.getRaidPrice);
+
 module.exports = router;

@@ -1,7 +1,7 @@
-const { Console } = require('winston/lib/winston/transports');
 const pool = require('../db/connection');
 const logger = require('../logger');  // logger.js 임포트
 const { sessionCache, getBookPrice, getDate, getJewelPrice, calculatePriceDiff, groupByNameArray, getMarketPrice } = require('../sessionUtil'); // 캐시 모듈 가져오기
+const { chaosResults, guardianResults, raidResults } = require('../contentsData');
 require('dotenv').config(); // .env 파일에서 환경 변수 로드
 
 function formatDateString(dateStr) {
@@ -931,4 +931,63 @@ exports.deletePackageEfficiencyList = async (req, res, next) => {
         // DB 연결 해제
         if (connection) connection.release();
     }
+}
+
+// 카오스던전 재화 조회
+exports.getChaosPrice = async (req, res, next) => {
+
+    // 로깅
+    const referer = req.headers.referer || req.headers.origin;
+    logger.info({
+        method: req.method,
+        url: req.url,
+        message: `요청 Host: ${referer} 카오스 재화`,
+    });
+
+    // if (!referer || (!referer.includes('loagap.com') && !referer.includes('localhost'))) {
+    //     return res.status(403).json({ message: 'Invalid host' });
+    // }
+
+    return res.status(200).json(
+        chaosResults(sessionCache.get("marketPrice"), sessionCache.get("jewelPrice"))
+    );
+}
+
+// 가디언 재화 조회
+exports.getGuardianPrice = async (req, res, next) => {
+
+    // 로깅
+    const referer = req.headers.referer || req.headers.origin;
+    logger.info({
+        method: req.method,
+        url: req.url,
+        message: `요청 Host: ${referer} 가디언 재화`,
+    });
+
+    // if (!referer || (!referer.includes('loagap.com') && !referer.includes('localhost'))) {
+    //     return res.status(403).json({ message: 'Invalid host' });
+    // }
+
+    return res.status(200).json(
+        guardianResults(sessionCache.get("marketPrice"))
+    );
+}
+
+exports.getRaidPrice = async (req, res, next) => {
+
+    // 로깅
+    const referer = req.headers.referer || req.headers.origin;
+    logger.info({
+        method: req.method,
+        url: req.url,
+        message: `요청 Host: ${referer} 레이드 재화`,
+    });
+
+    // if (!referer || (!referer.includes('loagap.com') && !referer.includes('localhost'))) {
+    //     return res.status(403).json({ message: 'Invalid host' });
+    // }
+
+    return res.status(200).json(
+        raidResults(sessionCache.get("marketPrice"))
+    );
 }
