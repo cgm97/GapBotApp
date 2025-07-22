@@ -75,7 +75,7 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, jewelsPrice, sel
     setPackageName(selectedPackageData.PACKAGE_NAME);
     setPackagePrice(selectedPackageData.PACKAGE_PRICE);
     setPackageCount(selectedPackageData.PACKAGE_COUNT);
-
+    setDicoPrice(selectedPackageData.DICO_PRICE || '');
     const updatedItems = (selectedPackageData.ITEMS || []).map((item) => {
       const marketItem =
         allItemList.find((m) => m.name === item.name) || {};
@@ -90,9 +90,6 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, jewelsPrice, sel
 
     setItems(updatedItems);
 
-    if (packageDvcd === '02') {
-      setDicoPrice(selectedPackageData.DICO_PRICE || '');
-    }
   }, [selectedPackageData, allItemList, packageDvcd]);
 
 
@@ -213,32 +210,36 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, jewelsPrice, sel
 
   // 디코 거래소 게산
   const dicoCalc = (feeRate = 0.05) => {
+    // 디코 1골드당 현금가
+    const pricePerGold = dicoPrice / 100;
 
-    // 100 : dicoPrice -> 1 : gold 변환
-    const pricePerGold = dicoPrice / 100; // 0.2원
+    let goldBeforeFee = 0;
 
-    const goldBeforeFee = (parseFloat(packagePrice) || 0) * (parseFloat(packageCount) || 0) / pricePerGold;
+    if (packageDvcd === '02') {
+      goldBeforeFee = (parseFloat(packagePrice) || 0) * (parseFloat(packageCount) || 0) / pricePerGold;
+    } else {
+      const change = packagePrice / 40 * 1100; // 블루크리스탈 -> 로열크리스탈 변환
+      goldBeforeFee = (parseFloat(change) || 0) * (parseFloat(packageCount) || 0) / pricePerGold;
+    }
 
-    // 수수료 반영 (실수령 골드)
     const gold = goldBeforeFee * (1 - feeRate);
-
-    // 구성품 가치와 비교한 차익
     const diff = itemsGold - gold;
     const efficiency = (itemsGold / gold) * 100 - 100;
 
     setDifferenceDicoPrice(diff.toFixed(0));
     setEfficiencyDico(efficiency.toFixed(2));
-    setgoldDico(gold);
+    setgoldDico(Number(gold.toFixed(1)));
+
     return {
-      gold: goldDico,
+      gold: Number(gold.toFixed(1)), // 상태값 말고 계산값 직접 사용
       diff: diff.toFixed(0),
       efficiency: efficiency.toFixed(2)
     };
-  }
+  };
+
 
   const dicoResult = useMemo(() => {
-    if (packageDvcd === '02') return dicoCalc();
-    return null;
+    return dicoCalc();
   }, [packageDvcd, packagePrice, packageCount, dicoPrice, itemsGold]);
 
   const handleSave = () => {
@@ -486,8 +487,20 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, jewelsPrice, sel
             required
             className="border p-2 w-full rounded"
           />
-
-          {packageDvcd === '02' && (
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
+            어둠 경로 가격 (100 : 가격)
+          </label>
+          <input
+            type="number"
+            placeholder="가격 (ex 20)"
+            value={dicoPrice}
+            onChange={(e) => {
+              setDicoPrice(e.target.value);
+              setResult(null);
+            }}
+            className="border p-2 w-full rounded"
+          />
+          {/* {packageDvcd === '02' && (
             <>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                 어둠 경로 가격 (100 : 가격)
@@ -503,7 +516,7 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, jewelsPrice, sel
                 className="border p-2 w-full rounded"
               />
             </>
-          )}
+          )} */}
         </div>
 
         <h4 className="mt-6 mb-2 font-semibold text-lg">📦 구성품 (1 패키지 기준)</h4>
@@ -572,7 +585,7 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, jewelsPrice, sel
               <div className="text-right">{packageBuyPrice.toLocaleString()} 크리스탈</div>
 
               <div><strong>구성품 총 가치</strong></div>
-              <div className="text-right">{itemsGold.toLocaleString()} G</div>
+              <div className="text-right">{itemsGold.toLocaleString()}G</div>
             </div>
 
             {/* 화폐 거래소 기준 */}
@@ -583,11 +596,11 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, jewelsPrice, sel
                   <strong>환산 골드</strong>
                   <span className="text-xs text-gray-400"> 5% 수수료 차감</span>
                 </div>
-                <div className="text-right">{packageBuyGold.toLocaleString()} G</div>
+                <div className="text-right">{packageBuyGold.toLocaleString()}</div>
 
                 <div><strong>이득/손해</strong></div>
                 <div className={`text-right font-bold ${differencePrice >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  {differencePrice.toLocaleString()} G
+                  {differencePrice.toLocaleString()}
                 </div>
 
                 <div><strong>패키지 효율</strong></div>
@@ -598,7 +611,7 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, jewelsPrice, sel
             </div>
 
             {/* 어둠 경로 기준 */}
-            {packageDvcd === '02' && dicoResult && (
+            {dicoResult && (
               <div className="p-3 rounded bg-gray-200 dark:bg-gray-700 shadow">
                 <p className="font-semibold mb-2">어둠 경로 기준 (100 : {dicoPrice})</p>
                 <div className="grid grid-cols-2 gap-2">
@@ -607,11 +620,11 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, jewelsPrice, sel
                     <span className="text-xs text-gray-400"> 5% 수수료 차감</span>
                   </div>
 
-                  <div className="text-right">{goldDico.toLocaleString()} G</div>
+                  <div className="text-right">{goldDico.toLocaleString()}</div>
 
                   <div><strong>이득/손해</strong></div>
                   <div className={`text-right font-bold ${dicoResult.diff >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {Number(dicoResult.diff).toLocaleString()} G
+                    {Number(dicoResult.diff).toLocaleString()}
                   </div>
 
                   <div><strong>패키지 효율</strong></div>
@@ -829,7 +842,7 @@ function PackageList({ onSelectPackage }) {
                   </div>
 
                   {/* 어둠 경로 기준 */}
-                  {item.PACKAGE_DVCD === '02' && item.DICO_PRICE > 0 && (
+                  {item.DICO_PRICE > 0 && (
                     <div className="p-3 rounded bg-gray-100 dark:bg-gray-800 border dark:border-gray-600">
                       <div className="text-xs text-gray-500 mb-1">
                         어둠의 경로 기준 (100 : {item.DICO_PRICE})
