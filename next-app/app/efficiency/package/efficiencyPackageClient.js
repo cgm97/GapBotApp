@@ -20,7 +20,8 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, jewelsPrice, sel
   const [allItemList, setAllItemList] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [nowCrystalPrice, setNowCrystalPrice] = useState(0);
-
+  const [giftSale, setGiftSale] = useState('');
+  
   // 계산 결과용 상태
   const [packageBuyPrice, setPackageBuyPrice] = useState(0);
   const [packageBuyGold, setPackageBuyGold] = useState(0);
@@ -237,6 +238,40 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, jewelsPrice, sel
     };
   };
 
+  function calculateGiftSale({
+    feeRate = 0.05,   // 수수료율 (기본 5%)
+  }) {
+    // 1100원 = 40 크리스탈 비율
+    const pricePerCrystal = 1100 / 40; // 27.5원/크리스탈
+
+    // 할인율 적용 후 실제 결제 금액
+    const actualPaid = packageBuyPrice * (1 - giftSale / 100);
+
+    // 실제 결제 금액 → 크리스탈 수량
+    const crystalCount = actualPaid / pricePerCrystal;
+
+    // 크리스탈 → 골드 환산
+    const goldBeforeFee = crystalCount * nowCrystalPrice;
+
+    // 수수료 적용
+    const receivedGold = goldBeforeFee * (1 - feeRate);
+
+    // 차익 및 효율 계산
+    const diff = itemsGold - receivedGold;
+    const efficiency = (itemsGold / receivedGold) * 100 - 100;
+
+    return {
+      actualPaid: actualPaid.toFixed(0),
+      receivedGold: receivedGold.toFixed(0),
+      diff: diff.toFixed(0),
+      efficiency: efficiency.toFixed(0)
+    };
+  }
+
+
+  const saleResult = useMemo(() => {
+    return packageDvcd == '02' ? calculateGiftSale(giftSale) : null;
+  }, [packageDvcd, packagePrice, packageCount, dicoPrice, itemsGold, giftSale]);
 
   const dicoResult = useMemo(() => {
     return dicoCalc();
@@ -500,23 +535,23 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, jewelsPrice, sel
             }}
             className="border p-2 w-full rounded"
           />
-          {/* {packageDvcd === '02' && (
+          {packageDvcd === '02' && (
             <>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
-                어둠 경로 가격 (100 : 가격)
+                상품권 할인률%
               </label>
               <input
                 type="number"
-                placeholder="가격 (ex 20)"
-                value={dicoPrice}
+                placeholder="ex) 5"
+                value={giftSale}
                 onChange={(e) => {
-                  setDicoPrice(e.target.value);
+                  setGiftSale(e.target.value);
                   setResult(null);
                 }}
                 className="border p-2 w-full rounded"
               />
             </>
-          )} */}
+          )}
         </div>
 
         <h4 className="mt-6 mb-2 font-semibold text-lg">📦 구성품 (1 패키지 기준)</h4>
@@ -546,8 +581,8 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, jewelsPrice, sel
             <input
               type="number"
               value={item.price}
-              readOnly
-              className="border p-2 w-28 bg-gray-100 text-center cursor-not-allowed"
+              onChange={(e) => handleItemChange(index, 'price', e.target.value)}
+              className="border p-2 w-28 text-center"
             />
             <button
               type="button"
@@ -582,11 +617,39 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, jewelsPrice, sel
             {/* 패키지 기본 정보 */}
             <div className="grid grid-cols-2 gap-2">
               <div><strong>패키지 구매 비용</strong></div>
-              <div className="text-right">{packageBuyPrice.toLocaleString()} 크리스탈</div>
+              <div className="text-right">{packageBuyPrice.toLocaleString()}{packageDvcd == '01' ? '크리스탈' : '원'}</div>
 
               <div><strong>구성품 총 가치</strong></div>
               <div className="text-right">{itemsGold.toLocaleString()}G</div>
             </div>
+
+            {packageDvcd == '02' && giftSale > 0 && saleResult && (
+              <div className="p-3 rounded bg-gray-200 dark:bg-gray-700 shadow">
+                <p className="font-semibold mb-2">상품권 할인</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="text-sm text-gray-800 dark:text-gray-200">
+                    <strong>구매 비용</strong>
+                    <span className="text-xs text-gray-400"> {giftSale}% 할인</span>
+                  </div>
+                  <div className="text-right">{Number(saleResult.actualPaid).toLocaleString()}원</div>
+                  <div className="text-sm text-gray-800 dark:text-gray-200">
+                    <strong>환산 골드</strong>
+                    <span className="text-xs text-gray-400"> 5% 수수료 차감</span>
+                  </div>
+                  <div className="text-right">{Number(saleResult.receivedGold).toLocaleString()}</div>
+
+                  <div><strong>이득/손해</strong></div>
+                  <div className={`text-right font-bold ${saleResult.diff >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {Number(saleResult.diff).toLocaleString()}
+                  </div>
+
+                  <div><strong>패키지 효율</strong></div>
+                  <div className={`text-right font-bold ${saleResult.efficiency >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {saleResult.efficiency}% {saleResult.efficiency >= 0 ? '이득' : '손해'}
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* 화폐 거래소 기준 */}
             <div className="mt-4 p-3 rounded bg-white dark:bg-gray-800 shadow">
@@ -609,7 +672,6 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, jewelsPrice, sel
                 </div>
               </div>
             </div>
-
             {/* 어둠 경로 기준 */}
             {dicoResult && (
               <div className="p-3 rounded bg-gray-200 dark:bg-gray-700 shadow">
