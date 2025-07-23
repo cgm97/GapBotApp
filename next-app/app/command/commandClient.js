@@ -35,7 +35,10 @@ const CommandPage = () => {
     },
     { id: 19, prefix: <>.사사게</>, description: '.사사게 키워드' },
     { id: 20, prefix: <>.클골</> },
-    { id: 24, prefix: <>.패키지효율</>, img: '/img/cmd/vozlwlgydbf.png', description: 'LOAGAP 패키지 효율 참조'},
+    { id: 24, prefix: <>.패키지 | .패키지효율</>, img: '/img/cmd/vozlwlgydbf.png', description: 'LOAGAP 패키지 효율 참조'},
+    { id: 25, prefix: <>.카던 | .카던효율</>, img: '/img/cmd/zkejs.png', description: 'LOAGAP 카오스던전 효율 참조'},
+    { id: 26, prefix: <>.가디언 | .가디언효율</>, img: '/img/cmd/rkeldjs.png', description: 'LOAGAP 가디언 효율 참조'},
+    { id: 27, prefix: <>.더보기 | .더보기효율</>, img: '/img/cmd/ejqhrl.png', description: 'LOAGAP 더보기 효율 참조'},
   ];
 
   const listUtilItems = [
