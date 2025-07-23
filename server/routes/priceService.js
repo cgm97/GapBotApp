@@ -944,9 +944,9 @@ exports.getChaosPrice = async (req, res, next) => {
         message: `요청 Host: ${referer} 카오스 재화`,
     });
 
-    // if (!referer || (!referer.includes('loagap.com') && !referer.includes('localhost'))) {
-    //     return res.status(403).json({ message: 'Invalid host' });
-    // }
+    if (!referer || (!referer.includes('loagap.com') && !referer.includes('localhost'))) {
+        return res.status(403).json({ message: 'Invalid host' });
+    }
 
     return res.status(200).json(
         chaosResults(sessionCache.get("marketPrice"), sessionCache.get("jewelPrice"))
@@ -964,9 +964,9 @@ exports.getGuardianPrice = async (req, res, next) => {
         message: `요청 Host: ${referer} 가디언 재화`,
     });
 
-    // if (!referer || (!referer.includes('loagap.com') && !referer.includes('localhost'))) {
-    //     return res.status(403).json({ message: 'Invalid host' });
-    // }
+    if (!referer || (!referer.includes('loagap.com') && !referer.includes('localhost'))) {
+        return res.status(403).json({ message: 'Invalid host' });
+    }
 
     return res.status(200).json(
         guardianResults(sessionCache.get("marketPrice"))
@@ -983,9 +983,9 @@ exports.getRaidPrice = async (req, res, next) => {
         message: `요청 Host: ${referer} 레이드 재화`,
     });
 
-    // if (!referer || (!referer.includes('loagap.com') && !referer.includes('localhost'))) {
-    //     return res.status(403).json({ message: 'Invalid host' });
-    // }
+    if (!referer || (!referer.includes('loagap.com') && !referer.includes('localhost'))) {
+        return res.status(403).json({ message: 'Invalid host' });
+    }
 
     return res.status(200).json(
         raidResults(sessionCache.get("marketPrice"))

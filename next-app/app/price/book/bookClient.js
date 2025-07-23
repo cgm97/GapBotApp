@@ -5,6 +5,7 @@ import axios from "axios";
 import "@/css/BookPrice.css";
 import LineChart from "@/components/LineChart";
 import useSWR from "swr";
+import AdSense from '@/components/Adsense';
 
 const fetcher = (url) => axios.get(url).then((res) => res.data);
 
@@ -355,6 +356,7 @@ export default function BookClient({ booksPrice, bookLastUpdate }) {
             ※ 하단 라벨을 클릭하여 해당 각인서 차트 라인을 켜거나 끌 수 있습니다.
           </h5>
           <LineChart rawData={chartData} />
+          <AdSense adSlot="1488834693" />
         </div>
       )}
 
