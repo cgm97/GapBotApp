@@ -4,6 +4,10 @@ import { useState } from 'react';
 import CandleChart from '@/components/CandleChart';
 import '@/css/Character.css';
 import axios from 'axios';
+import useSWR from "swr";
+import AdSense from '@/components/Adsense';
+
+const fetcher = (url) => axios.get(url).then((res) => res.data);
 
 export default function AccessoryClient({ accessorysPrice, accessoryLastUpdate }) {
   const [selectedTitles, setSelectedTitles] = useState([]);
@@ -15,6 +19,16 @@ export default function AccessoryClient({ accessorysPrice, accessoryLastUpdate }
   const allTitles = ['전체', ...accessorysPrice.map((tier) => tier.title)];
   const allEnhanceLevels = ['전체', '1', '2', '3'];
   const allNames = ['전체', '목걸이', '귀걸이', '반지'];
+
+  const { data, mutate } = useSWR(
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/price/accessory`,
+    fetcher,
+    {
+      fallbackData: { accessorysPrice, accessoryLastUpdate },
+      refreshInterval: 0,
+      revalidateOnFocus: false,
+    }
+  );
 
   const toggleSelection = (value, selectedList, setSelectedList) => {
     if (value === '전체') {
@@ -28,7 +42,7 @@ export default function AccessoryClient({ accessorysPrice, accessoryLastUpdate }
     }
   };
 
-  const filteredData = accessorysPrice
+  const filteredData = (data?.accessorysPrice || accessorysPrice)
     .filter(
       (tier) =>
         selectedTitles.length === 0 || selectedTitles.includes(tier.title)
@@ -64,6 +78,7 @@ export default function AccessoryClient({ accessorysPrice, accessoryLastUpdate }
       console.error("차트 데이터 오류:", e);
     }
   };
+  const lastUpdate = data?.accessoryPriceLastUpdate || accessoryLastUpdate;
 
   return (
     <div className="p-4 max-w-screen-lg mx-auto text-gray-800 dark:text-gray-200">
@@ -99,7 +114,7 @@ export default function AccessoryClient({ accessorysPrice, accessoryLastUpdate }
               (갱신 시 1분 대비 가격 변동이 약 50초간 표시됩니다.) */}
           </p>
           <p className="text-sm my-2 dark:text-gray-300">
-            <strong>마지막 업데이트:</strong> <span className="font-semibold">{accessoryLastUpdate}</span>
+            <strong>마지막 업데이트:</strong> <span className="font-semibold">{lastUpdate}</span>
           </p>
         </section>
       </main>
@@ -307,6 +322,7 @@ export default function AccessoryClient({ accessorysPrice, accessoryLastUpdate }
             {/* 캔들 차트 */}
             <div className="mt-4">
               <CandleChart chartData={chartData.itemData} />
+              <AdSense adSlot="1488834693" />
             </div>
           </div>
         </div>

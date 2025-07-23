@@ -2,9 +2,12 @@ import ChaosPage from './raidClient';
 import AdSense from '@/components/Adsense';
 
 async function getRaidData() {
-    try {
+  try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/price/raid`, {
-      next: { revalidate: 10 }, // ISR or SSR
+      next: { revalidate: 10 },
+      headers: {
+        referer: "https://loagap.com"
+      }, // ISR or SSR // ISR or SSR
     });
     if (!res.ok) throw new Error('Failed to fetch');
     return await res.json();

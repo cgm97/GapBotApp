@@ -7,6 +7,7 @@ import "@/css/BookPrice.css";
 import '@/css/Character.css';
 import LineChart from '@/components/LineChart';
 import useSWR from 'swr';
+import AdSense from '@/components/Adsense';
 
 // import {
 //   Chart as ChartJS,
@@ -289,6 +290,7 @@ export default function JewelClient({ jewelsPrice, jewelPriceLastUpdate }) {
       </div>
 
       {activeTab === 'price' && (
+
         <div className="price-table-container">
           {/* SEO용 숨은 텍스트 영역 (화면에는 안 보임) */}
           <section className="sr-only" aria-label="보석 시세 키워드">
@@ -473,6 +475,7 @@ export default function JewelClient({ jewelsPrice, jewelPriceLastUpdate }) {
             options={chartOptions}
            /> */}
           <LineChart rawData={chartData} />
+          <AdSense adSlot="1488834693" />
         </div>
       )}
 
