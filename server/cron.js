@@ -185,7 +185,7 @@ cron.schedule('1 10 * * 3', async () => { // async로 변경
 });
 
 // 매시 정각에 실행 - 공지사항 정보
-cron.schedule('0 * * * *', async () => {
+cron.schedule('1 * * * *', async () => {
     var method = '매일 1시간마다';
     logger.info({
         method: method,
