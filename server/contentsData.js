@@ -659,7 +659,7 @@ const chaosResults = (marketPrice, jewelPrice) => {
         icon = "https://loagap.com/img/cube/jewellery3.png"
       }
       if (key === "tier4_jewel") {
-        unitPrice = jewelPrice['1'][1].price;
+        unitPrice = jewelPrice?.['1']?.[1]?.price || jewelPrice?.['1']?.[0]?.price || 130;
         icon = "https://loagap.com/img/cube/jewellery4.png"
       }
 
@@ -801,7 +801,6 @@ const raidResults = (marketPrice) => {
     });
   });
 
-  console.log(raidGold);
   return raidGold;
 }
 
