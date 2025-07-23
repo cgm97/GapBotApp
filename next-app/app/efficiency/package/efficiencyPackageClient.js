@@ -538,7 +538,7 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, jewelsPrice, sel
           {packageDvcd === '02' && (
             <>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
-                상품권 할인률%
+                상품권 할인율 %
               </label>
               <input
                 type="number"

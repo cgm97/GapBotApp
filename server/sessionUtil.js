@@ -167,21 +167,25 @@ const getJewelPrice = async () => {
                 ItemName: `${i}레벨 ${type}`
             };
 
-            const response = await axios.post(API_URL, body, {
-                headers: {
-                    'accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'authorization': `bearer ${process.env.LOA_API_KEY}`,
-                },
-            });
-
-            const item = response.data.Items[0];
-            jemArr[i].push({
-                name: item.Name,
-                price: item.AuctionInfo.BuyPrice,
-                icon: item.Icon,
-                grade: item.Grade
-            });
+            try{
+                const response = await axios.post(API_URL, body, {
+                    headers: {
+                        'accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'authorization': `bearer ${process.env.LOA_API_KEY}`,
+                    },
+                });
+    
+                const item = response.data.Items[0];
+                jemArr[i].push({
+                    name: item.Name,
+                    price: item.AuctionInfo.BuyPrice,
+                    icon: item.Icon,
+                    grade: item.Grade
+                });
+            } catch(e){
+                continue;
+            }
         }
     }
     logger.info({
