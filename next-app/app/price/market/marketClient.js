@@ -7,6 +7,7 @@ import "@/css/BookPrice.css";
 import '@/css/Character.css';
 import LineChart from '@/components/LineChart';
 import useSWR from 'swr';
+import AdSense from '@/components/Adsense';
 
 const fetcher = (url) => axios.get(url).then(res => res.data);
 
@@ -396,6 +397,7 @@ export default function MarketClient({ marketsPrice, marketPriceLastUpdate }) {
             options={chartOptions}
            /> */}
           <LineChart rawData={chartData} />
+          <AdSense adSlot="1488834693" />
         </div>
       )}
 
