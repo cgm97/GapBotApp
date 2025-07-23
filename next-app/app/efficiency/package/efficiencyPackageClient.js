@@ -151,7 +151,7 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, jewelsPrice, sel
 
     const totalPackageValue = nowCrystalPrice * ((parseFloat(packagePrice) || 0) * (parseFloat(packageCount) || 0) * 1.05);
 
-    const efficiencyCalc = ((totalItemGold - totalPackageValue) / totalItemGold) * 100;
+    const efficiencyCalc = ((totalItemGold - totalPackageValue) / totalPackageValue) * 100;
 
     setPackageBuyPrice((parseFloat(packagePrice) || 0) * (parseFloat(packageCount) || 0));
     setPackageBuyGold(totalPackageValue);
@@ -194,7 +194,7 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, jewelsPrice, sel
 
     // const totalPackageValue = nowCrystalPrice * ((parseFloat(packagePrice) || 0) * (parseFloat(packageCount) || 0));
 
-    const efficiencyCalc = ((totalItemGold - totalPackageValue) / totalItemGold) * 100;
+    const efficiencyCalc = ((totalItemGold - totalPackageValue) / totalPackageValue) * 100;
 
     setPackageBuyPrice((parseFloat(packagePrice) || 0) * (parseFloat(packageCount) || 0));
     setPackageBuyGold(totalPackageValue);
