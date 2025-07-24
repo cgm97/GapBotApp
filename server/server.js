@@ -1,4 +1,4 @@
-const express = require('express');
+const Sentry = require("@sentry/node");
 const cors = require('cors');
 const path = require('path');
 const logger = require('./logger');  // logger.js 임포트
@@ -18,9 +18,20 @@ const cookieParser = require('cookie-parser');
 
 require('dotenv').config();
 
+Sentry.init({
+  dsn: process.env.SENTRY_DSN,
+
+  // Setting this option to true will send default PII data to Sentry.
+  // For example, automatic IP address collection on events
+  tracesSampleRate: 1.0,
+  sendDefaultPii: true,
+});
+
+const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 5000;
 const isProduction = process.env.NODE_ENV === 'PROD'; // 배포 여부 판단
+
 
 // 서버 시작 시 캐시 초기화
 initializeCache();
@@ -83,7 +94,7 @@ app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
 
 // 미들웨어: 모든 요청에 대해 자동으로 로그 기록
 app.use((req, res, next) => {
-
+  
   // 요청 처리 시작 로그
   const referer = req.headers.referer || req.headers.origin;
   logger.info({
@@ -141,6 +152,9 @@ app.use('/price', price);
 
 // bot 전용 API 사용
 app.use('/bot', bot);
+
+// 모니터링
+Sentry.setupExpressErrorHandler(app);
 
 // 후처리 미들웨어 (에러 처리 및 로깅)
 app.use((err, req, res, next) => {
