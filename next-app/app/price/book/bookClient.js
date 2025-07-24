@@ -18,6 +18,21 @@ export default function BookClient({ booksPrice, bookLastUpdate }) {
   const [loading, setLoading] = useState(false);
   const [disabled, setDisabled] = useState(false);
 
+  useEffect(() => {
+    const path = `/${activeTab}/book`;
+    const title = `${activeTab == "price" ? "유각시세" : "유각차트"} | LOAGAP`;
+
+    // Google Analytics (GA4)
+    if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
+      window.gtag('event', 'page_view', {
+        page_path: path,
+        page_title: title,
+        page_location: window.location.href,
+      });
+    }
+
+  }, [activeTab]);
+
   const { data, mutate } = useSWR(
     `${process.env.NEXT_PUBLIC_SERVER_URL}/price/book`,
     fetcher,

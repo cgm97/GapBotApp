@@ -47,6 +47,20 @@ export default function JewelClient({ jewelsPrice, jewelPriceLastUpdate }) {
   const [loading, setLoading] = useState(false);
   const [disabled, setDisabled] = useState(false);
 
+  useEffect(() => {
+    const path = `/${activeTab}/jewel`;
+    const title = `${activeTab == "price" ? "보석시세" : "보석차트"} | LOAGAP`;
+
+    // Google Analytics (GA4)
+    if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
+      window.gtag('event', 'page_view', {
+        page_path: path,
+        page_title: title,
+        page_location: window.location.href,
+      });
+    }
+
+  }, [activeTab]);
 
   // SWR 적용
   const { data, error, mutate } = useSWR(
@@ -59,7 +73,7 @@ export default function JewelClient({ jewelsPrice, jewelPriceLastUpdate }) {
     }
   );
 
-  const lastUpdateTimeRef = useRef(Date.now());
+  // const lastUpdateTimeRef = useRef(Date.now());
 
   // 1분마다 직접 mutate 호출 → 기준 시점 업데이트
   // useEffect(() => {

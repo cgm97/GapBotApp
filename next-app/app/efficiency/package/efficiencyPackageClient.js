@@ -21,7 +21,7 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, jewelsPrice, sel
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [nowCrystalPrice, setNowCrystalPrice] = useState(0);
   const [giftSale, setGiftSale] = useState('');
-  
+
   // 계산 결과용 상태
   const [packageBuyPrice, setPackageBuyPrice] = useState(0);
   const [packageBuyGold, setPackageBuyGold] = useState(0);
@@ -936,6 +936,21 @@ export default function PackageEfficiencyPage({ marketsPrice, crystalPrice, jewe
   const [activeTab, setActiveTab] = useState('calc1');
   const [selectedPackageData01, setSelectedPackageData01] = useState(null);
   const [selectedPackageData02, setSelectedPackageData02] = useState(null);
+
+  useEffect(() => {
+    const path = `/efficiency/package/${activeTab}`;
+    const title = `${activeTab === "calc1" ? "블크계산기" : activeTab === "calc2" ? "로크계산기" : "패키지효율리스트"} | LOAGAP`;
+
+    // Google Analytics (GA4)
+    if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
+      window.gtag('event', 'page_view', {
+        page_path: path,
+        page_title: title,
+        page_location: window.location.href,
+      });
+    }
+
+  }, [activeTab]);
 
   return (
     <>

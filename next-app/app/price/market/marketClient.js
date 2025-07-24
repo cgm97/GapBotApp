@@ -22,6 +22,20 @@ export default function MarketClient({ marketsPrice, marketPriceLastUpdate }) {
   const [disabled, setDisabled] = useState(false);
   const [categoryFilter, setCategoryFilter] = useState('전체');
 
+  useEffect(() => {
+    const path = `/${activeTab}/market`;
+    const title = `${activeTab == "price" ? "재료시세" : "재료차트"} | LOAGAP`;
+
+    // Google Analytics (GA4)
+    if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
+      window.gtag('event', 'page_view', {
+        page_path: path,
+        page_title: title,
+        page_location: window.location.href,
+      });
+    }
+
+  }, [activeTab]);
 
   // SWR 적용
   const { data, error, mutate } = useSWR(

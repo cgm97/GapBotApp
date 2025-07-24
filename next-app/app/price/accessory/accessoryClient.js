@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect  } from 'react';
 import CandleChart from '@/components/CandleChart';
 import '@/css/Character.css';
 import axios from 'axios';
@@ -19,6 +19,21 @@ export default function AccessoryClient({ accessorysPrice, accessoryLastUpdate }
   const allTitles = ['전체', ...accessorysPrice.map((tier) => tier.title)];
   const allEnhanceLevels = ['전체', '1', '2', '3'];
   const allNames = ['전체', '목걸이', '귀걸이', '반지'];
+
+  useEffect(() => {
+    const path = `/price/accessory/chart`;
+    const title = `악세차트 | LOAGAP`;
+
+    // Google Analytics (GA4)
+    if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
+      window.gtag('event', 'page_view', {
+        page_path: path,
+        page_title: title,
+        page_location: window.location.href,
+      });
+    }
+
+  }, [chartData]);
 
   const { data, mutate } = useSWR(
     `${process.env.NEXT_PUBLIC_SERVER_URL}/price/accessory`,
