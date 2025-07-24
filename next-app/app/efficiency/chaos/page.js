@@ -1,12 +1,13 @@
 import ChaosPage from './chaosClient';
 import AdSense from '@/components/Adsense';
+import axios from 'axios';
 
 async function getChaosData() {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/price/chaos`, {
       next: { revalidate: 10 },
       headers: {
-        referer: "https://loagap.com"
+        referer: "https://loagap.com/SSR"
       }, // ISR or SSR
     });
     if (!res.ok) throw new Error('Failed to fetch');

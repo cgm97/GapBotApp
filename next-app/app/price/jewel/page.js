@@ -5,6 +5,9 @@ import AdSense from '@/components/Adsense';
 async function getJewelsPriceData() {
   const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/price/jewel`, {
     next: { revalidate: 60 }, // ISR or SSR
+    headers: {
+      referer: "https://loagap.com/SSR"
+    }
   });
   if (!res.ok) throw new Error("Failed to fetch");
   const data = await res.json();

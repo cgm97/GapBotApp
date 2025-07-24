@@ -6,7 +6,7 @@ async function getGuardianData() {
     const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/price/guardian`, {
       next: { revalidate: 10 },
       headers: {
-        referer: "https://loagap.com"
+        referer: "https://loagap.com/SSR"
       }, // ISR or SSR // ISR or SSR
     });
     if (!res.ok) throw new Error('Failed to fetch');
