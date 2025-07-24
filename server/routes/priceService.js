@@ -908,9 +908,14 @@ exports.getChaosPrice = async (req, res, next) => {
         message: `카오스 재화`,
     });
 
-    return res.status(200).json(
-        chaosResults(sessionCache.get("marketPrice"), sessionCache.get("jewelPrice"))
-    );
+    try {
+        const chaos = chaosResults(sessionCache.get("marketPrice"), sessionCache.get("jewelPrice"))
+        return res.status(200).json(
+            chaos
+        );
+    } catch (e) {
+        next(new Error(e));
+    }
 }
 
 // 가디언 재화 조회
@@ -922,10 +927,14 @@ exports.getGuardianPrice = async (req, res, next) => {
         url: req.url,
         message: `가디언 재화`,
     });
-
-    return res.status(200).json(
-        guardianResults(sessionCache.get("marketPrice"))
-    );
+    try {
+        const guardian = guardianResults(sessionCache.get("marketPrice"));
+        return res.status(200).json(
+            guardian
+        );
+    } catch (e) {
+        next(new Error(e));
+    }
 }
 
 exports.getRaidPrice = async (req, res, next) => {
@@ -937,7 +946,12 @@ exports.getRaidPrice = async (req, res, next) => {
         message: `레이드 재화`,
     });
 
-    return res.status(200).json(
-        raidResults(sessionCache.get("marketPrice"))
-    );
+    try {
+        const raid = raidResults(sessionCache.get("marketPrice"))
+        return res.status(200).json(
+            raid
+        );
+    } catch (e) {
+        next(new Error(e));
+    }
 }
