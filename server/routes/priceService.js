@@ -90,16 +90,11 @@ exports.getBookChartPrice = async (req, res, next) => {
     const { item } = req.query;
 
     // 로깅
-    const referer = req.headers.referer || req.headers.origin;
     logger.info({
         method: req.method,
         url: req.url,
-        message: `요청 Host: ${referer} 유각차트조회: ${item}`,
+        message: `유각차트조회: ${item}`,
     });
-
-    if (!referer || (!referer.includes('loagap.com') && !referer.includes('localhost'))) {
-        return res.status(403).json({ message: 'Invalid host' });
-    }
 
     // DB 연결
     const connection = await pool.getConnection();
@@ -247,16 +242,11 @@ exports.getJewelChartPrice = async (req, res, next) => {
     const { item } = req.query;
 
     // 로깅
-    const referer = req.headers.referer || req.headers.origin;
     logger.info({
         method: req.method,
         url: req.url,
-        message: `요청 Host: ${referer} 보석조회: ${item}`,
+        message: `보석조회: ${item}`,
     });
-
-    if (!referer || (!referer.includes('loagap.com') && !referer.includes('localhost'))) {
-        return res.status(403).json({ message: 'Invalid host' });
-    }
 
     // DB 연결
     const connection = await pool.getConnection();
@@ -515,16 +505,11 @@ exports.getAccessoryChart = async (req, res, next) => {
     const { title, enhance, name, option, extra = '' } = req.query;
 
     // 로깅
-    const referer = req.headers.referer || req.headers.origin;
     logger.info({
         method: req.method,
         url: req.url,
-        message: `요청 Host: ${referer} 악세차트조회: ${title}, ${enhance}, ${name}, ${option}, ${extra}`,
+        message: `악세차트조회: ${title}, ${enhance}, ${name}, ${option}, ${extra}`,
     });
-
-    if (!referer || (!referer.includes('loagap.com') && !referer.includes('localhost'))) {
-        return res.status(403).json({ message: 'Invalid host' });
-    }
 
     if (!title || !enhance || !name || !option) {
         return res.status(400).json({ message: '필수값 누락' });
@@ -686,16 +671,11 @@ exports.getMarketChart = async (req, res, next) => {
     const { item } = req.query;
 
     // 로깅
-    const referer = req.headers.referer || req.headers.origin;
     logger.info({
         method: req.method,
         url: req.url,
-        message: `요청 Host: ${referer} 재료차트조회: ${item}`,
+        message: `재료차트조회: ${item}`,
     });
-
-    if (!referer || (!referer.includes('loagap.com') && !referer.includes('localhost'))) {
-        return res.status(403).json({ message: 'Invalid host' });
-    }
 
     // DB 연결
     const connection = await pool.getConnection();
@@ -771,16 +751,11 @@ exports.getPackageEfficiencyList = async (req, res, next) => {
     // const { packageDvcd } = req.query;
 
     // 로깅
-    const referer = req.headers.referer || req.headers.origin;
     logger.info({
         method: req.method,
         url: req.url,
-        message: `요청 Host: ${referer} 패키지리스트조회`,
+        message: `패키지리스트조회`,
     });
-
-    if (!referer || (!referer.includes('loagap.com') && !referer.includes('localhost'))) {
-        return res.status(403).json({ message: 'Invalid host' });
-    }
 
     // DB 연결
     const connection = await pool.getConnection();
@@ -832,16 +807,11 @@ exports.insertPackageEfficiencyList = async (req, res, next) => {
     let { packageName, packagePrice, packageCount, packageDvcd, packageType, items, packageBuyPrice, packageBuyGold, itemsGold, differencePrice, efficiency, dicoPrice, differenceDicoPrice, efficiencyDico } = req.body;
 
     // 로깅
-    const referer = req.headers.referer || req.headers.origin;
     logger.info({
         method: req.method,
         url: req.url,
-        message: `요청 Host: ${referer} 패키지리스트저장`,
+        message: `패키지리스트저장`,
     });
-
-    if (!referer || (!referer.includes('loagap.com') && !referer.includes('localhost'))) {
-        return res.status(403).json({ message: 'Invalid host' });
-    }
 
     // DB 연결
     const connection = await pool.getConnection();
@@ -895,16 +865,11 @@ exports.deletePackageEfficiencyList = async (req, res, next) => {
     const { packageName } = req.query;
 
     // 로깅
-    const referer = req.headers.referer || req.headers.origin;
     logger.info({
         method: req.method,
         url: req.url,
-        message: `요청 Host: ${referer} 패키지리스트삭제`,
+        message: `패키지리스트삭제`,
     });
-
-    if (!referer || (!referer.includes('loagap.com') && !referer.includes('localhost'))) {
-        return res.status(403).json({ message: 'Invalid host' });
-    }
 
     // DB 연결
     const connection = await pool.getConnection();
@@ -937,16 +902,11 @@ exports.deletePackageEfficiencyList = async (req, res, next) => {
 exports.getChaosPrice = async (req, res, next) => {
 
     // 로깅
-    const referer = req.headers.referer || req.headers.origin;
     logger.info({
         method: req.method,
         url: req.url,
-        message: `요청 Host: ${referer} 카오스 재화`,
+        message: `카오스 재화`,
     });
-
-    if (!referer || (!referer.includes('loagap.com') && !referer.includes('localhost'))) {
-        return res.status(403).json({ message: 'Invalid host' });
-    }
 
     return res.status(200).json(
         chaosResults(sessionCache.get("marketPrice"), sessionCache.get("jewelPrice"))
@@ -957,16 +917,11 @@ exports.getChaosPrice = async (req, res, next) => {
 exports.getGuardianPrice = async (req, res, next) => {
 
     // 로깅
-    const referer = req.headers.referer || req.headers.origin;
     logger.info({
         method: req.method,
         url: req.url,
-        message: `요청 Host: ${referer} 가디언 재화`,
+        message: `가디언 재화`,
     });
-
-    if (!referer || (!referer.includes('loagap.com') && !referer.includes('localhost'))) {
-        return res.status(403).json({ message: 'Invalid host' });
-    }
 
     return res.status(200).json(
         guardianResults(sessionCache.get("marketPrice"))
@@ -976,16 +931,11 @@ exports.getGuardianPrice = async (req, res, next) => {
 exports.getRaidPrice = async (req, res, next) => {
 
     // 로깅
-    const referer = req.headers.referer || req.headers.origin;
     logger.info({
         method: req.method,
         url: req.url,
-        message: `요청 Host: ${referer} 레이드 재화`,
+        message: `레이드 재화`,
     });
-
-    if (!referer || (!referer.includes('loagap.com') && !referer.includes('localhost'))) {
-        return res.status(403).json({ message: 'Invalid host' });
-    }
 
     return res.status(200).json(
         raidResults(sessionCache.get("marketPrice"))

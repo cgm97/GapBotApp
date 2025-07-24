@@ -3,7 +3,12 @@ import AdSense from '@/components/Adsense';
 
 async function getMarketsPriceData() {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/price/market`, { next: { revalidate: 10 } });
+    const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/price/market`, {
+      next: { revalidate: 10 },
+      headers: {
+        referer: "https://loagap.com/SSR"
+      },
+    });
     if (!res.ok) throw new Error('Failed to fetch');
     return await res.json();
   } catch (e) {
@@ -28,6 +33,9 @@ async function getCrystalPriceData() {
 async function getJewelsPriceData() {
   const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/price/jewel`, {
     next: { revalidate: 60 }, // ISR or SSR
+    headers: {
+      referer: "https://loagap.com"
+    },
   });
   if (!res.ok) throw new Error("Failed to fetch");
   const data = await res.json();

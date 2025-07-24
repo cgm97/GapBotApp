@@ -30,8 +30,8 @@ initializeCache();
 app.use(
   cors({
     origin: [process.env.REACT_APP_SERVER_URL1,
-             process.env.REACT_APP_SERVER_URL2
-            ], // 클라이언트 도메인
+    process.env.REACT_APP_SERVER_URL2
+    ], // 클라이언트 도메인
     credentials: true, // 쿠키를 포함한 요청을 허용
   })
 );
@@ -50,17 +50,17 @@ const swaggerDefinition = {
   },
   servers: isProduction
     ? [
-        {
-          url: 'https://api.loagap.com',
-          description: 'LOAGAP Server',
-        },
-      ]
+      {
+        url: 'https://api.loagap.com',
+        description: 'LOAGAP Server',
+      },
+    ]
     : [
-        {
-          url: `http://localhost:${PORT}`,
-          description: 'Local Server',
-        },
-      ],
+      {
+        url: `http://localhost:${PORT}`,
+        description: 'Local Server',
+      },
+    ],
 };
 
 // Swagger 옵션 설정
@@ -74,7 +74,7 @@ const swaggerSpec = swaggerJSDoc(options);
 
 // Swagger UI 설정
 app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
-  swaggerOptions:{
+  swaggerOptions: {
     docExpansion: 'none',
     defaultModelsExpandDepth: -1,
     displayRequestDuration: true
@@ -83,21 +83,35 @@ app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
 
 // 미들웨어: 모든 요청에 대해 자동으로 로그 기록
 app.use((req, res, next) => {
-  const requestId = Date.now();  // 요청 ID 또는 타임스탬프
+
   // 요청 처리 시작 로그
+  const referer = req.headers.referer || req.headers.origin;
   logger.info({
     method: req.method,
     url: req.originalUrl,  // 요청 URL
-    message: '[INTERCEPTOR] Request started'
+    message: `[INTERCEPTOR] [${referer}] Request started`
   });
-  
+
+  // 호스트 전처리
+  // if (!isProduction) {
+  //   if (!referer || (!referer.includes('loagap.com') && !referer.includes('localhost'))) {
+  //     logger.warn({
+  //       method: req.method,
+  //       url: req.originalUrl,
+  //       referer,
+  //         message: `[INTERCEPTOR] [${referer}] Blocked Host invalid'`
+  //     });
+  //     return res.status(403).json({ message: '허용되지 않은 잘못된 접근입니다.' });
+  //   }
+  // }
+
   // 응답이 끝난 후 로그를 기록하려면, res의 end 이벤트를 사용해야 합니다.
   res.on('finish', () => {
     logger.info({
       method: req.method,
       url: req.originalUrl,
       statusCode: res.statusCode, // 응답 상태 코드
-      message: '[INTERCEPTOR] Request completed'
+      message: `[INTERCEPTOR] [${referer}] Request completed`
     });
   });
 

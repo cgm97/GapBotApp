@@ -39,17 +39,12 @@ exports.getCharacterInfo = async (req, res, next) => {
     nickName = tryDecodeURIComponent(nickName);
 
     const referer = req.headers.referer || req.headers.origin || '';
-    const isAllowedHost = referer.includes('loagap.com') || referer.includes('localhost');
 
     logger.info({
       method: req.method,
       url: req.url,
-      message: `요청 Host: ${referer} 캐릭터검색: ${nickName}`,
+      message: `캐릭터검색: ${nickName}`,
     });
-
-    if (!isAllowedHost) {
-      return res.status(403).json({ message: 'Invalid host' });
-    }
 
     const [rows] = await exports.selectCharacter(nickName);
 
@@ -115,16 +110,11 @@ exports.executeRenew = async (req, res, next) => {
     nickName = tryDecodeURIComponent(nickName);
 
     try {
-        const referer = req.headers.referer || req.headers.origin;
         logger.info({
             method: req.method,
             url: req.url,
-            message: `요청 Host: ${referer} 캐릭터갱신: ${nickName}`,
+            message: `캐릭터갱신: ${nickName}`,
         });
-
-        if (!referer || (!referer.includes('loagap.com') && !referer.includes('localhost'))) {
-            return res.status(403).json({ message: 'Invalid host' });
-        }
 
         const isSuccess = await exports.renewCharacterInfo(nickName);
 

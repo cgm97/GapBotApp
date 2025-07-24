@@ -4,7 +4,12 @@ import AdSense from '@/components/Adsense';
 
 async function getMarketsPriceData() {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/price/market`);
+    const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/price/market`, {
+      next: { revalidate: 10 },
+      headers: {
+        referer: "https://loagap.com/SSR"
+      }, // ISR or SSR 
+    });
     if (!res.ok) throw new Error('Failed to fetch');
     return await res.json();
   } catch (e) {

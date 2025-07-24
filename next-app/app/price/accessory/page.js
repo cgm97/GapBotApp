@@ -7,6 +7,9 @@ async function getAccessoryPriceData() {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/price/accessory`, {
       next: { revalidate: 60 },
+      headers: {
+        referer: "https://loagap.com/SSR"
+      }
     });
 
     if (!res.ok) throw new Error('Response not OK');
@@ -41,13 +44,13 @@ export default async function Page() {
   const { accessorysPrice, accessoryPriceLastUpdate } = await getAccessoryPriceData();
   return (
     <div className="bg-background text-foreground min-h-screen">
-    <div className="container-patch">
-      <h2 className="dark:text-gray-300">악세시세 / 악세차트</h2>
-      <div>
-        <AdSense adSlot="1488834693" />
+      <div className="container-patch">
+        <h2 className="dark:text-gray-300">악세시세 / 악세차트</h2>
+        <div>
+          <AdSense adSlot="1488834693" />
+        </div>
+        <AccessoryPage accessorysPrice={accessorysPrice} accessoryLastUpdate={accessoryPriceLastUpdate} />
       </div>
-      <AccessoryPage accessorysPrice={accessorysPrice} accessoryLastUpdate={accessoryPriceLastUpdate} />
-    </div>
     </div>
   );
 }
