@@ -63,7 +63,7 @@ const MainPages = () => {
       <div className="relative w-full max-w-screen-xl mx-auto aspect-[23/5] ad-content dark:bg-gray-500">
         {/* 배너 이미지 */}
         <img
-          src="/img/banner/LOAGAP배너.jpg"
+          src="/img/banner/LOAGAP배너.png"
           alt="광고 배너"
           className="w-full h-full object-cover rounded"
         />
