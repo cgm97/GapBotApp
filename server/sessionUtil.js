@@ -254,9 +254,10 @@ const getAccessoriesPrice = async () => {
                                 }
 
                                 if(accessoryKey == "상상상"){
-                                    if(optionCount == 3){
-                                        etcOptions = functionTriple(params[0], params[1], params[2], params[3], params[4], params[5],  params[6], (grade[gradeKey].point[optionCount] + pointAdjust));
+                                    if(optionCount != 3){
+                                        continue;
                                     }
+                                    etcOptions = functionTriple(params[0], params[1], params[2], params[3], params[4], params[5],  params[6], (grade[gradeKey].point[optionCount] + pointAdjust));
                                 } else{
                                     etcOptions = functionDouble(params[0], params[1], params[2], params[3], params[4], (grade[gradeKey].point[optionCount] + pointAdjust));
                                 }
