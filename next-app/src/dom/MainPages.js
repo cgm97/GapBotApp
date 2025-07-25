@@ -11,6 +11,7 @@ const MainPages = () => {
   const [noticeData, setNoticeData] = useState([]);
   const [eventData, setEventData] = useState([]);
   const [patchNoteData, setPatchNoteData] = useState([]);
+  const [showInquiry, setShowInquiry] = useState(false);
 
 
   // 클라이언트 환경변수
@@ -38,7 +39,7 @@ const MainPages = () => {
       axios.get(`${SERVER_URL}/api/event`)
         .then(res => {
           setEventData(res.data);
-          sessionStorage.setItem('event',JSON.stringify(res.data));
+          sessionStorage.setItem('event', JSON.stringify(res.data));
         })
         .catch(console.error);
     }
@@ -62,9 +63,25 @@ const MainPages = () => {
     <>
       <Island />
 
-      <div className="ad-content dark:bg-gray-500">
-        {/* <KakaoAdFit unit="DAN-lOG6HPbp08gmb26g" width={728} height={90} disabled={true} /> */}
-        <AdSense adSlot="1488834693" />
+      <div className="relative ad-content dark:bg-gray-500">
+        {/* 배너 이미지 */}
+        <img
+          src="/img/banner/LOAGAP배너.jpg"
+          width={1150}
+          height={250}
+          className="rounded"
+          alt="광고 배너"
+        />
+
+        {/* 배너 문의 버튼 */}
+        {/* <a
+          href="https://open.kakao.com/o/svYJKm1g"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="absolute top-2 right-2 text-xs bg-white/80 text-gray-100 px-2 py-1 rounded hover:bg-white shadow z-20"
+        >
+          📢 배너 문의
+        </a> */}
       </div>
 
       <div className="notice">
