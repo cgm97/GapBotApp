@@ -502,13 +502,13 @@ exports.getAccessoryPrice = async (req, res, next) => {
 // 악세서리 차트 조회
 exports.getAccessoryChart = async (req, res, next) => {
 
-    const { title, enhance, name, option, extra = '' } = req.query;
+    const { title, enhance, name, option, extra = '', extra2 = '' } = req.query;
 
     // 로깅
     logger.info({
         method: req.method,
         url: req.url,
-        message: `악세차트조회: ${title}, ${enhance}, ${name}, ${option}, ${extra}`,
+        message: `악세차트조회: ${title}, ${enhance}, ${name}, ${option}, ${extra}, ${extra2}`,
     });
 
     if (!title || !enhance || !name || !option) {
@@ -545,6 +545,11 @@ exports.getAccessoryChart = async (req, res, next) => {
             OR
             (? = 0 AND OPTION2 = ?)
             )
+            AND (
+            (? = 1 AND OPTION3 IS NULL)
+            OR
+            (? = 0 AND OPTION3 = ?)
+            )
             AND PRICE > 0
             AND DL_YN = 'N'
         GROUP BY 
@@ -555,6 +560,8 @@ exports.getAccessoryChart = async (req, res, next) => {
 
         const option2Value = extra === '' ? null : extra;
         const option2IsNull = option2Value == null ? 1 : 0;
+        const option3Value = extra2 === '' ? null : extra2;
+        const option3IsNull = option3Value == null ? 1 : 0;
 
         const params = [
             title,
@@ -564,6 +571,9 @@ exports.getAccessoryChart = async (req, res, next) => {
             option2IsNull,
             option2IsNull,
             option2Value,
+            option3IsNull,
+            option3IsNull,
+            option3Value,
         ];
         const [rows] = await connection.execute(selectSql, params);
 

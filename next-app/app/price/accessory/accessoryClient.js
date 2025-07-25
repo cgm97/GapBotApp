@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect  } from 'react';
+import { useState, useEffect } from 'react';
 import CandleChart from '@/components/CandleChart';
 import '@/css/Character.css';
 import axios from 'axios';
@@ -221,6 +221,7 @@ export default function AccessoryClient({ accessorysPrice, accessoryLastUpdate }
                         query.set('name', item.name);
                         query.set('option', item.option[0]);
                         if (item.option[1]) query.set('extra', item.option[1]);
+                        if (item.option[2]) query.set('extra2', item.option[2]);
 
                         const link = `/price/accessory/chart?${query.toString()}`;
 
@@ -228,12 +229,14 @@ export default function AccessoryClient({ accessorysPrice, accessoryLastUpdate }
                           <tr
                             key={idx}
                             onClick={() =>
+                              
                               fetchChartData(link, {
                                 title: tier.title,
                                 enhance: enhance.enhance,
                                 name: item.name,
                                 option: item.option[0],
-                                extra: item.option[1] || ''
+                                extra: item.option[1] || '',
+                                extra2: item.option[2] || ''
                               })
                             }
                             className="text-center hover:bg-blue-50 dark:hover:bg-gray-600 cursor-pointer transition"
@@ -294,13 +297,18 @@ export default function AccessoryClient({ accessorysPrice, accessoryLastUpdate }
                     const decodedTitle = modalItem.title || '';
                     const decodedOption = modalItem.option || '';
                     const extra = modalItem.extra || '';
+                    const extra2 = modalItem.extra2 || '';
 
                     const gradeArr = [];
-                    if (decodedTitle.length < 2) {
+                    if (decodedTitle.length == 1) {
                       gradeArr.push({ grade: decodedTitle, option: decodedOption });
-                    } else {
+                    } else if (decodedTitle.length == 2) {
                       gradeArr.push({ grade: decodedTitle.substring(0, 1), option: decodedOption });
                       gradeArr.push({ grade: decodedTitle.substring(1), option: extra });
+                    } else {
+                      gradeArr.push({ grade: decodedTitle.substring(0, 1), option: decodedOption });
+                      gradeArr.push({ grade: decodedTitle.substring(1, 2), option: extra });
+                      gradeArr.push({ grade: decodedTitle.substring(2), option: extra2 });
                     }
 
                     return gradeArr.map((item, idx) => {
