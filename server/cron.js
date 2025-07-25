@@ -640,8 +640,9 @@ cron.schedule('0 0 * * *', async () => { // async로 변경
                 NAME,
                 OPTION1,
                 OPTION2,
+                OPTION3,
                 PRICE
-                ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 ON DUPLICATE KEY UPDATE
                 PRICE = VALUES(PRICE),
                 FST_DTTI = CURRENT_TIMESTAMP,
@@ -672,6 +673,7 @@ cron.schedule('0 0 * * *', async () => { // async로 변경
                         name,
                         option[0] || null,
                         option[1] || null,
+                        option[2] || null,
                         price
                     ]);
                 }
@@ -817,8 +819,9 @@ cron.schedule('*/60 * * * *', async () => { // async로 변경
                 NAME,
                 OPTION1,
                 OPTION2,
+                OPTION3,
                 PRICE
-                ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 ON DUPLICATE KEY UPDATE
                 PRICE = VALUES(PRICE),
                 FST_DTTI = CURRENT_TIMESTAMP,
@@ -849,6 +852,7 @@ cron.schedule('*/60 * * * *', async () => { // async로 변경
                         name,
                         option[0] || null,
                         option[1] || null,
+                        option[2] || null,
                         price
                     ]);
                 }
@@ -904,9 +908,9 @@ cron.schedule('* * * * *', async () => {
 
     try {
         // if (process.env.NODE_ENV == "PROD") {
-            await getBookPrice(); // 각인서
-            await getJewelPrice(); // 보석
-            await getMarketPrice(); // 재료
+        await getBookPrice(); // 각인서
+        await getJewelPrice(); // 보석
+        await getMarketPrice(); // 재료
         // }
     } catch (error) {
         console.error('1분마다 작업 중 오류 발생:', error);
