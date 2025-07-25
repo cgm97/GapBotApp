@@ -34,6 +34,27 @@ const ACCESSORY = {
     ],
     "useGetEtcOptionDouble": true
   },
+    "상상상": {
+    "title": "상상상",
+    "necklace": [
+      { "name": "목걸이", "option": ["적에게 주는 피해%", "추가 피해%", "공격력+"], "params": [7, 42, 41, 53, 200, 260, 390] },
+      { "name": "목걸이", "option": ["적에게 주는 피해%", "추가 피해%", "무기 공격력+"], "params": [7, 42, 41, 54, 200, 260, 960] },
+      { "name": "목걸이", "option": ["낙인력%", "세레나데", "무기 공격력+"], "params": [7, 44, 43, 54, 800, 600, 960] },
+      { "name": "목걸이", "option": ["낙인력%", "세레나데", "최대 생명력"], "params": [7, 44, 43, 55, 800, 600, 6500] }
+    ],
+    "earring": [
+      { "name": "귀걸이", "option": ["공격력% ", "무기 공격력%", "무기 공격력+"], "params": [7, 45, 46, 54, 155, 300, 960], "pointAdjust": -1 },
+      { "name": "귀걸이", "option": ["공격력% ", "무기 공격력%", "공격력+"], "params": [7, 45, 46, 53, 155, 300, 960], "pointAdjust": -1 },
+      { "name": "귀걸이", "option": ["최대 생명력 ", "무기 공격력%", "무기 공격력+"], "params": [7, 55, 46, 54, 6500, 300, 960], "pointAdjust": -1 },
+    ],
+    "ring": [
+      { "name": "반지", "option": ["치명타 피해% ", "치명타 적중률%", "공격력+"], "params": [7, 50, 49, 53, 400, 155, 390], "pointAdjust": -1 },
+      { "name": "반지", "option": ["치명타 피해% ", "치명타 적중률%", "무기 공격력+"], "params": [7, 50, 49, 54, 400, 155, 960], "pointAdjust": -1 },
+      { "name": "반지", "option": ["아군 피해 강화% ", "아군 공격력 강화%", "무기 공격력+"], "params": [7, 52, 51, 54, 750, 500, 960], "pointAdjust": -1 },
+      { "name": "반지", "option": ["아군 피해 강화% ", "아군 공격력 강화%", "최대 생명력"], "params": [7, 52, 51, 55, 750, 500, 6500], "pointAdjust": -1 }
+    ],
+    "useGetEtcOptionDouble": true
+  },
   "상중": {
     "title": "상중",
     "necklace": [
@@ -207,13 +228,50 @@ function getEtcOptionsDouble(firstOption, secondOption, secondOption2, value1, v
   ]
   return etcOptions;
 }
+// 아이템 상세정보 (3중첩)
+function getEtcOptionsTriple(firstOption, secondOption, secondOption2, secondOption3, value1, value2, value3, point) {
 
+  var etcOptions = [
+    {
+      // 상옵
+      "FirstOption": firstOption,
+      "SecondOption": secondOption,
+      "MinValue": value1,
+      "MaxValue": value1
+    }
+    ,
+    {
+      // 중옵
+      "FirstOption": firstOption,
+      "SecondOption": secondOption2,
+      "MinValue": value2,
+      "MaxValue": value2
+    }
+    ,
+    {
+      // 중옵
+      "FirstOption": firstOption,
+      "SecondOption": secondOption3,
+      "MinValue": value3,
+      "MaxValue": value3
+    }
+    ,
+    { // 깨포
+      "FirstOption": 8,
+      "SecondOption": 1,
+      "MinValue": point,
+      "MaxValue": point
+    }
+  ]
+  return etcOptions;
+}
 // export로 내보내기
 module.exports = {
   ACCESSORY,
   GRADE,
   CATEGORYCODE,
   getEtcOptionsSingle,
-  getEtcOptionsDouble
+  getEtcOptionsDouble,
+  getEtcOptionsTriple
 };
 

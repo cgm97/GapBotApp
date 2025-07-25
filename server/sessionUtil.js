@@ -19,14 +19,10 @@ const initializeCache = async () => {
             await getBookPrice();
             await getJewelPrice();
             await getMarketPrice();
-
-            // 느린 작업: 백그라운드 처리
             getAccessoriesPrice()
-                .then(() => console.log("악세서리 가격 캐시 완료"))
-                .catch(err => console.error("악세서리 캐시 실패:", err));
+                    .then(() => console.log("악세서리 가격 캐시 완료"))
+                    .catch(err => console.error("악세서리 캐시 실패:", err));           
         }
-
-        // console.log("Session Cache:", Object.fromEntries(sessionCache)); // Map 내용을 출력
     } catch (error) {
         console.error("Failed to initialize cache:", error);
     }
@@ -209,6 +205,7 @@ const getAccessoriesPrice = async () => {
     const CategoryCode = fillter.CATEGORYCODE;
     const functionSingle = fillter.getEtcOptionsSingle;
     const functionDouble = fillter.getEtcOptionsDouble;
+    const functionTriple = fillter.getEtcOptionsTriple;
 
     // if (now - accessoryPriceLastUpdate < 60 * 60 * 1000) { // 1시간
     logger.info({
@@ -255,7 +252,15 @@ const getAccessoriesPrice = async () => {
                                 if (optionCount == 1) {
                                     continue; // 연마 횟수가 1은 중첩 불가 -> 단일만 조회
                                 }
-                                etcOptions = functionDouble(params[0], params[1], params[2], params[3], params[4], (grade[gradeKey].point[optionCount] + pointAdjust));
+
+                                if(accessoryKey == "상상상"){
+                                    if(optionCount == 3){
+                                        etcOptions = functionTriple(params[0], params[1], params[2], params[3], params[4], params[5],  params[6], (grade[gradeKey].point[optionCount] + pointAdjust));
+                                    }
+                                } else{
+                                    etcOptions = functionDouble(params[0], params[1], params[2], params[3], params[4], (grade[gradeKey].point[optionCount] + pointAdjust));
+                                }
+                                
                             }
                             // 딘일(상 중)
                             else {
@@ -318,7 +323,7 @@ const getAccessoriesPrice = async () => {
                             });
                             cnt++;
 
-                            await new Promise(resolve => setTimeout(resolve, 1000));
+                            await new Promise(resolve => setTimeout(resolve, 900));
 
                             // "title": "상",
                             // "enhances": [
