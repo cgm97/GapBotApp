@@ -11,7 +11,6 @@ const MainPages = () => {
   const [noticeData, setNoticeData] = useState([]);
   const [eventData, setEventData] = useState([]);
   const [patchNoteData, setPatchNoteData] = useState([]);
-  const [showInquiry, setShowInquiry] = useState(false);
 
 
   // 클라이언트 환경변수
@@ -61,8 +60,6 @@ const MainPages = () => {
 
   return (
     <>
-      <Island />
-
       <div className="relative w-full max-w-screen-xl mx-auto aspect-[23/5] ad-content dark:bg-gray-500">
         {/* 배너 이미지 */}
         <img
@@ -80,6 +77,13 @@ const MainPages = () => {
         >
           📢 배너 문의
         </a> */}
+      </div>
+
+      <Island />
+
+      <div className="ad-content dark:bg-gray-500">
+        {/* <KakaoAdFit unit="DAN-lOG6HPbp08gmb26g" width={728} height={90} disabled={true} /> */}
+        <AdSense adSlot="1488834693" />
       </div>
 
       <div className="notice">
