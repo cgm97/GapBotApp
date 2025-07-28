@@ -21,7 +21,7 @@ export default function GoogleCallbackClient() {
     } else {
       router.replace('/user/login');
     }
-  }, [searchParams]);
+  }, []);
 
   return (
     <div className="flex justify-center items-center py-10 text-gray-800 dark:text-white">
