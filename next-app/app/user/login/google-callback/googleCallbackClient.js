@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useUserContext } from '@/context/UserContext';
 
 export default function GoogleCallbackClient() {
@@ -10,10 +10,11 @@ export default function GoogleCallbackClient() {
   const { login } = useUserContext();
 
   useEffect(() => {
-    const accessToken = searchParams.get('accessToken');
-    const email = searchParams.get('email');
-    const userCode = searchParams.get('userCode');
-    const roomCode = searchParams.get('roomCode');
+    const url = new URL(window.location.href);
+    const accessToken = url.searchParams.get('accessToken');
+    const email = url.searchParams.get('email');
+    const userCode = url.searchParams.get('userCode');
+    const roomCode = url.searchParams.get('roomCode');
 
     if (accessToken && email) {
       login(email, accessToken, userCode, roomCode);
