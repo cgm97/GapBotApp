@@ -87,6 +87,18 @@ export default function Login() {
           >
             로그인
           </button>
+          <a
+            href={`${process.env.NEXT_PUBLIC_SERVER_URL}/user/auth/google`}
+            className="w-full py-2 flex items-center justify-center gap-2 bg-gray-100 border border-gray-300 text-gray-700 font-medium rounded shadow-sm hover:shadow-md hover:text-gray-300 hover:bg-gray-700 transition"
+          >
+            <img
+              src="https://developers.google.com/identity/images/g-logo.png"
+              alt="Google logo"
+              className="w-5 h-5"
+            />
+            <span>Google 계정으로 로그인</span>
+          </a>
+
           <div className="text-center text-sm text-gray-600 mt-2">
             Don&apos;t have an account?{' '}
             <Link href="/register" className="text-black underline hover:text-blue-600">회원가입</Link>

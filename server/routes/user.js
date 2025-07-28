@@ -341,4 +341,6 @@ router.post('/save', userService.saveUserInfo);
  */
 router.get('/verifyEmail', userService.verifyEmail);
 
+router.get('/auth/google', userService.authGoogle);
+router.get('/auth/google/callback', userService.authGoogleCallback);
 module.exports = router;

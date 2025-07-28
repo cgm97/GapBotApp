@@ -70,7 +70,7 @@ exports.executeLogin = async (req, res, next) => {
         });
 
         // 응답
-        return res.status(200).json({ token: accessToken, email: user.USERNAME, userCode: user.USER_CODE, roomCode: user.ROOM_CODE});
+        return res.status(200).json({ token: accessToken, email: user.USERNAME, userCode: user.USER_CODE, roomCode: user.ROOM_CODE });
     } catch (error) {
         next(new Error(err));  // 에러 객체를 넘겨서 next 미들웨어로 전달
         return res.status(500).json({ message: '서버 오류가 발생했습니다.' });
@@ -87,15 +87,15 @@ exports.executeLogout = async (req, res, next) => {
         secure: process.env.NODE_ENV === 'PROD', // 프로덕션 환경에서만 secure 옵션 활성화
         domain: process.env.COOKIE_DOMAIN, // 상위 도메인(.loagap.com)으로 설정하여 서브도메인 간 쿠키 공유 가능
         path: '/'             // 모든 경로에서 유효하도록 설정
-      });
-    
-      // 추가적으로 서버에서 refreshToken 무효화 (DB 또는 캐시에서 삭제)
-      const refreshToken = req.cookies.refreshToken;
-      if (refreshToken) {
+    });
+
+    // 추가적으로 서버에서 refreshToken 무효화 (DB 또는 캐시에서 삭제)
+    const refreshToken = req.cookies.refreshToken;
+    if (refreshToken) {
         // 토큰 블랙리스트 추가 등 무효화 로직 구현 
-      }
-    
-      return res.status(200).json({ message: '로그아웃 되었습니다.' });
+    }
+
+    return res.status(200).json({ message: '로그아웃 되었습니다.' });
 }
 
 exports.executeRefresh = async (req, res, next) => {
@@ -114,12 +114,12 @@ exports.executeRefresh = async (req, res, next) => {
 
         const selectSql = `SELECT USERNAME, NICKNAME, ROOM_CODE, USER_CODE FROM USER_INFO WHERE USERNAME =?`;
         const [userInfo] = await connection.execute(selectSql, [user.USERNAME]);
-        
+
         // userInfo가 없으면, 해당 사용자가 존재하지 않음
         if (!userInfo || userInfo.length === 0) {
             return res.status(404).json({ message: '사용자를 찾을 수 없습니다.' });
         }
-        
+
         // 새로운 Access Token 생성
         const payload = {
             USERNAME: userInfo[0].USERNAME,
@@ -132,14 +132,14 @@ exports.executeRefresh = async (req, res, next) => {
 
         console.log("서버 갱신");
 
-        return res.status(200).json({ message: 'Access Token 재발급 되었습니다.', token: newAccessToken , user:userInfo[0].USERNAME});
+        return res.status(200).json({ message: 'Access Token 재발급 되었습니다.', token: newAccessToken, user: userInfo[0].USERNAME });
     } catch (error) {
         console.error(error);
         return res.status(403).json({ message: 'RefreshToken이 만료되었습니다.' });
     } finally {
-    // DB 연결 해제
-    if (connection) connection.release();
-  }
+        // DB 연결 해제
+        if (connection) connection.release();
+    }
 };
 
 
@@ -442,5 +442,109 @@ exports.verifyEmail = async (req, res, next) => {
         // DB 연결 해제
         if (connection) connection.release();
     }
-
 }
+// 구글 로그인 화면 접속
+exports.authGoogle = async (req, res, next) => {
+    const redirect_uri = encodeURIComponent(process.env.GOOGLE_SEVER_REDIRECT_URI);
+    const client_id = process.env.GOOGLE_CLIENT_ID;
+    const scope = encodeURIComponent('profile email');
+
+    const authURL = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${client_id}&redirect_uri=${redirect_uri}&scope=${scope}`;
+
+    res.redirect(authURL);
+};
+
+// 구글로그인 처리
+exports.authGoogleCallback = async (req, res, next) => {
+    const code = req.query.code;
+    const connection = await pool.getConnection();
+
+    try {
+        await connection.beginTransaction();
+
+        // 1. 액세스 토큰 요청
+        const tokenRes = await axios.post(
+            'https://oauth2.googleapis.com/token',
+            {
+                code,
+                client_id: process.env.GOOGLE_CLIENT_ID,
+                client_secret: process.env.GOOGLE_CLIENT_SCRET,
+                redirect_uri: process.env.GOOGLE_SEVER_REDIRECT_URI,
+                grant_type: 'authorization_code',
+            },
+            { headers: { 'Content-Type': 'application/json' } }
+        );
+
+        const { access_token } = tokenRes.data;
+
+        // 2. 유저 정보 요청
+        const userInfoRes = await axios.get(`https://www.googleapis.com/oauth2/v2/userinfo`, {
+            headers: { Authorization: `Bearer ${access_token}` },
+        });
+
+        const { email } = userInfoRes.data;
+
+        // 3. 사용자 조회
+        const selectSql = `
+            SELECT USERNAME, PASSWORD, NICKNAME, ROOM_CODE, USER_CODE, EMAIL_VERIFIED
+            FROM USER_INFO 
+            WHERE USERNAME = ? AND DL_YN = 'N'
+            `;
+        let [userInfo] = await connection.execute(selectSql, [email]);
+
+        logger.info({ method: req.method, url: req.url, message: `SQL: ${selectSql}\nParam: ${email}` });
+
+        // 4. 사용자 없으면 회원가입 처리
+        if (userInfo.length === 0) {
+            const insertSql = `
+                INSERT INTO USER_INFO (USERNAME, PASSWORD, EMAIL_VERIFIED)
+                VALUES (?, ?, 'Y')
+            `;
+            await connection.execute(insertSql, [email, 'google']);
+
+            logger.info({ method: req.method, url: req.url, message: `신규 유저 생성: ${email}` });
+
+            // 다시 조회
+            [userInfo] = await connection.execute(selectSql, [email]);
+        }
+
+        const user = userInfo[0];
+
+        // 5. JWT 발급
+        const payload = {
+            USERNAME: user.USERNAME,
+            NICKNAME: user.NICKNAME,
+            ROOM_CODE: user.ROOM_CODE,
+            USER_CODE: user.USER_CODE,
+        };
+        const payload1 = { USERNAME: user.USERNAME };
+
+        const accessToken = jwt.sign(payload, process.env.JWT_SECRET, {
+            expiresIn: process.env.EXPIRES_TIME_ACCESS,
+        });
+        const refreshToken = jwt.sign(payload1, process.env.JWT_SECRET_REFRESH, {
+            expiresIn: process.env.EXPIRES_TIME_REFRESH,
+        });
+
+        // 6. 리프레시 토큰을 HttpOnly 쿠키로 설정
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'PROD',
+            domain: process.env.COOKIE_DOMAIN,
+            path: '/',
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
+        });
+
+        await connection.commit();
+
+        // 7. 프론트로 리디렉션 (accessToken, 사용자 식별 정보 전달)
+        const frontendRedirect = process.env.GOOGLE_CLIENT_REDIRECT_URI;
+        res.redirect(`${frontendRedirect}?accessToken=${accessToken}&email=${user.USERNAME}&userCode=${user.USER_CODE}&roomCode=${user.ROOM_CODE}`);
+    } catch (e) {
+        await connection.rollback();
+        logger.error(`[Google Auth Callback Error] ${e.message}`);
+        next(e);
+    } finally {
+        if (connection) connection.release();
+    }
+};
