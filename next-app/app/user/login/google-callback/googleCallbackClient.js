@@ -6,7 +6,6 @@ import { useUserContext } from '@/context/UserContext';
 
 export default function GoogleCallbackClient() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { login } = useUserContext();
 
   useEffect(() => {
