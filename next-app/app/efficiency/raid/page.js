@@ -19,18 +19,18 @@ async function getRaidData() {
 }
 
 export const metadata = {
-  title: '더보기 효율 | LOAGAP',
-  description: '로스트아크의 레이드 더보기 실시간 효율 확인해보세요.',
-  keywords: '로스트아크, 로아 레이드 더보기, 더보기 효율, 더보기 보상, LOAGAP, 빈틈봇',
+  title: '레이드 더보기 효율 | LOAGAP',
+  description: '로스트아크의 레이드 더보기 보상 골드 효율을 실시간 시세로 확인하세요. 더보기 아이템만 반영한 효율 계산기입니다.',
+  keywords: '로스트아크, 레이드 더보기, 더보기 효율, 로아 더보기 보상, 골드 계산기, 레이드 효율, LOAGAP, 빈틈봇',
   openGraph: {
-    title: '더보기 효율 | LOAGAP',
-    description: '로스트아크의 레이드 더보기 실시간 효율 확인해보세요.',
-    url: 'https://loagap.com/price/book',
+    title: '레이드 더보기 효율 | LOAGAP',
+    description: '더보기 보상 아이템 기준 실시간 시세 기반 골드 환산 효율을 확인하세요.',
+    url: 'https://loagap.com/efficiency/raid',
     type: 'website',
     images: [
       {
         url: 'https://loagap.com/img/logo.png',
-        alt: `빈틈 이미지`
+        alt: '레이드 더보기 효율 계산기 이미지',
       }
     ]
   },
@@ -41,10 +41,18 @@ export default async function Page() {
 
   return (
     <div className="bg-background text-foreground min-h-screen">
-      <h1 className="dark:text-gray-300">레이드 실시간 더보기 효율표</h1>
-      <section className="text-sm text-gray-600 dark:text-gray-300 mb-6" aria-label="레이드 더보기 효율 안내">
-        <p>레이드 더보기시 얻는 아이템의 실시간 단가로 계산된 효율을 확인 할 수 있습니다.</p>
-        <p>특수 재료는 제외됩니다. 오직 더보기 아이템 단가로 계산됩니다.</p>
+      <h1 className="text-2xl font-bold dark:text-gray-300">
+        레이드 더보기 실시간 골드 효율 계산기
+      </h1>
+
+      <section className="text-sm text-gray-600 dark:text-gray-300 mb-6" aria-label="레이드 더보기 효율 설명">
+        <p>
+          로스트아크의 <strong>레이드 더보기</strong>를 통해 획득 가능한 <strong>아이템 가격</strong>을 기반으로
+          <strong> 실시간 골드 효율</strong>을 계산합니다.
+        </p>
+        <p>
+          특수 재료는 제외되며, <strong>더보기 아이템</strong>만 골드로 환산하여 비교합니다.
+        </p>
       </section>
       <div>
         <AdSense adSlot="1488834693" />
