@@ -21,12 +21,12 @@ async function getChaosData() {
 
 export const metadata = {
   title: '카오스 던전 효율 | LOAGAP',
-  description: '로스트아크의 카오스 던전의 1회 보상 실시간 효율 확인해보세요.',
-  keywords: '로스트아크, 로아 카던 효율, 카오스 던전 효율, 카던 보상, LOAGAP, 빈틈봇',
+  description: '로스트아크 카오스 던전 1회 보상 효율을 실시간 시세 기반으로 분석해보세요. 골드 환산, 아이템 가치, 효율 비교 제공.',
+  keywords: '로스트아크, 카오스 던전, 카던 효율, 카던 보상, 카던 시세, 카오스 효율 계산기, 로아 골드 효율, LOAGAP',
   openGraph: {
     title: '카오스 던전 효율 | LOAGAP',
-    description: '로스트아크의 카오스 던전의 1회 보상 실시간 효율 확인해보세요.',
-    url: 'https://loagap.com/price/book',
+    description: '로스트아크 카오스 던전 1회 보상 효율을 실시간 시세 기반으로 분석해보세요. 골드 환산, 아이템 가치, 효율 비교 제공.',
+    url: 'https://loagap.com/efficiency/chaos',
     type: 'website',
     images: [
       {
@@ -43,10 +43,17 @@ export default async function Page() {
   return (
     <div className="bg-background text-foreground min-h-screen">
       <div className="container-patch">
-        <h1 className="dark:text-gray-300">카오스 던전 실시간 효율표</h1>
-        <section className="text-sm text-gray-600 dark:text-gray-300 mb-6" aria-label="카오스 던전 효율 안내">
-          <p>카오스 던전 클리어시 얻는 아이템의 실시간 단가로 계산된 효율을 확인 할 수 있습니다.</p>
-          <p>휴식 게이지 보상은 따로 계산하지 않았으며, 원할시 계산된 효율의 2배로 게산됩니다.</p>
+        <h1 className="text-xl font-bold dark:text-gray-300">
+          로스트아크 카오스 던전 효율 (실시간 시세 기반)
+        </h1>
+        <section className="text-sm text-gray-600 dark:text-gray-300 mb-6">
+          <p>
+            로스트아크 카오스 던전 1회 보상으로 획득할 수 있는 아이템을 실시간 시세 기준으로 분석하여
+            <strong> 골드 효율 </strong>을 계산합니다.
+          </p>
+          <p>
+            휴식 게이지 보상은 별도로 계산되지 않으며, 평균적으로 <strong>2배 효율</strong>로 추정됩니다.
+          </p>
         </section>
         <div>
           <AdSense adSlot="1488834693" />

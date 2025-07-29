@@ -49,7 +49,7 @@ export const metadata = {
   openGraph: {
     title: '패키지 효율 계산기 | LOAGAP',
     description: '로스트아크 크리스탈 패키지의 효율을 계산하고 비교해보세요.',
-    url: 'https://loagap.com/efficiency',
+    url: 'https://loagap.com/efficiency/package',
     type: 'website',
     images: [
       {

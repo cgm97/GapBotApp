@@ -14,7 +14,8 @@ export default function GuardianClient({ guardianData }) {
 
   return (
     <div className="overflow-x-auto p-4 text-gray-800 dark:text-gray-200">
-      <table className="min-w-full border border-gray-400 dark:border-gray-600 text-sm bg-white dark:bg-gray-900 rounded-lg overflow-hidden">
+      <table className="min-w-full border border-gray-400 dark:border-gray-600 text-sm bg-white dark:bg-gray-900 rounded-lg overflow-hidden" aria-label="가디언 토벌 보상 효율표">
+        <caption className="sr-only">가디언 토벌 던전별 골드 효율 표</caption>
         <thead className="bg-blue-700 text-white">
           <tr>
             {['입장레벨', '이름', '거래가능', '총 합계', '구성품'].map((title, idx) => (
@@ -81,11 +82,10 @@ export default function GuardianClient({ guardianData }) {
                               개, 약 {reward.price.toLocaleString()} G
                             </div>
                             <div
-                              className={`text-[11px] font-medium ${
-                                reward.isTradeable
-                                  ? 'text-green-600 dark:text-green-400'
-                                  : 'text-gray-400 dark:text-gray-500'
-                              }`}
+                              className={`text-[11px] font-medium ${reward.isTradeable
+                                ? 'text-green-600 dark:text-green-400'
+                                : 'text-gray-400 dark:text-gray-500'
+                                }`}
                             >
                               {reward.isTradeable ? '거래가능' : '거래불가(귀속)'}
                             </div>
@@ -100,6 +100,12 @@ export default function GuardianClient({ guardianData }) {
           ))}
         </tbody>
       </table>
+      <footer className="mt-10 text-xs text-gray-500 dark:text-gray-400">
+        <p>
+          LOAGAP는 로스트아크 가디언 토벌 보상 효율을 실시간 시세로 계산하여 제공합니다.
+          가디언 토벌 효율, 가토 보상, 가토 효율, 실시간 계산기, 로아 골드 효율 등의 키워드로 검색해보세요.
+        </p>
+      </footer>
     </div>
   );
 }

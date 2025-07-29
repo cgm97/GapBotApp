@@ -14,7 +14,8 @@ export default function RaidClient({ raidData }) {
 
   return (
     <div className="overflow-x-auto p-4 text-gray-800 dark:text-gray-200">
-      <table className="min-w-full border border-gray-300 dark:border-gray-700 text-sm bg-white dark:bg-gray-900 rounded-lg overflow-hidden">
+      <table className="min-w-full border border-gray-300 dark:border-gray-700 text-sm bg-white dark:bg-gray-900 rounded-lg overflow-hidden" aria-label="레이드 더보기 보상 효율표">
+        <caption className="sr-only">레이드 보상 아이템의 실시간 골드 효율 표</caption>
         <thead className="bg-blue-700 text-white">
           <tr>
             <th className="px-4 py-2">입장레벨</th>
@@ -169,6 +170,12 @@ export default function RaidClient({ raidData }) {
           ))}
         </tbody>
       </table>
+      <footer className="mt-10 text-xs text-gray-500 dark:text-gray-400">
+        <p>
+          LOAGAP은 로스트아크 레이드 더보기 보상의 실시간 시세를 바탕으로 한 효율을 계산합니다.
+          로아 더보기 효율, 로아 레이드 더보기 골드 환산, 더보기 보상 효율, 실시간 계산기 키워드로 검색해보세요.
+        </p>
+      </footer>
     </div>
   );
 }

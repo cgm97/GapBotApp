@@ -20,17 +20,17 @@ async function getGuardianData() {
 
 export const metadata = {
   title: '가디언 토벌 효율 | LOAGAP',
-  description: '로스트아크의 가디언 토벌의 1회 보상 실시간 효율을 확인해보세요.',
-  keywords: '로스트아크, 로아 가토 효율, 가디언 토벌 효율, 가토 보상, LOAGAP, 빈틈봇',
+  description: '로스트아크 가디언 토벌 1회 보상의 실시간 시세 기반 골드 효율을 확인하세요. 던전별 구성품과 거래 여부 포함.',
+  keywords: '로스트아크, 가디언 토벌, 가토 보상, 가토 효율, 가토 시세, 로아 효율, 골드 환산, LOAGAP',
   openGraph: {
     title: '가디언 토벌 효율 | LOAGAP',
-    description: '로스트아크의 가디언 토벌 1회 보상 실시간 효율 확인해보세요.',
-    url: 'https://loagap.com/price/book',
+    description: '가디언 토벌에서 얻는 보상의 실시간 시세와 골드 효율을 확인해보세요.',
+    url: 'https://loagap.com/efficiency/guardian',
     type: 'website',
     images: [
       {
         url: 'https://loagap.com/img/logo.png',
-        alt: `빈틈 이미지`
+        alt: '가디언 토벌 보상 효율',
       }
     ]
   },
@@ -42,10 +42,10 @@ export default async function Page() {
   return (
     <div className="bg-background text-foreground min-h-screen">
       <div className="container-patch">
-        <h1 className="dark:text-gray-300">가디언 토벌 실시간 효율표</h1>
-        <section className="text-sm text-gray-600 dark:text-gray-300 mb-6" aria-label="가디언 토벌 효율 안내">
-          <p>가디언 토벌시 얻는 아이템의 실시간 단가로 계산된 효율을 확인 할 수 있습니다.</p>
-          <p>휴식 게이지 보상은 따로 계산하지 않았으며, 원할시 계산된 효율의 2배로 게산됩니다</p>
+        <h1 className="text-2xl font-bold">가디언 토벌 효율</h1>
+        <section aria-label="가디언 토벌 보상 설명">
+          <p><strong>가디언 토벌</strong>에서 획득 가능한 보상을 골드로 환산한 <strong>실시간 효율</strong>을 제공합니다.</p>
+          <p>이 효율은 <em>실시간 시세</em> 기반으로 자동 업데이트됩니다.</p>
         </section>
         <div>
           <AdSense adSlot="1488834693" />
