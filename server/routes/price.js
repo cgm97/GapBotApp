@@ -300,4 +300,6 @@ router.get('/chaos', priceService.getChaosPrice);
 router.get('/guardian', priceService.getGuardianPrice);
 router.get('/raid', priceService.getRaidPrice);
 
+router.post('/enhance', priceService.getEnhancePrice);
+
 module.exports = router;
