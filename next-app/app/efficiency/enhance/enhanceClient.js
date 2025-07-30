@@ -368,7 +368,7 @@ export default function EnhanceClient({ enhanceData: initialEnhanceData }) {
                 </tr>
               </thead>
               <tbody>
-                {enhanceData.armorEnhace.map((item, index) => (
+                {enhanceData && enhanceData.armorEnhace.map((item, index) => (
                   <tr
                     key={index}
                     className="text-center cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
@@ -393,7 +393,7 @@ export default function EnhanceClient({ enhanceData: initialEnhanceData }) {
                 </tr>
               </thead>
               <tbody>
-                {enhanceData.armorAdvancedEnhace.map((item, index) => (
+                {enhanceData && enhanceData.armorAdvancedEnhace.map((item, index) => (
                   <tr
                     key={index}
                     className="text-center cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
@@ -445,7 +445,7 @@ export default function EnhanceClient({ enhanceData: initialEnhanceData }) {
                 </tr>
               </thead>
               <tbody>
-                {enhanceData.weaponEnhace.map((item, index) => (
+                {enhanceData && enhanceData.weaponEnhace.map((item, index) => (
                   <tr
                     key={index}
                     className="text-center cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
@@ -470,7 +470,7 @@ export default function EnhanceClient({ enhanceData: initialEnhanceData }) {
                 </tr>
               </thead>
               <tbody>
-                {enhanceData.weaponAdvancedEnhace.map((item, index) => (
+                {enhanceData && enhanceData.weaponAdvancedEnhace.map((item, index) => (
                   <tr
                     key={index}
                     className="text-center cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
