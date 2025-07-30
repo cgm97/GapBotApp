@@ -9,14 +9,23 @@ async function getEnhanceData() {
       headers: {
         referer: "https://loagap.com/SSR"
       }, // ISR or SSR
-      body: JSON.stringify({ items:["all"] }) // ← JSON body로 데이터 전송
+      body: JSON.stringify({ items: ["all"] }) // ← JSON body로 데이터 전송
     });
     if (!res.ok) throw new Error('Failed to fetch');
     return await res.json();
   } catch (e) {
     console.error('API fetch 실패:', e);
     // fallback 데이터 또는 빈 데이터 반환
-    return [];
+    return {
+      armorEnhace: [],
+      weaponEnhace: [],
+      armorAdvancedEnhace: [],
+      weaponAdvancedEnhace: [],
+      armorSequence: [],
+      weaponSequence: [],
+      armorTotalCost: 0,
+      weaponTotalCost: 0
+    };
   }
 }
 
