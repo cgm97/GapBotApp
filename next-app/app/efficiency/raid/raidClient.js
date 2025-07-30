@@ -15,7 +15,7 @@ export default function RaidClient({ raidData }) {
   return (
     <div className="overflow-x-auto p-4 text-gray-800 dark:text-gray-200">
       <table className="min-w-full border border-gray-300 dark:border-gray-700 text-sm bg-white dark:bg-gray-900 rounded-lg overflow-hidden" aria-label="레이드 더보기 보상 효율표">
-        <caption className="sr-only">레이드 보상 아이템의 실시간 골드 효율 표</caption>
+        <caption className="sr-only">로아 더보기 효율</caption>
         <thead className="bg-blue-700 text-white">
           <tr>
             <th className="px-4 py-2">입장레벨</th>

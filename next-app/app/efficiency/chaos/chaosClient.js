@@ -15,7 +15,7 @@ export default function ChaosClient({ chaosData }) {
   return (
     <div className="overflow-x-auto p-4 text-gray-800 dark:text-gray-200">
       <table className="min-w-full border border-gray-300 dark:border-gray-700 text-sm bg-white dark:bg-gray-900 rounded-lg overflow-hidden" aria-label="카오스 던전 효율 표">
-        <caption className="sr-only">카오스 던전 레벨별 효율</caption>
+        <caption className="sr-only">로스트아크 카오스 던전(카던) 레벨별 효율</caption>
         <thead className="bg-blue-700 text-white">
           <tr>
             <th className="px-4 py-2">입장레벨</th>

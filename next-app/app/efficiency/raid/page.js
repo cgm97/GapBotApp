@@ -20,11 +20,11 @@ async function getRaidData() {
 
 export const metadata = {
   title: '레이드 더보기 효율 | LOAGAP',
-  description: '로스트아크의 레이드 더보기 보상 골드 효율을 실시간 시세로 확인하세요. 더보기 아이템만 반영한 효율 계산기입니다.',
-  keywords: '로스트아크, 레이드 더보기, 더보기 효율, 로아 더보기 보상, 골드 계산기, 레이드 효율, LOAGAP, 빈틈봇',
+  description: '로아 더보기 효율 아이템 기준 실시간 시세 기반 골드 효율을 계산합니다. 레이드 더보기 보상만 반영한 효율 계산기입니다.',
+  keywords: '로스트아크, 로아, 더보기, 레이드 더보기, 더보기 효율, 로아 더보기 보상, 골드 계산기, 레이드 효율, LOAGAP, 빈틈봇',
   openGraph: {
     title: '레이드 더보기 효율 | LOAGAP',
-    description: '더보기 보상 아이템 기준 실시간 시세 기반 골드 환산 효율을 확인하세요.',
+    description: '로아 더보기 보상 아이템 기준 실시간 시세 기반 골드 효율을 계산합니다. 레이드 더보기 보상만 반영한 효율 계산기입니다.',
     url: 'https://loagap.com/efficiency/raid',
     type: 'website',
     images: [
