@@ -2,6 +2,7 @@ const pool = require('../db/connection');
 const logger = require('../logger');  // logger.js 임포트
 const { sessionCache, getBookPrice, getDate, getJewelPrice, calculatePriceDiff, groupByNameArray, getMarketPrice } = require('../sessionUtil'); // 캐시 모듈 가져오기
 const { chaosResults, guardianResults, raidResults } = require('../contentsData');
+const { armor, weapon, armorAdvanced, weaponAdvanced, getSequence, calculateEnhance, calculateTotalCost } = require('../enhancesData');
 require('dotenv').config(); // .env 파일에서 환경 변수 로드
 
 function formatDateString(dateStr) {
@@ -961,6 +962,86 @@ exports.getRaidPrice = async (req, res, next) => {
         return res.status(200).json(
             raid
         );
+    } catch (e) {
+        next(new Error(e));
+    }
+}
+exports.getEnhancePrice = async (req, res, next) => {
+
+    const { items = ["all"] } = req.body;
+
+    // 로깅
+    logger.info({
+        method: req.method,
+        url: req.url,
+        message: `재련효율 ${items.length}`,
+    });
+
+    try {
+        const armorEnhace = calculateEnhance(armor, sessionCache.get("marketPrice"), items);
+        const weaponEnhace = calculateEnhance(weapon, sessionCache.get("marketPrice"), items);
+
+        const armorAdvancedEnhace = calculateEnhance(armorAdvanced, sessionCache.get("marketPrice"), items);
+        const weaponAdvancedEnhace = calculateEnhance(weaponAdvanced, sessionCache.get("marketPrice"), items);
+
+        // const result = {};
+        // const result1 = {};
+
+        // armorAdvancedEnhace.forEach(({ level: advLevel, perLevelCost: advCost }) => {
+        //     // 일반 재련 중 상급 재련 비용보다 작은것들만 필터
+        //     const filtered = armorEnhace
+        //         .filter(({ perLevelCost }) => perLevelCost < advCost);
+                
+        //     if (filtered.length === 0) {
+        //         // 모두 작거나 같으면 가장 높은 단계보다 상급 재련가 효율 좋음
+        //         result[advLevel] = `모든 일반 재련 단계보다 ${advLevel} 상급재련이 효율좋음`;
+        //     } else {
+        //         // 가장 높은 강화 단계 선택
+        //         const minNormal = filtered.reduce((prev, curr) =>
+        //             prev.perLevelCost > curr.perLevelCost ? prev : curr
+        //         );
+        //         // ex: "15강 보다 10-11 상급재련이 효율좋음"
+        //         result[advLevel] = `${minNormal.level} 보다 ${advLevel} 상급재련이 효율좋음`;
+        //     }
+        // });
+
+        // weaponAdvancedEnhace.forEach(({ level: advLevel, perLevelCost: advCost }) => {
+        //     // 일반 재련 중 상급 재련 비용보다 작은것들만 필터
+        //     const filtered = weaponEnhace
+        //         .filter(({ perLevelCost }) => perLevelCost < advCost);
+
+        //     if (filtered.length === 0) {
+        //         // 모두 작거나 같으면 가장 높은 단계보다 상급 재련가 효율 좋음
+        //         result1[advLevel] = `모든 일반 재련 단계보다 ${advLevel} 상급재련이 효율좋음`;
+        //     } else {
+        //         // 가장 높은 강화 단계 선택
+        //         const minNormal = filtered.reduce((prev, curr) =>
+        //             prev.perLevelCost > curr.perLevelCost ? prev : curr
+        //         );
+        //         // ex: "15강 보다 10-11 상급재련이 효율좋음"
+        //         result1[advLevel] = `${minNormal.level} 보다 ${advLevel} 상급재련이 효율좋음`;
+        //     }
+        // });
+
+        // console.log(result);
+        // console.log(result1);
+
+        const armorSequence = getSequence(armorEnhace, armorAdvancedEnhace);
+        const weaponSequence = getSequence(weaponEnhace, weaponAdvancedEnhace);
+
+        const armorTotalCost = calculateTotalCost(armorSequence, armorEnhace, armorAdvancedEnhace);
+        const weaponTotalCost = calculateTotalCost(weaponSequence, weaponEnhace, weaponAdvancedEnhace);
+
+        return res.status(200).json({
+            armorEnhace,
+            weaponEnhace,
+            armorAdvancedEnhace,
+            weaponAdvancedEnhace,
+            armorSequence,
+            weaponSequence,
+            armorTotalCost,
+            weaponTotalCost
+        });
     } catch (e) {
         next(new Error(e));
     }

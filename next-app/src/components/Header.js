@@ -165,6 +165,9 @@ const Header = () => {
           <Link href="/efficiency/package" title="패키지 효율 계산">패키지 계산기</Link>
         </li>
         <li className="px-4 py-2 whitespace-nowrap hover:bg-blue-600 rounded">
+          <Link href="/efficiency/enhance" title="상급재련 효율">상급재련 | 재련루트</Link>
+        </li>
+        <li className="px-4 py-2 whitespace-nowrap hover:bg-blue-600 rounded">
           <Link href="/efficiency/chaos" title="카오스 던전 효율">카오스 던전</Link>
         </li>
         <li className="px-4 py-2 whitespace-nowrap hover:bg-blue-600 rounded">
