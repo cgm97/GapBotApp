@@ -52,7 +52,6 @@ export default async function Page() {
 
   return (
     <div className="bg-background text-foreground min-h-screen">
-      <div className="container-patch">
         <h1 className="text-2xl font-bold dark:text-gray-300">
           로스트아크 상급 재련 효율 계산
         </h1>
@@ -75,7 +74,6 @@ export default async function Page() {
           <AdSense adSlot="1488834693" />
         </div>
         <EnhanceClient enhanceData={enhanceData} />
-      </div>
     </div>
   );
 }
