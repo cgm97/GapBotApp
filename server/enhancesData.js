@@ -38,16 +38,16 @@ const armorAdvanced = {
     type: "방어구상급재련",
     tier: 4,
     perLevel: 10,
-    level: ["1-10", "10-20", "21-30", "31-40"],
+    level: ["1-10", "11-20", "21-30", "31-40"],
     data: {
-        fate_guardian_stone: [8614, 20675, 53990, 64788],
-        fate_leapstone: [207, 368, 972, 1242],
-        abyss_fusion_material: [241, 368, 918, 1026],
-        fate_shard: [82694, 220531, 377932, 431923],
-        glacier_breath: [32, 65, 21, 25],
-        tailoring_flame_1_10: [5.75, 0, 0, 0],
-        tailoring_flame_10_20: [0, 7.7, 0, 0],
-        avg_gold_cost: [26186, 66159, 107981, 129577]
+        fate_guardian_stone: [8614, 15505, 53990, 64788],
+        fate_leapstone: [207, 276, 972, 1242],
+        abyss_fusion_material: [241, 276, 918, 1026],
+        fate_shard: [82694, 165388, 377932, 431923],
+        glacier_breath: [32, 47, 21, 25],
+        tailoring_flame_1_10: [34.5, 0, 0, 0],
+        tailoring_flame_10_20: [0, 34.5, 0, 0],
+        avg_gold_cost: [26186, 49616, 107981, 129577]
     }
 }
 
@@ -55,13 +55,13 @@ const weaponAdvanced = {
     type: "무기상급재련",
     tier: 4,
     perLevel: 10,
-    level: ["1-10", "10-20", "21-30", "31-40"],
+    level: ["1-10", "11-20", "21-30", "31-40"],
     data: {
         fate_destruction_stone: [11082, 18951, 64788, 75586],
         fate_leapstone: [296, 379, 1350, 1728],
         abyss_fusion_material: [443, 448, 1512, 1620],
         fate_shard: [147756, 275646, 620889, 701875],
-        lava_breath: [0, 41, 21, 25],
+        lava_breath: [0, 47, 21, 25],
         metallurgy_flame_1_10: [36.9, 0, 0, 0],
         metallurgy_flame_10_20: [0, 34.5, 0, 0],
         avg_gold_cost: [33245, 68911, 161971, 215961]
