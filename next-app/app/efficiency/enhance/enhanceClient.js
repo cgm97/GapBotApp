@@ -168,11 +168,11 @@ function Modal({ isOpen, onClose, title, children }) {
             ✕
           </button>
           <div>
-<AdSense adSlot="1488834693" />
+            <AdSense adSlot="1488834693" />
           </div>
-          
+
         </div>
-        
+
       </div>
     </>
   );
@@ -197,6 +197,19 @@ export default function EnhanceClient({ enhanceData: initialEnhanceData }) {
     setModalTitle(`${level} 평균 소모 재료`);
     setModalMaterials(materials);
     setModalOpen(true);
+
+
+    const path = `/efficiency/enhance/table`;
+    const title = `${level} 재료 | LOAGAP`;
+
+    // Google Analytics (GA4)
+    if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
+      window.gtag('event', 'page_view', {
+        page_path: path,
+        page_title: title,
+        page_location: window.location.href,
+      });
+    }
   };
 
   // 예시: 방어구 일반재련 테이블 행 클릭시 모달 열기
