@@ -167,7 +167,10 @@ function Modal({ isOpen, onClose, title, children }) {
           >
             ✕
           </button>
-          <AdSense adSlot="1488834693" />
+          <div>
+<AdSense adSlot="1488834693" />
+          </div>
+          
         </div>
         
       </div>
@@ -339,7 +342,7 @@ export default function EnhanceClient({ enhanceData: initialEnhanceData }) {
               평균 소모 비용(G): {Number(enhanceData.armorTotalCost).toLocaleString()}
             </span>
           </div>
-          <div className="flex items-center space-x-1">
+          <div className="flex items-center space-x-1 overflow-x-auto flex-nowrap max-w-full scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600">
             {armorLevel.map((step, index) => (
               <React.Fragment key={index}>
                 <div className="flex flex-col items-center">
@@ -416,7 +419,7 @@ export default function EnhanceClient({ enhanceData: initialEnhanceData }) {
               평균 소모 비용(G): {Number(enhanceData.weaponTotalCost).toLocaleString()}G
             </span>
           </div>
-          <div className="flex items-center space-x-1">
+          <div className="flex items-center space-x-1 overflow-x-auto flex-nowrap max-w-full scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600">
             {weaponLevel.map((step, index) => (
               <React.Fragment key={index}>
                 <div className="flex flex-col items-center">
