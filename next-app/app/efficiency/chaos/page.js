@@ -21,11 +21,11 @@ async function getChaosData() {
 
 export const metadata = {
   title: '카오스 던전 효율 | LOAGAP',
-  description: '로스트아크 카오스 던전 1회 보상 효율을 실시간 시세 기반으로 분석해보세요. 골드 환산, 아이템 가치, 효율 비교 제공.',
-  keywords: '로스트아크, 카오스 던전, 카던 효율, 카던 보상, 카던 시세, 카오스 효율 계산기, 로아 골드 효율, LOAGAP',
+  description: '로아 카던 효율을 실시간 시세 기반으로 확인하세요. 카오스 던전 1회 보상 골드 환산, 아이템 가치, 효율 비교 제공.',
+  keywords: '로스트아크, 로아, 카오스 던전, 카던, 카던 효율, 카던 보상, 카던 골드, 카던 시세, 카던 계산기, 카오스 효율 계산기, 로아 골드 효율, chaos dungeon, LOAGAP',
   openGraph: {
     title: '카오스 던전 효율 | LOAGAP',
-    description: '로스트아크 카오스 던전 1회 보상 효율을 실시간 시세 기반으로 분석해보세요. 골드 환산, 아이템 가치, 효율 비교 제공.',
+    description: '로아 카던 효율을 실시간 시세 기반으로 확인하세요. 카오스 던전 1회 보상 골드 환산, 아이템 가치, 효율 비교 제공.',
     url: 'https://loagap.com/efficiency/chaos',
     type: 'website',
     images: [
@@ -48,7 +48,7 @@ export default async function Page() {
         </h1>
         <section className="text-sm text-gray-600 dark:text-gray-300 mb-6">
           <p>
-            로스트아크 카오스 던전 1회 보상으로 획득할 수 있는 아이템을 실시간 시세 기준으로 분석하여
+            로스트아크 카오스 던전(카던) 1회 보상으로 획득할 수 있는 아이템을 실시간 시세 기준으로 분석하여
             <strong> 골드 효율 </strong>을 계산합니다.
           </p>
           <p>
