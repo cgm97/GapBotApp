@@ -20,6 +20,7 @@ const CommandPage = () => {
     { id: 11, prefix: <>.앜패 <span className="text-xs text-blue-500 dark:text-blue-300">(.내앜패)</span></>, img: '/img/cmd/dkzvo.png' },
     { id: 22, prefix: <>.로빌 <span className="text-xs text-blue-500 dark:text-blue-300">(.내로빌)</span></>, img: '/img/cmd/lostbuild.png', description: '로스트빌드 지원 - 데미지 TOP 3 스킬' },
     { id: 23, prefix: <>.로펙 <span className="text-xs text-blue-500 dark:text-blue-300">(.내로펙)</span></>, description: '로펙 지원 - 로펙점수 확인' },
+    { id: 29, prefix: <>.견적 <span className="text-xs text-blue-500 dark:text-blue-300">(.내견적)</span></>, img: '/img/cmd/ruswjr.png', description: '.내견적 목표단계 OR .견적 캐릭터명 목표단계 OR .견적 시작단계 목표단계 | 로아베스팅 지원 - 재련 견적 확인' },
     { id: 21, prefix: <>.큐브</>, img: '/img/cmd/cube.png', description: 'LOAGAP 사이트와 연동이 되어야합니다.' },
     { id: 12, prefix: <>.떠상 <span className="text-xs text-gray-500 dark:text-gray-300">(루페온 등)</span></>, img: '/img/cmd/ejtkd.png' },
     { id: 13, prefix: <>.분배금</>, img: '/img/cmd/qnsqorma.png' },
@@ -39,6 +40,7 @@ const CommandPage = () => {
     { id: 25, prefix: <>.카던 | .카던효율</>, img: '/img/cmd/zkejs.png', description: 'LOAGAP 카오스던전 효율 참조'},
     { id: 26, prefix: <>.가디언 | .가디언효율</>, img: '/img/cmd/rkeldjs.png', description: 'LOAGAP 가디언 효율 참조'},
     { id: 27, prefix: <>.더보기 | .더보기효율</>, img: '/img/cmd/ejqhrl.png', description: 'LOAGAP 더보기 효율 참조'},
+    { id: 28, prefix: <>.상급재련효율 | .상재효율</>, img: '/img/cmd/tkdwogydbf.png', description: 'LOAGAP 상급재련 효율 참조'},
   ];
 
   const listUtilItems = [

@@ -94,7 +94,7 @@ app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
 
 // 미들웨어: 모든 요청에 대해 자동으로 로그 기록
 app.use((req, res, next) => {
-  
+
   // 요청 처리 시작 로그
   const referer = req.headers.referer || req.headers.origin;
   logger.info({
@@ -104,17 +104,15 @@ app.use((req, res, next) => {
   });
 
   // 호스트 전처리
-  // if (!isProduction) {
-  //   if (!referer || (!referer.includes('loagap.com') && !referer.includes('localhost'))) {
-  //     logger.warn({
-  //       method: req.method,
-  //       url: req.originalUrl,
-  //       referer,
-  //         message: `[INTERCEPTOR] [${referer}] Blocked Host invalid'`
-  //     });
-  //     return res.status(403).json({ message: '허용되지 않은 잘못된 접근입니다.' });
-  //   }
-  // }
+  if (!referer || (!referer.includes('loagap.com') && !referer.includes('localhost'))) {
+    logger.warn({
+      method: req.method,
+      url: req.originalUrl,
+      referer,
+      message: `[INTERCEPTOR] [${referer}] Blocked Host invalid'`
+    });
+    return res.status(403).json({ message: '허용되지 않은 잘못된 접근입니다.' });
+  }
 
   // 응답이 끝난 후 로그를 기록하려면, res의 end 이벤트를 사용해야 합니다.
   res.on('finish', () => {
