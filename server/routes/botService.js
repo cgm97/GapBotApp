@@ -1203,70 +1203,106 @@ function groupByNameArray(items) {
 // 로아베스팅 - 재련 견적 게산 API
 exports.executeLoavestCalc = async (req, res, next) => {
 
-  const { nickName, targetLevel } = req.query;
+  const { nickName, startLevel = 10, targetLevel } = req.query;
 
-  const [rows] = await characterService.selectCharacter(nickName);
+  const parts = [];
+  const partTypes = ["helmet", "shoulder", "chest", "pants", "gloves", "weapon"];
 
-  if (rows.length > 0 && rows[0].characterData.equipItems != null) {
-    // 조회된 데이터가 있을 경우
-    const characterData = rows[0].characterData;
+  let requestData = {
+    // book_count: 0,
+    // breath_count: 0,
+    parts: [],
+    tier: 4
+  };
 
-    // JSON 데이터를 해체할당으로 분리
-    const {
-      equipItems
-    } = characterData;
+  let IS_DONATE = "N";
+  if (nickName) {
+    const [rows] = await characterService.selectCharacter(nickName);
 
-    const parts = [];
+    if (rows.length > 0 && rows[0].characterData.equipItems != null) {
+      // 조회된 데이터가 있을 경우
+      const characterData = rows[0].characterData;
 
-    0
-    // : 
-    // {current_level: "19", target_level: "20", part_type: "weapon"}
-    // 1
-    // : 
-    // {current_level: "15", target_level: "19", part_type: "helmet"}
-    // 2
-    // : 
-    // {current_level: "15", target_level: "19", part_type: "chest"}
-    // 3
-    // : 
-    // {current_level: "15", target_level: "19", part_type: "pants"}
-    // 4
-    // : 
-    // {current_level: "16", target_level: "19", part_type: "gloves"}
-    // 5
-    // : 
-    // {current_level: "15", target_level: "19", part_type: "shoulder"}
+      // JSON 데이터를 해체할당으로 분리
+      const {
+        equipItems
+      } = characterData;
+      IS_DONATE = characterData.profile.IS_DONATE;
 
-    const partTypes = ["helmet", "shoulder", "chest", "pants", "gloves", "weapon"];
-    equipItems.slice(0, -1).map((item, index) => {
+      equipItems.slice(0, -1).map((item, index) => {
 
-      const enhanceMatch = item.name.match(/\+(\d+)/); // + 뒤 숫자
-      const advanceMatch = item.name.match(/X(\d+)/);     // X 뒤 숫자
+        const enhanceMatch = item.name.match(/\+(\d+)/); // + 뒤 숫자
+        // const advanceMatch = item.name.match(/X(\d+)/);     // X 뒤 숫자
 
-      const enhance = enhanceMatch ? parseInt(enhanceMatch[1]) : null;
-      const advance = advanceMatch ? parseInt(advanceMatch[1]) : null;
+        const enhance = enhanceMatch ? parseInt(enhanceMatch[1]) : null;
+        // const advance = advanceMatch ? parseInt(advanceMatch[1]) : null;
 
-
-
+        // 타겟레벨보다 현재 장비 렙이 높으면 패스
+        if (enhance < targetLevel) {
+          parts.push({
+            current_level: enhance,
+            target_level: targetLevel,
+            part_type: partTypes[index]
+          });
+        }
+      });
+    }
+    else {
+      return res.status(500).send("LOAGAP에서 우선 캐릭터 조회를 해주세요.");
+    }
+  } else {
+    partTypes.forEach(type => {
       parts.push({
-        current_level: enhance,
+        current_level: startLevel,
         target_level: targetLevel,
-        part_type: partTypes[index]
+        part_type: type
       });
     });
+  }
 
-    const requestData = {
-      book_count: 0,
-      breath_count: 0,
-      parts: parts,
-      tier: 4
-    };
-    // 응답 반환
+  requestData.parts = parts;
+  try {
+    const API_URL = `https://loavesting-backend.vercel.app/api/calculator/refine/cost/`;
+    const response = await axios.post(API_URL, requestData, {
+      headers: {
+        "Content-Type": "application/json",
+        "X-API-KEY": " cb8badb0-f02e-4587-b4d8-76774fe06e81"
+      }
+    });
+
+    const data = response.data.data;
+
+    const result = {
+      nickName: nickName,
+      startLevel: startLevel,
+      targetLevel: targetLevel,
+      helmet_startLevel: parts.find(p => p.part_type === 'helmet')?.current_level || '',
+      shoulder_startLevel: parts.find(p => p.part_type === 'shoulder')?.current_level || '',
+      chest_startLevel: parts.find(p => p.part_type === 'chest')?.current_level || '',
+      pants_startLevel: parts.find(p => p.part_type === 'pants')?.current_level || '',
+      gloves_startLevel: parts.find(p => p.part_type === 'gloves')?.current_level || '',
+      weapon_startLevel:parts.find(p => p.part_type === 'weapon')?.current_level || '',
+
+      helmet_totalGold: (data.details.helmet || []).reduce((sum, item) => sum + item.gold, 0),
+      shoulder_totalGold: (data.details.shoulder || []).reduce((sum, item) => sum + item.gold, 0),
+      chest_totalGold: (data.details.chest || []).reduce((sum, item) => sum + item.gold, 0),
+      pants_totalGold: (data.details.pants || []).reduce((sum, item) => sum + item.gold, 0),
+      gloves_totalGold: (data.details.gloves || []).reduce((sum, item) => sum + item.gold, 0),
+      weapon_totalGold: (data.details.weapon || []).reduce((sum, item) => sum + item.gold, 0),
+      totalGold: data.total_gold || 0,
+      totalSilling: data.total_silver || 0,
+
+      IS_DONATE: IS_DONATE == "Y" ? "https://www.loagap.com/donationKing.png" : "",
+
+      original: response.data
+    }
+
     return res.status(200).json(
-      requestData
+      result
     );
-  } else {
-    return res.status(500).send("LOAGAP에서 우선 캐릭터 조회를 해주세요.");
+  } catch (e) {
+    console.log(e);
+    return res.status(500).send(e);
   }
 };
 
