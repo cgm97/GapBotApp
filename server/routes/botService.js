@@ -1295,16 +1295,16 @@ exports.executeLoavestCalc = async (req, res, next) => {
       gloves_startLevel: parts.find(p => p.part_type === 'gloves')?.current_level || '',
       weapon_startLevel:parts.find(p => p.part_type === 'weapon')?.current_level || '',
 
-      helmet_totalGold: (data.details.helmet || []).reduce((sum, item) => sum + item.gold, 0),
-      shoulder_totalGold: (data.details.shoulder || []).reduce((sum, item) => sum + item.gold, 0),
-      chest_totalGold: (data.details.chest || []).reduce((sum, item) => sum + item.gold, 0),
-      pants_totalGold: (data.details.pants || []).reduce((sum, item) => sum + item.gold, 0),
-      gloves_totalGold: (data.details.gloves || []).reduce((sum, item) => sum + item.gold, 0),
-      weapon_totalGold: (data.details.weapon || []).reduce((sum, item) => sum + item.gold, 0),
-      totalGold: data.total_gold || 0,
-      totalSilling: data.total_silver || 0,
+      helmet_totalGold: (data.details.helmet || []).reduce((sum, item) => sum + item.gold, 0).toLocaleString(),
+      shoulder_totalGold: (data.details.shoulder || []).reduce((sum, item) => sum + item.gold, 0).toLocaleString(),
+      chest_totalGold: (data.details.chest || []).reduce((sum, item) => sum + item.gold, 0).toLocaleString(),
+      pants_totalGold: (data.details.pants || []).reduce((sum, item) => sum + item.gold, 0).toLocaleString(),
+      gloves_totalGold: (data.details.gloves || []).reduce((sum, item) => sum + item.gold, 0).toLocaleString(),
+      weapon_totalGold: (data.details.weapon || []).reduce((sum, item) => sum + item.gold, 0).toLocaleString(),
+      totalGold: (data.total_gold + total_material_cost).toLocaleString() || 0,
+      totalSilling: data.total_silver.toLocaleString() || 0,
 
-      IS_DONATE: IS_DONATE == "Y" ? "https://www.loagap.com/donationKing.png" : "",
+      img: IS_DONATE == "Y" ? "https://www.loagap.com/donationKing.png" : "",
 
       original: response.data
     }
