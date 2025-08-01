@@ -1301,7 +1301,7 @@ exports.executeLoavestCalc = async (req, res, next) => {
       pants_totalGold: (data.details.pants || []).reduce((sum, item) => sum + item.gold, 0).toLocaleString(),
       gloves_totalGold: (data.details.gloves || []).reduce((sum, item) => sum + item.gold, 0).toLocaleString(),
       weapon_totalGold: (data.details.weapon || []).reduce((sum, item) => sum + item.gold, 0).toLocaleString(),
-      totalGold: (data.total_gold + total_material_cost).toLocaleString() || 0,
+      totalGold: (data.total_gold + data.total_material_cost).toLocaleString() || 0,
       totalSilling: data.total_silver.toLocaleString() || 0,
 
       img: IS_DONATE == "Y" ? "https://www.loagap.com/donationKing.png" : "",
