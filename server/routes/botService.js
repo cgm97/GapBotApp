@@ -1261,7 +1261,7 @@ exports.executeLoavestCalc = async (req, res, next) => {
           });
         }
       } else {
-        if(type != "weapon"){
+        if(type == "gloves"){
           parts.push({
             current_level: startLevel,
             target_level: targetLevel,
