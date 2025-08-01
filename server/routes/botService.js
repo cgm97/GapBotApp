@@ -1252,8 +1252,8 @@ exports.executeLoavestCalc = async (req, res, next) => {
     }
   } else {
     partTypes.forEach(type => {
-      if(nickName == "무기"){
-        if(type == "weapon"){
+      if (nickName == "무기") {
+        if (type == "weapon") {
           parts.push({
             current_level: startLevel,
             target_level: targetLevel,
@@ -1261,7 +1261,7 @@ exports.executeLoavestCalc = async (req, res, next) => {
           });
         }
       } else {
-        if(type == "gloves"){
+        if (type == "gloves") {
           parts.push({
             current_level: startLevel,
             target_level: targetLevel,
@@ -1293,14 +1293,37 @@ exports.executeLoavestCalc = async (req, res, next) => {
       chest_startLevel: parts.find(p => p.part_type === 'chest')?.current_level || '',
       pants_startLevel: parts.find(p => p.part_type === 'pants')?.current_level || '',
       gloves_startLevel: parts.find(p => p.part_type === 'gloves')?.current_level || '',
-      weapon_startLevel:parts.find(p => p.part_type === 'weapon')?.current_level || '',
+      weapon_startLevel: parts.find(p => p.part_type === 'weapon')?.current_level || '',
 
-      helmet_totalGold: (data.details.helmet || []).reduce((sum, item) => sum + item.gold, 0).toLocaleString(),
-      shoulder_totalGold: (data.details.shoulder || []).reduce((sum, item) => sum + item.gold, 0).toLocaleString(),
-      chest_totalGold: (data.details.chest || []).reduce((sum, item) => sum + item.gold, 0).toLocaleString(),
-      pants_totalGold: (data.details.pants || []).reduce((sum, item) => sum + item.gold, 0).toLocaleString(),
-      gloves_totalGold: (data.details.gloves || []).reduce((sum, item) => sum + item.gold, 0).toLocaleString(),
-      weapon_totalGold: (data.details.weapon || []).reduce((sum, item) => sum + item.gold, 0).toLocaleString(),
+      helmet_totalGold: (data.details.helmet || []).reduce((sum, item) => {
+        const usedPriceTotal = Object.values(item.used_price || {}).reduce((a, b) => a + b, 0);
+        return sum + item.gold + usedPriceTotal;
+      }, 0).toLocaleString(),
+
+      shoulder_totalGold: (data.details.shoulder || []).reduce((sum, item) => {
+        const usedPriceTotal = Object.values(item.used_price || {}).reduce((a, b) => a + b, 0);
+        return sum + item.gold + usedPriceTotal;
+      }, 0).toLocaleString(),
+
+      chest_totalGold: (data.details.chest || []).reduce((sum, item) => {
+        const usedPriceTotal = Object.values(item.used_price || {}).reduce((a, b) => a + b, 0);
+        return sum + item.gold + usedPriceTotal;
+      }, 0).toLocaleString(),
+
+      pants_totalGold: (data.details.pants || []).reduce((sum, item) => {
+        const usedPriceTotal = Object.values(item.used_price || {}).reduce((a, b) => a + b, 0);
+        return sum + item.gold + usedPriceTotal;
+      }, 0).toLocaleString(),
+
+      gloves_totalGold: (data.details.gloves || []).reduce((sum, item) => {
+        const usedPriceTotal = Object.values(item.used_price || {}).reduce((a, b) => a + b, 0);
+        return sum + item.gold + usedPriceTotal;
+      }, 0).toLocaleString(),
+
+      weapon_totalGold: (data.details.weapon || []).reduce((sum, item) => {
+        const usedPriceTotal = Object.values(item.used_price || {}).reduce((a, b) => a + b, 0);
+        return sum + item.gold + usedPriceTotal;
+      }, 0).toLocaleString(),
       totalGold: (data.total_gold + data.total_material_cost).toLocaleString() || 0,
       totalSilling: data.total_silver.toLocaleString() || 0,
 
