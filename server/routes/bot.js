@@ -659,7 +659,7 @@ router.post('/myNickName', botService.getMyNickName);
 router.get('/accessory', botService.getAccessory);
 
 // 외부 API
-router.get('/loavestiong/calculator', botService.executeLoavestCalc);
+router.get('/loavesting/calculator', botService.executeLoavestCalc);
 router.get('/lostBuilds', botService.getlostBuilds);
 router.get('/lopec', botService.getLopecPoint);
 module.exports = router;
