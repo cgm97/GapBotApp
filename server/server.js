@@ -104,7 +104,7 @@ app.use((req, res, next) => {
   });
 
   // 호스트 전처리
-  if (!referer || (!referer.includes('loagap.com') && !referer.includes('localhost') && referer.includes('google'))) {
+  if (!referer || (!referer.includes('loagap.com') && !referer.includes('localhost') && !referer.includes('google'))) {
     logger.warn({
       method: req.method,
       url: req.originalUrl,
