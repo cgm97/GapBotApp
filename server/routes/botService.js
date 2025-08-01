@@ -1216,7 +1216,7 @@ exports.executeLoavestCalc = async (req, res, next) => {
   };
 
   let IS_DONATE = "N";
-  if (nickName) {
+  if (nickName != "방어구" && nickName != "무기") {
     const [rows] = await characterService.selectCharacter(nickName);
 
     if (rows.length > 0 && rows[0].characterData.equipItems != null) {
@@ -1252,11 +1252,23 @@ exports.executeLoavestCalc = async (req, res, next) => {
     }
   } else {
     partTypes.forEach(type => {
-      parts.push({
-        current_level: startLevel,
-        target_level: targetLevel,
-        part_type: type
-      });
+      if(nickName == "무기"){
+        if(type == "weapon"){
+          parts.push({
+            current_level: startLevel,
+            target_level: targetLevel,
+            part_type: type
+          });
+        }
+      } else {
+        if(type != "weapon"){
+          parts.push({
+            current_level: startLevel,
+            target_level: targetLevel,
+            part_type: type
+          });
+        }
+      }
     });
   }
 
