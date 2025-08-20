@@ -136,6 +136,17 @@ const chaosRewards = [
       fate_shard: 33664,
     },
   },
+  {
+    itemLevel: 1720,
+    name: '네프타 2 작전',
+    rewards: {
+      fate_destruction_stone: 343,
+      fate_guardian_stone: 1021,
+      fate_leapstone: 27.5,
+      tier4_jewel: 6.9,
+      fate_shard: 38922,
+    },
+  },
 ];
 
 const guardianRewards = [
@@ -214,6 +225,15 @@ const guardianRewards = [
       fate_destruction_stone: 193.7,
       fate_guardian_stone: 578.5,
       fate_leapstone: 21.5,
+    },
+  },
+    {
+    itemLevel: 1720,
+    name: '크라티오스',
+    rewards: {
+      fate_destruction_stone: 353.09,
+      fate_guardian_stone: 1108.59,
+      fate_leapstone: 35.28,
     },
   },
 ];
@@ -614,6 +634,106 @@ const raidRewards = [
       fate_leapstone: 131,
       fate_shard: 33700,
       gold: 12600
+    },
+  },
+
+  {
+    itemLevel: 1700,
+    name: '4막 파멸의 성채',
+    difficulty: '노말',
+    rewards: {
+      fate_destruction_stone: 1780,
+      fate_guardian_stone: 3560,
+      fate_leapstone: 21,
+      fate_shard: 12200,
+      gold: 33000
+    },
+    extraRewards: {
+      fate_destruction_stone: 3800,
+      fate_guardian_stone: 7600,
+      fate_leapstone: 122,
+      fate_shard: 32040,
+      gold: 10500
+    },
+  },
+
+  {
+    itemLevel: 1720,
+    name: '4막 파멸의 성채',
+    difficulty: '하드',
+    rewards: {
+      fate_destruction_stone: 2130,
+      fate_guardian_stone: 4260,
+      fate_leapstone: 27,
+      fate_shard: 15400,
+      gold: 42000
+    },
+    extraRewards: {
+      fate_destruction_stone: 4560,
+      fate_guardian_stone: 9120,
+      fate_leapstone: 147,
+      fate_shard: 38450,
+      gold: 13440
+    },
+  },
+
+    {
+    itemLevel: 1710,
+    name: '종막 최후의 날',
+    difficulty: '노말',
+    rewards: {
+      fate_destruction_stone: 1980,
+      fate_guardian_stone: 3960,
+      fate_leapstone: 27,
+      fate_shard: 14100,
+      gold: 40000
+    },
+    extraRewards: {
+      fate_destruction_stone: 4370,
+      fate_guardian_stone: 8740,
+      fate_leapstone: 140,
+      fate_shard: 36850,
+      gold: 12800
+    },
+  },
+
+    {
+    itemLevel: 1730,
+    name: '종막 최후의 날',
+    difficulty: '하드',
+    rewards: {
+      fate_destruction_stone: 2550,
+      fate_guardian_stone: 5100,
+      fate_leapstone: 38,
+      fate_shard: 18400,
+      gold: 52000
+    },
+    extraRewards: {
+      fate_destruction_stone: 6000,
+      fate_guardian_stone: 12000,
+      fate_leapstone: 190,
+      fate_shard: 47300,
+      gold: 16640
+    },
+  },
+
+    {
+    itemLevel: 1740,
+    name: '4막 파멸의 성채',
+    difficulty: '더퍼스트',
+    rewards: {
+      fate_destruction_stone: 0,
+      fate_guardian_stone: 0,
+      fate_leapstone: 0,
+      fate_shard: 0,
+      gold: 52000
+    },
+    extraRewards: {
+      fate_destruction_stone: 0,
+      fate_guardian_stone: 0,
+      fate_leapstone: 0,
+      fate_shard: 0,
+      gold: 0
     },
   },
 ];
