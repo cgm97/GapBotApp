@@ -105,7 +105,8 @@ const getBookPrice = async () => {
 
             response.data.Items.forEach(item => {
                 bookArr.push({
-                    name: item.Name,
+                    // 25 08 20 기준 각인서 앞에 유물, 전설이라는 접두어가 붙어서 나옴.
+                    name: item.Name.replaceAll("유물", "").trim(),
                     price: item.CurrentMinPrice,
                     icon: item.Icon,
                     grade: item.Grade,
