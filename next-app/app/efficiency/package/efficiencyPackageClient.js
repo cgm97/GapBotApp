@@ -62,6 +62,7 @@ function PackageCalc({ packageDvcd, marketsPrice, crystalPrice, jewelsPrice, sel
       { name: "큐브 입장권(1해금)", bundleCount: 1, price: ((cube_red_price * 4) + (cube_blue_price * 4) + (cube_stone_price * 14) + (cube_jewels_price * 3)).toFixed(0), icon: "https://cdn-lostark.game.onstove.com/efui_iconatlas/use/use_12_193.png" },
       { name: "큐브 입장권(2해금)", bundleCount: 1, price: ((cube_red_price * 5) + (cube_blue_price * 5) + (cube_stone_price * 25) + (cube_jewels_price * 6)).toFixed(0), icon: "https://cdn-lostark.game.onstove.com/efui_iconatlas/use/use_12_194.png" },
       { name: "큐브 입장권(3해금)", bundleCount: 1, price: ((cube_red_price * 6) + (cube_blue_price * 6) + (cube_stone_price * 32) + (cube_jewels_price * 8)).toFixed(0), icon: "https://cdn-lostark.game.onstove.com/efui_iconatlas/use/use_12_195.png" },
+      { name: "큐브 입장권(4해금)", bundleCount: 1, price: ((cube_red_price * 8) + (cube_blue_price * 8) + (cube_stone_price * 41) + (cube_jewels_price * 11)).toFixed(0), icon: "https://cdn-lostark.game.onstove.com/efui_iconatlas/use/use_12_196.png" },
       { name: "메넬리크의 서", bundleCount: 1, price: cardExp_book_price.toFixed(0), icon: "https://cdn-lostark.game.onstove.com/efui_iconatlas/use/use_10_225.png" },
       { name: "태초의 조각", bundleCount: 1, price: cardExp_taecho_price.toFixed(0), icon: "https://cdn-lostark.game.onstove.com/efui_iconatlas/use/use_10_224.png" }
     ];
