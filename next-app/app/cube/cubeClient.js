@@ -393,7 +393,7 @@ const Cube = ({ characterTemp, cubeTemp }) => {
               <div className="tier-section">
                 <h3 className="tier-title">4티어</h3>
                 <ul className="tier-list">
-                  {["1해금", "2해금", "3해금"].map((tierName, index) => {
+                  {["1해금", "2해금", "3해금", "4해금"].map((tierName, index) => {
                     const cube = CUBES.find((c) => c.name === tierName) || { count: 0 };
                     return (
                       <li key={index}>

@@ -244,5 +244,17 @@ export const cube = [
         "ETC1": 6,
         "ETC2": 6,
         "ETC3": 0
+    },
+    {
+        "NAME": "4해금",
+        "LEVEL": 9,
+        "CARD_EXP": 20500,
+        "JEWELRY": 24,
+        "JEWELRY_PRICE": 0,
+        "STONES": 41,
+        "SILLING": 190000,
+        "ETC1": 8,
+        "ETC2": 8,
+        "ETC3": 0
     }
 ]
