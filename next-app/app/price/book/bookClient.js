@@ -197,13 +197,9 @@ export default function BookClient({ booksPrice, bookLastUpdate }) {
                 변동가격은 기준일자 0시 종가 기준으로 계산된 값이며, 차트를 추가하거나 제거할 수 있습니다.
               </p>
               <p className="text-sm my-2 dark:text-gray-300">
-                <strong>기준일자:</strong>{" "}
-                <time dateTime={new Date(new Date().setDate(new Date().getDate() - 1))
-                  .toISOString()
-                  .slice(0, 10)}>
-                  {new Date(new Date().setDate(new Date().getDate() - 1))
-                    .toISOString()
-                    .slice(0, 10)}
+                <strong>기준일자:</strong>{' '}
+                <time dateTime={new Date(Date.now() - 86400000).toISOString().slice(0, 10)}>
+                  {new Date(Date.now() - 86400000).toISOString().slice(0, 10)}
                 </time>
               </p>
               <p className="text-sm my-2 text-gray-400 dark:text-gray-400">

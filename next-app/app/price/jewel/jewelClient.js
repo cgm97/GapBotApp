@@ -328,7 +328,9 @@ export default function JewelClient({ jewelsPrice, jewelPriceLastUpdate }) {
               </p>
               <p className="text-sm my-2 dark:text-gray-300">
                 <strong>기준일자:</strong>{' '}
-                <time dateTime={new Date(new Date().setDate(new Date().getDate() - 1)).toISOString().slice(0, 10)}>{new Date(new Date().setDate(new Date().getDate() - 1)).toISOString().slice(0, 10)}</time>
+                <time dateTime={new Date(Date.now() - 86400000).toISOString().slice(0, 10)}>
+                  {new Date(Date.now() - 86400000).toISOString().slice(0, 10)}
+                </time>
               </p>
               <p className="text-sm my-2 text-gray-300">
                 갱신 시 1분 대비 가격 변동이 약 50초간 표시됩니다.
