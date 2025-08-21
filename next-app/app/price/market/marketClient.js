@@ -347,7 +347,7 @@ export default function MarketClient({ marketsPrice, marketPriceLastUpdate }) {
                         const changedInfo = changedItems.find(ci => ci.name === item.name);
 
                         return (
-                          <tr key={item.name} className={`border-t dark:border-gray-600 ${changedInfo ? "animate-price-change" : ""}`}>
+                          <tr key={`${item.name}(${item.grade})`} className={`border-t dark:border-gray-600 ${changedInfo ? "animate-price-change" : ""}`}>
                             <td className="p-2 dark:border-gray-600">
                               <div className={`gem-box ${getGradeClass(item.grade)} inline-flex items-center justify-center rounded p-0`}
                                 style={{ width: '38px', height: '38px' }}>

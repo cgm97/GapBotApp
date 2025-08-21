@@ -417,9 +417,13 @@ const getMarketPrice = async () => {
                 });
 
                 for (const item of response.data.Items) {
+                    // 젬만 추출 그리고 등급별로 명칭이 같아 접두어 표시
+                    if(code == 51000 && !item.Name.includes("젬")){
+                        continue;
+                    }
                     marketArr.push({
                         catergory: name,
-                        name: item.Name,
+                        name: code == 51000 ? `(${item.Grade})${item.Name}` : item.Name,
                         tier: tier,
                         grade: item.Grade,
                         icon: item.Icon,

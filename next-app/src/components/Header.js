@@ -135,7 +135,7 @@ const Header = () => {
         }}
       >
         <li className="px-4 py-2 whitespace-nowrap hover:bg-blue-600 rounded">
-          <Link href="/price/market">재료시세</Link>
+          <Link href="/price/market">젬·재료시세</Link>
         </li>
         <li className="px-4 py-2 whitespace-nowrap hover:bg-blue-600 rounded">
           <Link href="/price/book">유각시세</Link>
