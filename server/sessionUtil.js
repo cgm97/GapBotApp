@@ -380,6 +380,7 @@ const getMarketPrice = async () => {
     const API_URL = "https://developer-lostark.game.onstove.com/markets/items";
 
     const CategoryCodeArray = [
+        { name: "젬", code: 51000, tier: null },
         { name: "강화재료", code: 50010, tier: 3 },
         { name: "강화추가재료", code: 50020, tier: 3 },
         { name: "강화재료", code: 50010, tier: 4 },
@@ -401,7 +402,7 @@ const getMarketPrice = async () => {
             const body = {
                 "CategoryCode": code,
                 "ItemTier": tier,
-                "Sort": "CURRENT_MIN_PRICE ",
+                "Sort": "CURRENT_MIN_PRICE",
                 "SortCondition": "DESC",
                 "PageNo": page
             };
