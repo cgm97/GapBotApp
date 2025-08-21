@@ -119,7 +119,9 @@ export default function AccessoryClient({ accessorysPrice, accessoryLastUpdate }
           </p>
           <p className="text-sm my-2 dark:text-gray-300">
             <strong>기준일자:</strong>{' '}
-            <time dateTime={new Date(new Date().setDate(new Date().getDate() - 1)).toISOString().slice(0, 10)}>{new Date(new Date().setDate(new Date().getDate() - 1)).toISOString().slice(0, 10)}</time>
+            <time dateTime={new Date(Date.now() - 86400000).toISOString().slice(0, 10)}>
+              {new Date(Date.now() - 86400000).toISOString().slice(0, 10)}
+            </time>
           </p>
           <p className="text-sm my-2 text-gray-400">
             1시간마다 갱신
@@ -229,7 +231,7 @@ export default function AccessoryClient({ accessorysPrice, accessoryLastUpdate }
                           <tr
                             key={idx}
                             onClick={() =>
-                              
+
                               fetchChartData(link, {
                                 title: tier.title,
                                 enhance: enhance.enhance,
