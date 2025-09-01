@@ -98,7 +98,7 @@ const Character = ({ nickName }) => {
         setAccessoryItems([]);
         setArkItems({});
         setEngravings([]);
-
+        setArkGridItems({});
         if (error.response?.status === 404) {
             setError(error.response.data);
         } else {
@@ -228,7 +228,7 @@ const Character = ({ nickName }) => {
 
                     {/* 아크그리드 정보 영역 */}
                     <div className="engraving dark:bg-background">
-                        {arkGridItems.slots.map((item, index) => (
+                        {arkGridItems.slots?.map((item, index) => (
                             <div key={index}>
                                 <img className="engraving-img" src={item.icon} alt={item.name} />
                                 <div
@@ -244,7 +244,7 @@ const Character = ({ nickName }) => {
                                 <p className="name dark:text-gray-300">[{item.point}P] {item.name}</p>
                             </div>
                         ))}
-                        {arkGridItems.effects.map((item, index) => (
+                        {arkGridItems.effects?.map((item, index) => (
                             <div key={index}>
                                 <p className="name dark:text-gray-300">Lv.{item.level} {item.name} {item.effect}</p>
                             </div>
