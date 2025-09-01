@@ -32,7 +32,7 @@ const CommandPage = () => {
       id: 18,
       prefix: <>.시세 <span className="text-xs text-gray-500 dark:text-gray-300">(.시세 상 유물or고대 1~3)</span></>,
       img: '/img/cmd/tkdwnd.png',
-      description: '상,상상,상중,상하,중,중중,중하,유각,전각,재료,채집,벌목,낚시,고고학,채광,수렵,보석',
+      description: '상,상상,상중,상하,중,중중,중하,유각,전각,재료,채집,벌목,낚시,고고학,채광,수렵,보석,젬',
     },
     { id: 19, prefix: <>.사사게</>, description: '.사사게 키워드' },
     { id: 20, prefix: <>.클골</> },
