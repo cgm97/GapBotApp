@@ -717,25 +717,25 @@ const raidRewards = [
     },
   },
 
-    {
-    itemLevel: 1740,
-    name: '종막 최후의 날',
-    difficulty: '더퍼스트',
-    rewards: {
-      fate_destruction_stone: 0,
-      fate_guardian_stone: 0,
-      fate_leapstone: 0,
-      fate_shard: 0,
-      gold: 52000
-    },
-    extraRewards: {
-      fate_destruction_stone: 0,
-      fate_guardian_stone: 0,
-      fate_leapstone: 0,
-      fate_shard: 0,
-      gold: 0
-    },
-  },
+  //   {
+  //   itemLevel: 1740,
+  //   name: '종막 최후의 날',
+  //   difficulty: '더퍼스트',
+  //   rewards: {
+  //     fate_destruction_stone: 0,
+  //     fate_guardian_stone: 0,
+  //     fate_leapstone: 0,
+  //     fate_shard: 0,
+  //     gold: 52000
+  //   },
+  //   extraRewards: {
+  //     fate_destruction_stone: 0,
+  //     fate_guardian_stone: 0,
+  //     fate_leapstone: 0,
+  //     fate_shard: 0,
+  //     gold: 0
+  //   },
+  // },
 ];
 
 
