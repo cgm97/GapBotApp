@@ -228,7 +228,7 @@ const Character = ({ nickName }) => {
 
                     {/* 아크그리드 정보 영역 */}
                     <div className="engraving dark:bg-background">
-                        {arkGridItems.slot.map((item, index) => (
+                        {arkGridItems.slots.map((item, index) => (
                             <div key={index}>
                                 <img className="engraving-img" src={item.icon} alt={item.name} />
                                 <div
