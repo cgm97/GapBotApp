@@ -11,7 +11,7 @@ const getCharacterProfile = async (nickName) => {
 
 
 // 캐릭터 정보 insert
-const insertCharacterInfo = async (equipItems, gemItems, accessoryItems, cardItems, engravings, profile, guild, wisdom, arkItems) => {
+const insertCharacterInfo = async (equipItems, gemItems, accessoryItems, cardItems, engravings, profile, guild, wisdom, arkItems, arkGridItems) => {
 
     const method = 'insertCharacterInfo';
     // console.log(equipItems, gemItems, accessoryItems, cardItems, engravings, profile, guild, wisdom, arkItems);
@@ -89,7 +89,7 @@ const insertCharacterInfo = async (equipItems, gemItems, accessoryItems, cardIte
             imgUrl
         ]);
 
-        // 캐틱터 장비 SQL
+        // 캐릭터 장비 SQL
         const characterEquipmentSql = `
             INSERT INTO CHARACTER_EQUIPMENT (
                 NICKNAME,
@@ -106,7 +106,7 @@ const insertCharacterInfo = async (equipItems, gemItems, accessoryItems, cardIte
             nickname, equipItems, accessoryItems, engravings
         ]);
 
-        // 캐틱터 길드 SQL
+        // 캐릭터 길드 SQL
         const characteGuildSql = `
             INSERT INTO CHARACTER_GUILD (
                 NICKNAME,
@@ -121,7 +121,7 @@ const insertCharacterInfo = async (equipItems, gemItems, accessoryItems, cardIte
             nickname, guild.NAME, guild.IS_OWNER
         ]);
 
-        // 캐틱터 영지 SQL
+        // 캐릭터 영지 SQL
         const characteWisdomSql = `
             INSERT INTO CHARACTER_WISDOM (
                 NICKNAME,
@@ -136,7 +136,7 @@ const insertCharacterInfo = async (equipItems, gemItems, accessoryItems, cardIte
             nickname, wisdom.NAME, wisdom.LEVEL
         ]);
 
-        // 캐틱터 보석 SQL
+        // 캐릭터 보석 SQL
         const characteGemSql = `
             INSERT INTO CHARACTER_JEWELS (
                 NICKNAME,
@@ -149,7 +149,7 @@ const insertCharacterInfo = async (equipItems, gemItems, accessoryItems, cardIte
             nickname, gemItems
         ]);
 
-        // 캐틱터 카드 SQL
+        // 캐릭터 카드 SQL
         const characteCardSql = `
             INSERT INTO CHARACTER_CARD (
                 NICKNAME,
@@ -166,7 +166,7 @@ const insertCharacterInfo = async (equipItems, gemItems, accessoryItems, cardIte
             nickname, cardItems.name, cardItems.CARDS, cardItems.CARD_SETS
         ]);
 
-        // 캐틱터 앜패 SQL
+        // 캐릭터 앜패 SQL
         const characteArkSql = `
             INSERT INTO CHARACTER_ARKPASSIVE (
                 NICKNAME,
@@ -179,6 +179,19 @@ const insertCharacterInfo = async (equipItems, gemItems, accessoryItems, cardIte
             nickname, arkItems
         ]);
 
+        // 캐릭터 아크그리드
+        const characteArkGridSql = `
+            INSERT INTO CHARACTER_ARKGRID (
+                NICKNAME,
+                ARK_GRID
+            ) VALUES (?, ?)
+            ON DUPLICATE KEY UPDATE
+                ARK_GRID = VALUES(ARK_GRID)
+        `;
+        const [insertArkGrid] = await connection.execute(characteArkGridSql, [
+            nickname, arkGridItems
+        ]);
+
         // 스킬 
         try {
             // const kloaCharacter = `https://api.korlark.com/lostark/characters/${nickname}?renew=true&blocking=true`;
@@ -186,7 +199,7 @@ const insertCharacterInfo = async (equipItems, gemItems, accessoryItems, cardIte
             const responseChar = await axios.get(kloaCharacter, { timeout: 10000 });
             const kloaCharacterData = responseChar.data; // 응답 데이터 저장
 
-            // 캐틱터 스킬 SQL
+            // 캐릭터 스킬 SQL
             const characteSkillSql = `
             INSERT INTO CHARACTER_SKILL (
                 NICKNAME,
@@ -216,7 +229,7 @@ const insertCharacterInfo = async (equipItems, gemItems, accessoryItems, cardIte
             const responseCollect = await axios.get(kloaCollectibles,{ timeout: 10000 });
             const kloaCollectiblesData = responseCollect.data; // 응답 데이터 저장
 
-            // 캐틱터 스킬 SQL
+            // 캐릭터 스킬 SQL
             const characterCollectSql = `
             INSERT INTO CHARACTER_COLLECTION (
                 NICKNAME,
