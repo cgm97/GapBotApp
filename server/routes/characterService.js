@@ -88,7 +88,8 @@ exports.getCharacterInfo = async (req, res, next) => {
       characterData.profile,
       characterData.guild,
       characterData.wisdom,
-      characterData.arkItems
+      characterData.arkItems,
+      characterData.arkGridItems
     );
 
     if (isSuccess) {
@@ -135,7 +136,7 @@ exports.renewCharacterInfo = async (nickName) => {
     const originItemLevelHistory = rows[0]?.ITEM_LEVEL_HISTORY || null;
 
     // 파싱
-    const { equipItems, gemItems, accessoryItems, cardItems, engravings, profile, guild, wisdom, arkItems } = await characterUtil.getCharacterProfile(nickName);
+    const { equipItems, gemItems, accessoryItems, cardItems, engravings, profile, guild, wisdom, arkItems, arkGridItems } = await characterUtil.getCharacterProfile(nickName);
 
     // 히스토리 병합
     if (originItemLevelHistory) {
@@ -145,7 +146,7 @@ exports.renewCharacterInfo = async (nickName) => {
 
     const isSuccess = await characterUtil.insertCharacterInfo(
         equipItems, gemItems, accessoryItems, cardItems,
-        engravings, profile, guild, wisdom, arkItems
+        engravings, profile, guild, wisdom, arkItems, arkGridItems
     );
 
     return isSuccess;
@@ -209,7 +210,8 @@ exports.selectCharacter = async (nickName) => {
 							'skillItems', JSON_OBJECT(
                                 'point', CSK.SKILL_POINT,
                                 'skill', CSK.SKILLS
-                            )
+                            ),
+                            'arkGridItems', CAG.ARK_GRID
                         ) AS characterData,
                          CAST(DATE_FORMAT(CI.LST_DTTI, '%Y-%m-%d %H:%i:%s') AS CHAR) AS last_fetch_date
                     FROM 
@@ -221,6 +223,7 @@ exports.selectCharacter = async (nickName) => {
                     LEFT JOIN CHARACTER_WISDOM CW ON CI.NICKNAME = CW.NICKNAME
                     LEFT JOIN CHARACTER_ARKPASSIVE CAP ON CI.NICKNAME = CAP.NICKNAME
                     LEFT JOIN CHARACTER_SKILL CSK ON CI.NICKNAME = CSK.NICKNAME
+                    LEFT JOIN CHARACTER_ARKGRID CAG ON CI.NICKNAME = CAG.NICKNAME
                     WHERE CI.NICKNAME = ?`;
 
     return await pool.query(query, [nickName]);

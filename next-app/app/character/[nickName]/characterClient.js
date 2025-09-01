@@ -23,6 +23,7 @@ const Character = ({ nickName }) => {
     const [engravings, setEngravings] = useState([]);
     const [cardItems, setCardItems] = useState([]);
     const [skillItems, setSkillItems] = useState([]);
+    const [arkGridItems, setArkGridItems] = useState({});
     const [isLoading, setIsLoading] = useState(false);
     const [isRenewing, setIsRenewing] = useState(false); // 갱신 중 상태 추가
     const [error, setError] = useState(null);
@@ -53,6 +54,7 @@ const Character = ({ nickName }) => {
                 setEngravings(data.engravings || []);
                 setCardItems(data.cardItems || []);
                 setSkillItems(data.skillItems || []);
+                setArkGridItems(data.arkGridItems || {});
             }
         } catch (error) {
             handleError(error);
@@ -220,6 +222,31 @@ const Character = ({ nickName }) => {
                                         <p className="name dark:text-gray-300">{item.abilityLevel}</p>
                                     </div>
                                 )}
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* 아크그리드 정보 영역 */}
+                    <div className="engraving dark:bg-background">
+                        {arkGridItems.slots.map((item, index) => (
+                            <div key={index}>
+                                <img className="engraving-img" src={item.icon} alt={item.name} />
+                                <div
+                                    className={`engraving-ico ${item.grade === "유물"
+                                        ? "orange"
+                                        : item.grade === "전설"
+                                            ? "yellow"
+                                            : item.grade === "영웅"
+                                                ? "puple"
+                                                : ""
+                                        }`}
+                                ></div>
+                                <p className="name dark:text-gray-300">[{item.point}P] {item.name}</p>
+                            </div>
+                        ))}
+                        {arkGridItems.effects.map((item, index) => (
+                            <div key={index}>
+                                <p className="name dark:text-gray-300">Lv.{item.level} {item.name} {item.effect}</p>
                             </div>
                         ))}
                     </div>
