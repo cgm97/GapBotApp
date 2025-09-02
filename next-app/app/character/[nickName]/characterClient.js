@@ -28,6 +28,8 @@ const Character = ({ nickName }) => {
     const [isRenewing, setIsRenewing] = useState(false); // 갱신 중 상태 추가
     const [error, setError] = useState(null);
 
+    const [lastFetchDate, setLastFetchDate] = useState(null);
+    const [minutesAgo, setMinutesAgo] = useState(null);
     const [selectedTab, setSelectedTab] = useState('정보');
 
     // 데이터 불러오기 함수
@@ -55,6 +57,7 @@ const Character = ({ nickName }) => {
                 setCardItems(data.cardItems || []);
                 setSkillItems(data.skillItems || []);
                 setArkGridItems(data.arkGridItems || {});
+                setLastFetchDate(data.lastFetchDate || null);
             }
         } catch (error) {
             handleError(error);
@@ -105,6 +108,19 @@ const Character = ({ nickName }) => {
             setError("서버 오류가 발생했습니다.");
         }
     };
+
+    useEffect(() => {
+        if (lastFetchDate) {
+            const now = new Date();
+            // "2025-09-02 20:30:10" → JS가 이해할 수 있도록 "T" 추가
+            const lastFetch = new Date(lastFetchDate.replace(" ", "T"));
+            const diffMs = now - lastFetch;
+            const diffMinutes = Math.floor(diffMs / (1000 * 60));
+            setMinutesAgo(diffMinutes);
+        }
+    }, [lastFetchDate]);
+
+    const isDisabled = minutesAgo !== null && minutesAgo < 1;
 
     // 로딩 상태
     if (isLoading) {
@@ -166,13 +182,20 @@ const Character = ({ nickName }) => {
 
 
     return (
+
         <div className="character-container">
             <div className="group">
                 {/* 캐릭터 정보 영역 */}
                 <div className="group-info">
                     <div className="character">
                         <img className="character-img" src={profile.IMG_URL} alt="캐릭터 이미지" />
-                        <button className="renew-button" onClick={handleRenew}>갱신하기</button>
+                        <button
+                            className="renew-button"
+                            onClick={handleRenew}
+                            disabled={isDisabled}
+                        >
+                            {isDisabled ? `${minutesAgo}분 전 갱신완료` : "갱신하기"}
+                        </button>
                         <div className="character-info">
                             <p className="character-name dark:text-gray-300">{profile.TITLE !== "없음" ? profile.TITLE : ""}</p>
                             <h1 className="character-name dark:text-gray-300">Lv.{profile.CHARACTER_LEVEL}&nbsp;{profile.NICKNAME} {profile.IS_DONATE === "Y" ? <img src={donatePng} alt={"후원"} className="inline-block align-middle w-5 h-5 ml-1" /> : ""}</h1>
@@ -484,6 +507,9 @@ const Character = ({ nickName }) => {
 
 
                 </div>
+            </div>
+            <div>
+                <AdSense adSlot="1488834693" />
             </div>
         </div>
     );
