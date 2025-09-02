@@ -34,76 +34,83 @@ const updateItemLevelHistory = (origin, current) => {
 };
 
 exports.getCharacterInfo = async (req, res, next) => {
-  try {
-    let { nickName } = req.query;
-    nickName = tryDecodeURIComponent(nickName);
+    try {
+        let { nickName } = req.query;
+        nickName = tryDecodeURIComponent(nickName);
 
-    const referer = req.headers.referer || req.headers.origin || '';
+        const referer = req.headers.referer || req.headers.origin || '';
 
-    logger.info({
-      method: req.method,
-      url: req.url,
-      message: `캐릭터검색: ${nickName}`,
-    });
-
-    const [rows] = await exports.selectCharacter(nickName);
-
-    if (rows.length > 0 && rows[0].characterData?.equipItems) {
-      const characterData = rows[0].characterData;
-      const lastFetch = new Date(rows[0].last_fetch_date);
-      const now = new Date();
-
-      const isOver24Hours = (now - lastFetch) >= 24 * 60 * 60 * 1000;
-
-      if (isOver24Hours && !referer.includes('loagap.com/meta')) {
-        const isSuccess = await exports.renewCharacterInfo(nickName);
         logger.info({
-          method: req.method,
-          url: req.url,
-          message: `캐릭터검색 1일 이전 갱신 : ${isSuccess}`,
+            method: req.method,
+            url: req.url,
+            message: `캐릭터검색: ${nickName}`,
         });
-      }
 
-      return res.status(200).json({
-        ...characterData,
-        lastFetchDate: rows[0].last_fetch_date,
-      });
+        const [rows] = await exports.selectCharacter(nickName);
+
+        if (rows.length > 0 && rows[0].characterData?.equipItems) {
+            const characterData = rows[0].characterData;
+            const lastFetch = new Date(rows[0].last_fetch_date);
+            const now = new Date();
+
+            // const isOver24Hours = (now - lastFetch) >= 24 * 60 * 60 * 1000;
+            const isOver3Minutes = (now - lastFetch) >= 1 * 60 * 1000;
+            if (isOver3Minutes && !referer.includes('loagap.com/meta')) {
+                const isSuccess = await exports.renewCharacterInfo(nickName);
+                logger.info({
+                    method: req.method,
+                    url: req.url,
+                    message: `캐릭터검색 자동 갱신 : ${isSuccess}`,
+                });
+
+                const [renewRows] = await exports.selectCharacter(nickName);
+                const reNewCharacterData = renewRows[0].characterData;
+                return res.status(200).json({
+                    ...reNewCharacterData,
+                    lastFetchDate: renewRows[0].last_fetch_date,
+                });
+            }
+
+            return res.status(200).json({
+                ...characterData,
+                lastFetchDate: rows[0].last_fetch_date,
+            });
+        }
+
+        // DB에 없을 경우 신규 캐릭터 조회 및 저장
+        logger.info({
+            method: req.method,
+            url: req.url,
+            message: `캐릭터검색 DB 존재 x : ${nickName}`,
+        });
+
+        const characterData = await characterUtil.getCharacterProfile(nickName);
+
+        const isSuccess = await characterUtil.insertCharacterInfo(
+            characterData.equipItems,
+            characterData.gemItems,
+            characterData.accessoryItems,
+            characterData.cardItems,
+            characterData.engravings,
+            characterData.profile,
+            characterData.guild,
+            characterData.wisdom,
+            characterData.arkItems,
+            characterData.arkGridItems
+        );
+
+        if (isSuccess) {
+            return res.status(200).json(characterData);
+        }
+
+        const message = '등록되지 않은 캐릭터입니다.';
+        return referer.includes('loagap.com/meta')
+            ? res.status(200).send(message)
+            : res.status(404).send(message);
+
+    } catch (error) {
+        next(new Error(error));
     }
-
-    // DB에 없을 경우 신규 캐릭터 조회 및 저장
-    logger.info({
-      method: req.method,
-      url: req.url,
-      message: `캐릭터검색 DB 존재 x : ${nickName}`,
-    });
-
-    const characterData = await characterUtil.getCharacterProfile(nickName);
-
-    const isSuccess = await characterUtil.insertCharacterInfo(
-      characterData.equipItems,
-      characterData.gemItems,
-      characterData.accessoryItems,
-      characterData.cardItems,
-      characterData.engravings,
-      characterData.profile,
-      characterData.guild,
-      characterData.wisdom,
-      characterData.arkItems,
-      characterData.arkGridItems
-    );
-
-    if (isSuccess) {
-      return res.status(200).json(characterData);
-    }
-
-    const message = '등록되지 않은 캐릭터입니다.';
-    return referer.includes('loagap.com/meta')
-      ? res.status(200).send(message)
-      : res.status(404).send(message);
-
-  } catch (error) {
-    next(new Error(error));
-  }
 };
 
 exports.executeRenew = async (req, res, next) => {
