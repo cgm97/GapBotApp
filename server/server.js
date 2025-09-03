@@ -97,11 +97,20 @@ app.use((req, res, next) => {
 
   // 요청 처리 시작 로그
   const referer = req.headers.referer || req.headers.origin;
+  const botName = req.headers['x-bot-name'];
+
+  // 로그에 찍을 source 결정 (봇이 있으면 botName, 아니면 referer)
+  const source = botName || referer || 'unknown';
+
   logger.info({
     method: req.method,
     url: req.originalUrl,  // 요청 URL
-    message: `[INTERCEPTOR] [${referer}] Request started`
+    message: `[INTERCEPTOR] [${source}] Request started`
   });
+
+  if (botName) {
+    return next();
+  }
 
   // 호스트 전처리
   if (!referer || (!referer.includes('loagap.com') && !referer.includes('localhost') && !referer.includes('google'))) {
