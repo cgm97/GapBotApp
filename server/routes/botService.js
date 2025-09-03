@@ -1017,6 +1017,8 @@ exports.getLopecPoint = async (req, res, next) => {
     msg += `${param.thumbnailUrl}`
   } else {
     msg += "캐릭터 정보가 없습니다."
+    msg += `LOPEC 갱신하기 ▼\n`
+    msg += `${param.thumbnailUrl}`
   }
   res.send(msg);
 };
