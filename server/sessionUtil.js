@@ -380,7 +380,7 @@ const getMarketPrice = async () => {
     const API_URL = "https://developer-lostark.game.onstove.com/markets/items";
 
     const CategoryCodeArray = [
-        { name: "젬", code: 51000, tier: null },
+        { name: "젬", code: 230000, tier: null },
         { name: "강화재료", code: 50010, tier: 3 },
         { name: "강화추가재료", code: 50020, tier: 3 },
         { name: "강화재료", code: 50010, tier: 4 },
@@ -418,12 +418,12 @@ const getMarketPrice = async () => {
 
                 for (const item of response.data.Items) {
                     // 젬만 추출 그리고 등급별로 명칭이 같아 접두어 표시
-                    if(code == 51000 && !item.Name.includes("젬")){
+                    if(code == 230000 && !item.Name.includes("젬")){
                         continue;
                     }
                     marketArr.push({
                         catergory: name,
-                        name: code == 51000 ? `(${item.Grade})${item.Name}` : item.Name,
+                        name: code == 230000 ? `(${item.Grade})${item.Name}` : item.Name,
                         tier: tier,
                         grade: item.Grade,
                         icon: item.Icon,
