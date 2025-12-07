@@ -5,7 +5,7 @@ import Footer from '@/components/Footer';
 import KakaoAdFit from '@/components/KakaoAdFit';
 import { UserProvider } from '@/context/UserContext';  // 경로 확인
 import Script from 'next/script';
-
+import NoticeModalContainer from '@/components/NoticeModalContainer';
 export const viewport = {
   width: "device-width",
   initialScale: 0.5,
@@ -60,6 +60,7 @@ export default function RootLayout({
       <body className="dark:bg-background">
         <div className="bg-background text-foreground min-h-screen">
         <UserProvider>
+          <NoticeModalContainer />
           <div className="wrapper">
             <div className="advertise left">
               {/* <KakaoAdFit unit="DAN-Qnq0ez9rvfuNOCVh" width={160} height={600} disabled={true} /> */}
