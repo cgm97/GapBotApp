@@ -1,9 +1,7 @@
 {
   "version": 2,
-  "builds": [
-    { "src": "next-app/package.json", "use": "@vercel/next" }
-  ],
-  "routes": [
-    { "src": "/(.*)", "dest": "next-app/$1" }
-  ]
+  "framework": "nextjs",
+  "buildCommand": "cd next-app && npm install && npm run build",
+  "outputDirectory": "next-app/.next",
+  "installCommand": "cd next-app && npm install"
 }
