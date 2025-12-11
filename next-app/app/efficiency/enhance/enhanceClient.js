@@ -287,7 +287,7 @@ export default function EnhanceClient({ enhanceData: initialEnhanceData }) {
       </div>
       <div className="flex justify-between items-center mb-4 flex-wrap gap-2">
         <span className="text-xs dark:text-gray-100 italic">
-          재련 계산식 업데이트: 2025-07-29
+          재련 계산식 업데이트: 2025-12-12
         </span>
 
         <div className="flex flex-wrap items-center justify-end gap-2">
