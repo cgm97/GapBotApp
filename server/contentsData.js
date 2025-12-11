@@ -46,50 +46,50 @@ const chaosRewards = [
   // },
 
   // T3 상급 재료
-  {
-    itemLevel: 1580,
-    name: '천공 1단계',
-    rewards: {
-      refined_destruction_stone: 79,
-      refined_guardian_stone: 216.2,
-      radiant_leapstone: 6.2,
-      tier3_jewel: 10,
-      honor_shard: 19913,
-    },
-  },
-  {
-    itemLevel: 1600,
-    name: '천공 2단계',
-    rewards: {
-      refined_destruction_stone: 88,
-      refined_guardian_stone: 257.1,
-      radiant_leapstone: 8.8,
-      tier3_jewel: 11,
-      honor_shard: 20491,
-    },
-  },
-  {
-    itemLevel: 1610,
-    name: '계몽 1단계',
-    rewards: {
-      refined_destruction_stone: 114.7,
-      refined_guardian_stone: 326.7,
-      radiant_leapstone: 11.9,
-      tier3_jewel: 13.8,
-      honor_shard: 24313,
-    },
-  },
-  {
-    itemLevel: 1630,
-    name: '계몽 2단계',
-    rewards: {
-      refined_destruction_stone: 135.1,
-      refined_guardian_stone: 412.1,
-      radiant_leapstone: 15.9,
-      tier3_jewel: 16.9,
-      honor_shard: 26139,
-    },
-  },
+  // {
+  //   itemLevel: 1580,
+  //   name: '천공 1단계',
+  //   rewards: {
+  //     refined_destruction_stone: 79,
+  //     refined_guardian_stone: 216.2,
+  //     radiant_leapstone: 6.2,
+  //     tier3_jewel: 10,
+  //     honor_shard: 19913,
+  //   },
+  // },
+  // {
+  //   itemLevel: 1600,
+  //   name: '천공 2단계',
+  //   rewards: {
+  //     refined_destruction_stone: 88,
+  //     refined_guardian_stone: 257.1,
+  //     radiant_leapstone: 8.8,
+  //     tier3_jewel: 11,
+  //     honor_shard: 20491,
+  //   },
+  // },
+  // {
+  //   itemLevel: 1610,
+  //   name: '계몽 1단계',
+  //   rewards: {
+  //     refined_destruction_stone: 114.7,
+  //     refined_guardian_stone: 326.7,
+  //     radiant_leapstone: 11.9,
+  //     tier3_jewel: 13.8,
+  //     honor_shard: 24313,
+  //   },
+  // },
+  // {
+  //   itemLevel: 1630,
+  //   name: '계몽 2단계',
+  //   rewards: {
+  //     refined_destruction_stone: 135.1,
+  //     refined_guardian_stone: 412.1,
+  //     radiant_leapstone: 15.9,
+  //     tier3_jewel: 16.9,
+  //     honor_shard: 26139,
+  //   },
+  // },
 
   // T4 구간
   {
@@ -151,53 +151,53 @@ const chaosRewards = [
 
 const guardianRewards = [
   // T3 일반
-  {
-    itemLevel: 1490,
-    name: '칼엘리고스',
-    rewards: {
-      destruction_stone: 75,
-      guardian_stone: 226,
-      great_leapstone: 10,
-    },
-  },
-  {
-    itemLevel: 1540,
-    name: '하누마탄',
-    rewards: {
-      destruction_stone: 101,
-      guardian_stone: 306,
-      great_leapstone: 14,
-    },
-  },
+  // {
+  //   itemLevel: 1490,
+  //   name: '칼엘리고스',
+  //   rewards: {
+  //     destruction_stone: 75,
+  //     guardian_stone: 226,
+  //     great_leapstone: 10,
+  //   },
+  // },
+  // {
+  //   itemLevel: 1540,
+  //   name: '하누마탄',
+  //   rewards: {
+  //     destruction_stone: 101,
+  //     guardian_stone: 306,
+  //     great_leapstone: 14,
+  //   },
+  // },
 
-  // T3 상급
-  {
-    itemLevel: 1580,
-    name: '소나벨',
-    rewards: {
-      refined_destruction_stone: 68,
-      refined_guardian_stone: 204,
-      radiant_leapstone: 8,
-    },
-  },
-  {
-    itemLevel: 1610,
-    name: '가르가디스',
-    rewards: {
-      refined_destruction_stone: 103,
-      refined_guardian_stone: 301,
-      radiant_leapstone: 12,
-    },
-  },
-  {
-    itemLevel: 1630,
-    name: '베스칼',
-    rewards: {
-      refined_destruction_stone: 166,
-      refined_guardian_stone: 506,
-      radiant_leapstone: 24,
-    },
-  },
+  // // T3 상급
+  // {
+  //   itemLevel: 1580,
+  //   name: '소나벨',
+  //   rewards: {
+  //     refined_destruction_stone: 68,
+  //     refined_guardian_stone: 204,
+  //     radiant_leapstone: 8,
+  //   },
+  // },
+  // {
+  //   itemLevel: 1610,
+  //   name: '가르가디스',
+  //   rewards: {
+  //     refined_destruction_stone: 103,
+  //     refined_guardian_stone: 301,
+  //     radiant_leapstone: 12,
+  //   },
+  // },
+  // {
+  //   itemLevel: 1630,
+  //   name: '베스칼',
+  //   rewards: {
+  //     refined_destruction_stone: 166,
+  //     refined_guardian_stone: 506,
+  //     radiant_leapstone: 24,
+  //   },
+  // },
 
   // T4
   {
@@ -474,14 +474,14 @@ const raidRewards = [
       refined_guardian_stone: 1140,
       radiant_leapstone: 11,
       honor_shard: 11700,
-      gold: 7300,
+      gold: 6100,
     },
     extraRewards: {
       refined_destruction_stone: 850,
       refined_guardian_stone: 1700,
       radiant_leapstone: 32,
       honor_shard: 10690,
-      gold: 1220,
+      gold: 1010,
     },
   },
   {
@@ -493,14 +493,14 @@ const raidRewards = [
       fate_guardian_stone: 920,
       fate_leapstone: 5,
       fate_shard: 6500,
-      gold: 8800
+      gold: 7200
     },
     extraRewards: {
       fate_destruction_stone: 770,
       fate_guardian_stone: 1540,
       fate_leapstone: 19,
       fate_shard: 5170,
-      gold: 2880
+      gold: 2350
     },
   },
   {
@@ -512,7 +512,7 @@ const raidRewards = [
       fate_guardian_stone: 960,
       fate_leapstone: 5,
       fate_shard: 7000,
-      gold: 8800,
+      gold: 7200,
     },
     extraRewards: {
       fate_destruction_stone: 770,
@@ -531,14 +531,14 @@ const raidRewards = [
       fate_guardian_stone: 2120,
       fate_leapstone: 9,
       fate_shard: 8000,
-      gold: 15500
+      gold: 11500
     },
     extraRewards: {
       fate_destruction_stone: 1030,
       fate_guardian_stone: 2060,
       fate_leapstone: 29,
       fate_shard: 9810,
-      gold: 3430
+      gold: 2530
     },
   },
   {
@@ -550,14 +550,14 @@ const raidRewards = [
       fate_guardian_stone: 2480,
       fate_leapstone: 13,
       fate_shard: 9600,
-      gold: 24500
+      gold: 18000
     },
     extraRewards: {
       fate_destruction_stone: 1790,
       fate_guardian_stone: 3580,
       fate_leapstone: 59,
       fate_shard: 16490,
-      gold: 9520
+      gold: 5970
     },
   },
   {
@@ -569,14 +569,14 @@ const raidRewards = [
       fate_guardian_stone: 2360,
       fate_leapstone: 5,
       fate_shard: 8600,
-      gold: 21500
+      gold: 16500
     },
     extraRewards: {
       fate_destruction_stone: 1600,
       fate_guardian_stone: 3200,
       fate_leapstone: 42,
       fate_shard: 15050,
-      gold: 8070
+      gold: 5540
     },
   },
   {
@@ -588,14 +588,14 @@ const raidRewards = [
       fate_guardian_stone: 2680,
       fate_leapstone: 15,
       fate_shard: 10600,
-      gold: 30500
+      gold: 23000
     },
     extraRewards: {
       fate_destruction_stone: 2350,
       fate_guardian_stone: 4700,
       fate_leapstone: 80,
       fate_shard: 22000,
-      gold: 11700
+      gold: 7500
     },
   },
   {
@@ -607,14 +607,14 @@ const raidRewards = [
       fate_guardian_stone: 2480,
       fate_leapstone: 14,
       fate_shard: 9800,
-      gold: 28000
+      gold: 21000
     },
     extraRewards: {
       fate_destruction_stone: 1960,
       fate_guardian_stone: 3920,
       fate_leapstone: 64,
       fate_shard: 17800,
-      gold: 9800
+      gold: 7010
     },
   },
   {
@@ -626,14 +626,14 @@ const raidRewards = [
       fate_guardian_stone: 3200,
       fate_leapstone: 20,
       fate_shard: 13000,
-      gold: 38000
+      gold: 27000
     },
     extraRewards: {
       fate_destruction_stone: 4050,
       fate_guardian_stone: 8100,
       fate_leapstone: 131,
       fate_shard: 33700,
-      gold: 12600
+      gold: 8350
     },
   },
 
@@ -716,26 +716,63 @@ const raidRewards = [
       gold: 16640
     },
   },
-
-  //   {
-  //   itemLevel: 1740,
-  //   name: '종막 최후의 날',
-  //   difficulty: '더퍼스트',
-  //   rewards: {
-  //     fate_destruction_stone: 0,
-  //     fate_guardian_stone: 0,
-  //     fate_leapstone: 0,
-  //     fate_shard: 0,
-  //     gold: 52000
-  //   },
-  //   extraRewards: {
-  //     fate_destruction_stone: 0,
-  //     fate_guardian_stone: 0,
-  //     fate_leapstone: 0,
-  //     fate_shard: 0,
-  //     gold: 0
-  //   },
-  // },
+    {
+    itemLevel: 1710,
+    name: '고통의 마녀, 세르카',
+    difficulty: '노말',
+    rewards: {
+      fate_destruction_stone: 0,
+      fate_guardian_stone: 0,
+      fate_leapstone: 0,
+      fate_shard: 0,
+      gold: 35000
+    },
+    extraRewards: {
+      fate_destruction_stone: 0,
+      fate_guardian_stone: 0,
+      fate_leapstone: 0,
+      fate_shard: 0,
+      gold: 0
+    },
+  },
+  {
+    itemLevel: 1730,
+    name: '고통의 마녀, 세르카',
+    difficulty: '하드',
+    rewards: {
+      fate_destruction_stone: 0,
+      fate_guardian_stone: 0,
+      fate_leapstone: 0,
+      fate_shard: 0,
+      gold: 44000
+    },
+    extraRewards: {
+      fate_destruction_stone: 0,
+      fate_guardian_stone: 0,
+      fate_leapstone: 0,
+      fate_shard: 0,
+      gold: 0
+    },
+  },
+  {
+    itemLevel: 1740,
+    name: '고통의 마녀, 세르카',
+    difficulty: '하드',
+    rewards: {
+      fate_destruction_stone: 0,
+      fate_guardian_stone: 0,
+      fate_leapstone: 0,
+      fate_shard: 0,
+      gold: 54000
+    },
+    extraRewards: {
+      fate_destruction_stone: 0,
+      fate_guardian_stone: 0,
+      fate_leapstone: 0,
+      fate_shard: 0,
+      gold: 0
+    },
+  },
 ];
 
 
