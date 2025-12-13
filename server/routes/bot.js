@@ -662,4 +662,5 @@ router.get('/accessory', botService.getAccessory);
 router.get('/loavesting/calculator', botService.executeLoavestCalc);
 router.get('/lostBuilds', botService.getlostBuilds);
 router.get('/lopec', botService.getLopecPoint);
+router.get('/loaup', botService.getLoaup);
 module.exports = router;

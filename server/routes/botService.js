@@ -1397,3 +1397,56 @@ exports.getlostBuilds = async (req, res, next) => {
   }
 
 };
+
+// 로아업
+exports.getLoaup = async (req, res, next) => {
+
+  const { nickName } = req.query;
+
+  const [rows] = await characterService.selectCharacter(nickName);
+  if (rows.length > 0) {
+  }
+  else {
+    return res.status(500).send("LOAGAP에서 우선 캐릭터 조회를 해주세요.");
+  }
+  const subJob = rows[0].characterData.profile.SUBJOB;
+console.log(subJob)
+
+  var API_URL = `https://loaup.com/api/efficiency/${nickName}`;
+  if(subJob == "서폿"){
+    API_URL = `https://loaup.com/api/efficiency/${nickName}%3F쫀지`;
+  }
+
+  try {
+    const loaup = await axios.get(API_URL, {
+      headers: {
+        accept: 'application/json'
+      },
+    });
+
+    const topEfficiencies = loaup.data.result.topEfficiencies;
+    console.log(topEfficiencies)
+    let msg = `❚ ${nickName}님 스펙업 효율\n\n`;
+    msg += "❚ TOP 5 효율 리스트\n";
+    var idx = 1;
+    topEfficiencies.forEach(item => {
+      if(item.type == "accessory"){
+        msg += `[${idx}] ${item.name} ${item.details}\n`
+      } else {
+        msg += `[${idx}] ${item.name}\n`
+      }
+      idx++;
+    })
+
+    msg += `\n로아업 바로가기 ▼`
+    msg += `\nhttps://loaup.com/character/${nickName}`
+
+    // 응답 반환
+    return res.status(200).send(
+      msg
+    );
+  } catch (e) {
+    return res.status(500).send(`캐릭터에 오류가 발생했거나, 갱신이 필요합니다.\nhttps://loaup.com/character/${nickName}`);
+  }
+
+};
