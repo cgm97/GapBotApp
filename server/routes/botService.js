@@ -1410,7 +1410,6 @@ exports.getLoaup = async (req, res, next) => {
     return res.status(500).send("LOAGAP에서 우선 캐릭터 조회를 해주세요.");
   }
   const subJob = rows[0].characterData.profile.SUBJOB;
-console.log(subJob)
 
   var API_URL = `https://loaup.com/api/efficiency/${nickName}`;
   if(subJob == "서폿"){
@@ -1425,7 +1424,7 @@ console.log(subJob)
     });
 
     const topEfficiencies = loaup.data.result.topEfficiencies;
-    console.log(topEfficiencies)
+
     let msg = `❚ ${nickName}님 스펙업 효율\n\n`;
     msg += "❚ TOP 5 효율 리스트\n";
     var idx = 1;
