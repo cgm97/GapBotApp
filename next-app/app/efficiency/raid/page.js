@@ -4,7 +4,7 @@ import AdSense from '@/components/Adsense';
 async function getRaidData() {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/price/raid`, {
-      next: { revalidate: 10 },
+      next: { revalidate: 1800 },
       headers: {
         referer: "https://loagap.com"
       }, // ISR or SSR // ISR or SSR

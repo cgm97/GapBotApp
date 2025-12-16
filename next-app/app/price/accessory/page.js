@@ -6,7 +6,7 @@ import sampleData from './data.json';
 async function getAccessoryPriceData() {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/price/accessory`, {
-      next: { revalidate: 60 },
+      next: { revalidate: 600 },
       headers: {
         referer: "https://loagap.com/SSR"
       }

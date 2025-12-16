@@ -5,7 +5,7 @@ async function getEnhanceData() {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/price/enhance`, {
       method: 'POST',
-      next: { revalidate: 10 },
+      next: { revalidate: 600 },
       headers: {
         referer: "https://loagap.com/SSR"
       }, // ISR or SSR
