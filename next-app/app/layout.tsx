@@ -60,7 +60,7 @@ export default function RootLayout({
       <body className="dark:bg-background">
         <div className="bg-background text-foreground min-h-screen">
         <UserProvider>
-          <NoticeModalContainer />
+          {/* <NoticeModalContainer /> */}
           <div className="wrapper">
             <div className="advertise left">
               {/* <KakaoAdFit unit="DAN-Qnq0ez9rvfuNOCVh" width={160} height={600} disabled={true} /> */}
