@@ -60,7 +60,10 @@ const MainPages = () => {
 
   return (
     <>
-      <div className="relative w-full max-w-screen-xl mx-auto aspect-[23/5] ad-content dark:bg-gray-500">
+      <div
+  className="relative mx-auto ad-content dark:bg-gray-500"
+  style={{ width: "1155px", height: "200px" }}
+>
         {/* 배너 이미지 */}
         <img
           src="/img/banner/LOAGAP배너.png"

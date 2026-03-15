@@ -36,7 +36,11 @@ const Top = () => {
           빈틈봇소통방(분양)
         </a>
         &nbsp;&nbsp;
-        <Link href="/donate">후원</Link>
+        <Link href="/donate">후원하기</Link>
+        &nbsp;&nbsp;
+        <a href="https://superb-antler-e73.notion.site/LOAGAP-324c5e5dcbb180b6a0ddd082aca7957c" target="_blank" rel="noopener noreferrer">
+          광고배너문의
+        </a>
       </div>
 
       <div className="top-center">
