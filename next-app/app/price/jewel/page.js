@@ -1,6 +1,7 @@
 
 import JewelPage from './jewelClient';
 import AdSense from '@/components/Adsense';
+import Banner from "@/components/Banner";
 
 async function getJewelsPriceData() {
   const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/price/jewel`, {
@@ -39,9 +40,10 @@ export default async function Page() {
     <div className="bg-background text-foreground min-h-screen">
       <div className="container-patch">
         <h2 className="dark:text-gray-300">보석시세 / 보석차트</h2>
-        <div>
+        {/* <div>
           <AdSense adSlot="1488834693" />
-        </div>
+        </div> */}
+        <Banner img="/img/banner/banner_0315_800_200.jpg" link="https://discord.com/invite/8grfVXvHxs"/>
         <JewelPage jewelsPrice={jewelsPrice} jewelPriceLastUpdate={jewelPriceLastUpdate} />
       </div>
     </div>

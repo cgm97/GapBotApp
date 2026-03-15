@@ -33,14 +33,16 @@ const Top = () => {
       <div className="top-left">
         
         <a href="https://open.kakao.com/o/g6Abem1g" target="_blank" rel="noopener noreferrer">
-          빈틈봇소통방(분양)
+          빈틈봇(분양)
         </a>
         &nbsp;&nbsp;
-        <Link href="/donate">후원하기</Link>
-        &nbsp;&nbsp;
+        
         <a href="https://superb-antler-e73.notion.site/LOAGAP-324c5e5dcbb180b6a0ddd082aca7957c" target="_blank" rel="noopener noreferrer">
-          광고배너문의
+          광고배너안내
         </a>
+
+        &nbsp;&nbsp;
+        <Link href="/donate">후원</Link>
       </div>
 
       <div className="top-center">

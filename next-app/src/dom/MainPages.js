@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Island from '@/components/Island';
 import KakaoAdFit from '@/components/KakaoAdFit';
 import AdSense from '@/components/Adsense';
+import Banner from "@/components/Banner";
 
 const MainPages = () => {
   const [noticeData, setNoticeData] = useState([]);
@@ -64,25 +65,9 @@ const MainPages = () => {
   className="relative mx-auto ad-content dark:bg-gray-500"
   style={{ width: "1155px", height: "100px" }}
 > */}
-<div className="relative w-full max-w-screen-xl mx-auto aspect-[23/5] ad-content dark:bg-gray-500">
-        {/* 배너 이미지 */}
-        <img
-          src="/img/banner/LOAGAP배너.png"
-          alt="광고 배너"
-          className="w-full h-full object-cover rounded"
-        />
 
-        {/* 배너 문의 버튼 */}
-        {/* <a
-          href="https://open.kakao.com/o/svYJKm1g"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="absolute top-2 right-2 text-xs bg-white/80 text-gray-100 px-2 py-1 rounded hover:bg-white shadow z-20"
-        >
-          📢 배너 문의
-        </a> */}
-      </div>
-
+      {/* 배너 이미지 */}
+      <Banner img="/img/banner/banner_0315_1150_200.jpg" link="https://discord.com/invite/8grfVXvHxs" maxWidth="1150" showContact="true" />
       <Island />
 
       <div className="ad-content dark:bg-gray-500">
