@@ -45,10 +45,10 @@ export default async function Page() {
     <div className="bg-background text-foreground min-h-screen">
       <div className="container-patch">
         <h2 className="dark:text-gray-300">젬 / 강화 재련 재료 / 생활 재료 시세 및 차트</h2>
-        {/* <div>
+        <div>
           <AdSense adSlot="1488834693" />
-        </div> */}
-        <Banner img="/img/banner/banner_0315_800_200.jpg" link="https://discord.com/invite/8grfVXvHxs"/>
+        </div>
+        {/* <Banner img="/img/banner/banner_0315_800_200.jpg" link="https://discord.com/invite/8grfVXvHxs"/> */}
         <MarketPage marketsPrice={marketsPrice} marketPriceLastUpdate={marketPriceLastUpdate} />
       </div>
     </div>

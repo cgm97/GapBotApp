@@ -47,10 +47,10 @@ export default async function Page() {
     <div className="bg-background text-foreground min-h-screen">
       <div className="container-patch">
         <h2 className="dark:text-gray-300">악세시세 / 악세차트</h2>
-        {/* <div>
+        <div>
           <AdSense adSlot="1488834693" />
-        </div> */}
-        <Banner img="/img/banner/banner_0315_800_200.jpg" link="https://discord.com/invite/8grfVXvHxs"/>
+        </div>
+        {/* <Banner img="/img/banner/banner_0315_800_200.jpg" link="https://discord.com/invite/8grfVXvHxs"/> */}
         <AccessoryPage accessorysPrice={accessorysPrice} accessoryLastUpdate={accessoryPriceLastUpdate} />
       </div>
     </div>

@@ -67,7 +67,7 @@ const MainPages = () => {
 > */}
 
       {/* 배너 이미지 */}
-      <Banner img="/img/banner/banner_0315_1150_200.jpg" link="https://discord.com/invite/8grfVXvHxs" maxWidth="1150" showContact="true" />
+      <Banner img="/img/banner/LOAGAP배너.png" link="" maxWidth="1150" showContact="true" />
       <Island />
 
       <div className="ad-content dark:bg-gray-500">
